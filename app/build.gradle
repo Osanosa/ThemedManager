@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.firebase-perf'
 }
 
 android {
@@ -10,9 +12,9 @@ android {
     defaultConfig {
         applicationId "pro.themed.manager"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
-        versionName "0.1.2"
+        versionName "0.1.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -27,8 +29,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility "11"
+        targetCompatibility "11"
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -44,6 +46,12 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
+    }
 }
 
 dependencies {
@@ -55,6 +63,9 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation 'androidx.compose.material:material:1.3.0'
     implementation 'androidx.browser:browser:1.4.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:21.3.0'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.2.0'
+    implementation 'com.google.android.gms:play-services-ads:21.3.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
