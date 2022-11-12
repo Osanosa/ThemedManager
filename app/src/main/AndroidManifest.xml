@@ -5,10 +5,10 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/themed_dev_logo_00000"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/themed_dev_logo_00000"
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager"
         tools:targetApi="31">

@@ -1,6 +1,12 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
     ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager
@@ -17,6 +23,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,34 +35,141 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.Navigation
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.jaredrummler.ktsh.Shell
+import pro.themed.manager.ui.theme.*
+
+
+@get:Composable
+val Colors.bordercol: Color
+    get() = if (isLight) borderLight else borderDark
+val Colors.cardcol: Color
+    get() = if (isLight) backgroundLight else backgroundDark
+
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
-            ThemedManagerTheme()
+            ThemedManagerTheme {
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
+                ) {
+                    Main()
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
+   // @Preview
+    @Composable
+    fun Main() {
+        Column(
+        ) {
+
+
+            val navController = rememberNavController()
+
+            Scaffold(
+                topBar = { TopAppBar()},
+                bottomBar = { BottomNavigationBar(navController) }
+            ) {
+                Navigation(navController)
+            }
+            ColorsTab()
         }
     }
 }
+
+private operator fun Navigation.invoke(navController: NavHostController) {
+
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val items = listOf(
+        NavigationItems.ColorsTab,
+        NavigationItems.IconsTab)
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.background,
+        contentColor = Color.Black
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        items.forEach { items ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = items.icon),
+                        contentDescription = items.title
+                    )
+                },
+                label = { Text(text = items.title) },
+                selectedContentColor = Color.Black,
+                unselectedContentColor = Color.Black.copy(0.4f),
+                alwaysShowLabel = true,
+                selected = currentRoute == items.route,
+                onClick = {
+                    navController.navigate(items.route) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route = route) {
+                                saveState = true
+                            }
+                        }
+
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+
+                }
+            )
+        }
+    }
+
+}
+
+@Composable
+fun Navigation(navController: NavHostController){
+
+    NavHost(navController, startDestination = NavigationItems.ColorsTab.route){
+
+        composable(NavigationItems.ColorsTab.route){
+            ColorsTab()
+        }
+
+        composable(NavigationItems.IconsTab.route){
+            IconsTab()
+        }
+    }
+
+}
+
 
 @Composable
 fun InfoCard() {
     Card(
         border = BorderStroke(
-            width = 1.dp, color = colorResource(id = R.color.grey_outline)
+            width = 1.dp, color = MaterialTheme.colors.bordercol
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -61,7 +177,9 @@ fun InfoCard() {
             .padding(8.dp)
             .padding(top = 0.dp),
         elevation = (0.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+                backgroundColor = MaterialTheme.colors.cardcol
+
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
@@ -72,40 +190,57 @@ fun InfoCard() {
 }
 
 @Composable
-fun ThemedBar() {
-    TopAppBar(title = { Text("Themed Manager") }, elevation = 24.dp, modifier = Modifier.wrapContentHeight(), actions = {
-        val context = LocalContext.current
-        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
+fun TopAppBar() {
+    var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-        IconButton(onClick = { context.startActivity(webIntent) }) {
-            Image(
-                painter = painterResource(R.drawable.telegram_svgrepo_com),
-                contentDescription = "Telegram support group"
-            )
-        }
+    TopAppBar(
+        title = { Text("Themed Manager") },
+        backgroundColor = MaterialTheme.colors.cardcol,
+        actions = {
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.FavoriteBorder, contentDescription = "list")
+            }
 
-        val context1 = LocalContext.current
-        val webIntent1 = Intent(
-            Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
-        )
+            IconButton(onClick = { showMenu = !showMenu }) {
+                Icon(Icons.Default.MoreVert, contentDescription = "list")
+            }
 
-        IconButton(onClick = { context1.startActivity(webIntent1) }) {
-            Image(
-                painter = painterResource(R.drawable.iconmonstr_github_1),
-                contentDescription = null
-            )
-        }
+            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                val webIntent =
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
+                val webIntent1 = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
+                )
+                val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
 
-        val context2 = LocalContext.current
-        val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
+                DropdownMenuItem(onClick = { context.startActivity(webIntent) }) {
+                    Image(
+                        painter = painterResource(R.drawable.telegram_svgrepo_com),
+                        contentDescription = "Telegram support group"
+                    )
+                }
 
-        IconButton(onClick = { context2.startActivity(webIntent2) }) {
-            Image(
-                painter = painterResource(R.drawable.baseline_language_24),
-                contentDescription = null
-            )
-        }
-    })
+                DropdownMenuItem(onClick = { context.startActivity(webIntent1) }) {
+                    Row {
+                        Image(
+                            painter = painterResource(R.drawable.iconmonstr_github_1),
+                            contentDescription = null
+                        )
+                        Text(text = "GitHub")
+                    }
+                }
+
+
+                DropdownMenuItem(onClick = { context.startActivity(webIntent2) }) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_language_24),
+                        contentDescription = null
+                    )
+                }
+            }
+        })
 }
 
 fun resetAccents() {
@@ -248,14 +383,16 @@ fun resetAccentsDark() {
 
 @Composable
 fun AccentsCard() {
+
     Card(
-        border = BorderStroke(width = 1.dp, color = colorResource(id = R.color.grey_outline)),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(8.dp),
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp),
         elevation = (0.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
     ) {
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 8
 
@@ -273,7 +410,9 @@ fun AccentsCard() {
                     text = "Accents",
                     fontSize = 24.sp
                 )
-                IconButton(onClick = { resetAccents() }) {
+                IconButton(onClick = {
+                    resetAccents()
+                }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
                         contentDescription = null
@@ -620,13 +759,14 @@ fun AccentsCard() {
 @Composable
 fun AccentsDarkCard() {
     Card(
-        border = BorderStroke(width = 1.dp, color = colorResource(id = R.color.grey_outline)),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(8.dp),
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp),
         elevation = (0.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
     ) {
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 8
 
@@ -1013,24 +1153,91 @@ fun AdvertView(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
-@Composable
-fun ThemedManagerTheme() {
-    Column {
-        ThemedBar()
-        Surface(
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                AdvertView()
-                AccentsCard()
-                AccentsDarkCard()
-                InfoCard()
 
-            }
+@Composable
+fun ColorsTab() {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol) {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AdvertView()
+            AccentsCard()
+            AccentsDarkCard()
+            InfoCard()
         }
 
     }
 
+
 }
+@Composable
+fun IconsTab() {
+    Surface( color = MaterialTheme.colors.cardcol) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AdvertView()
+            QSTileCard()
+            InfoCard()
+
+        }
+    }
+
+}
+@Preview
+@Composable
+fun QSTileCard() {
+
+        Card(
+            border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(8.dp),
+            elevation = (0.dp),
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = MaterialTheme.colors.cardcol
+        ) {
+            val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
+
+            var expanded by remember { mutableStateOf(true) }
+            Column(modifier = Modifier.clickable { expanded = !expanded }) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .padding(start = 8.dp),
+                        text = "QSTiles",
+                        fontSize = 24.sp
+                    )
+                    IconButton(onClick = {
+                        resetQSTiles()
+                    }) {
+                        Image(
+                            painter = painterResource(R.drawable.restart_alt_48px),
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                Divider(thickness = 1.dp)
+                AnimatedVisibility(expanded) {
+                    Surface {
+                        Column {
+                            Row() {
+                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(testdp.dp)) {
+                                    Image(painter = , contentDescription = )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+fun resetQSTiles() {
+    TODO("Not yet implemented")
+}
+
 
