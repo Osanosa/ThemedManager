@@ -5,6 +5,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -14,8 +16,8 @@ val DarkColorPalette = darkColors(
 )
 
 val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
+    primary = Color.Transparent,
+    primaryVariant = Color.Transparent,
     background = backgroundLight,
 surface = backgroundLight
 
@@ -46,4 +48,16 @@ fun ThemedManagerTheme(
         shapes = Shapes,
         content = content
     )
+
+    val systemUiController = rememberSystemUiController()
+    if(darkTheme){
+        systemUiController.setSystemBarsColor(
+            color = backgroundDark
+        )
+    }else{
+        systemUiController.setSystemBarsColor(
+            color = backgroundLight
+        )
+}
+
 }

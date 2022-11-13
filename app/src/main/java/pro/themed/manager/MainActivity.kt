@@ -24,8 +24,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,12 +54,13 @@ import com.google.android.gms.ads.AdView
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.*
 
-
 @get:Composable
 val Colors.bordercol: Color
     get() = if (isLight) borderLight else borderDark
 val Colors.cardcol: Color
     get() = if (isLight) backgroundLight else backgroundDark
+val Colors.textcol: Color
+    get() = if (isLight) backgroundDark else backgroundLight
 
 
 class MainActivity : ComponentActivity() {
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
-   // @Preview
+ //   @Preview
     @Composable
     fun Main() {
         Column(
@@ -89,13 +90,16 @@ class MainActivity : ComponentActivity() {
 
             val navController = rememberNavController()
 
-            Scaffold(
+            Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
                 topBar = { TopAppBar()},
                 bottomBar = { BottomNavigationBar(navController) }
             ) {
-                Navigation(navController)
+                Box {
+                    PaddingValues(bottom = 200.dp)
+                    Navigation(navController)
+                }
             }
-            ColorsTab()
+            //ColorsTab()
         }
     }
 }
@@ -110,8 +114,8 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationItems.ColorsTab,
         NavigationItems.IconsTab)
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background,
-        contentColor = Color.Black
+        backgroundColor = MaterialTheme.colors.cardcol,
+        contentColor = MaterialTheme.colors.textcol, elevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -125,8 +129,8 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 label = { Text(text = items.title) },
-                selectedContentColor = Color.Black,
-                unselectedContentColor = Color.Black.copy(0.4f),
+                selectedContentColor = MaterialTheme.colors.textcol,
+                unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
                 alwaysShowLabel = true,
                 selected = currentRoute == items.route,
                 onClick = {
@@ -176,7 +180,6 @@ fun InfoCard() {
             .wrapContentHeight()
             .padding(8.dp)
             .padding(top = 0.dp),
-        elevation = (0.dp),
         shape = RoundedCornerShape(8.dp),
                 backgroundColor = MaterialTheme.colors.cardcol
 
@@ -189,21 +192,22 @@ fun InfoCard() {
     }
 }
 
+//@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun TopAppBar() {
     var showMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    TopAppBar(
+    TopAppBar(elevation = 0.dp,
         title = { Text("Themed Manager") },
         backgroundColor = MaterialTheme.colors.cardcol,
         actions = {
             IconButton(onClick = {}) {
-                Icon(Icons.Default.FavoriteBorder, contentDescription = "list")
+                Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
 
             IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "list")
+                Icon(Icons.Default.Info, contentDescription = "list")
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -242,6 +246,7 @@ fun TopAppBar() {
             }
         })
 }
+
 
 fun resetAccents() {
     Shell.SU.run("cmd overlay disable themed.accents.MaterialPinkA700")
@@ -420,7 +425,7 @@ fun AccentsCard() {
                 }
             }
 
-            Divider(thickness = 1.dp)
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
             AnimatedVisibility(expanded) {
                 Surface {
                     Column {
@@ -792,7 +797,7 @@ fun AccentsDarkCard() {
                 }
             }
 
-            Divider(thickness = 1.dp)
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
             AnimatedVisibility(expanded) {
                 Surface {
                     Column {
@@ -1153,10 +1158,12 @@ fun AdvertView(modifier: Modifier = Modifier) {
     }
 }
 
-
+//@Preview
 @Composable
 fun ColorsTab() {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = 56.dp), color = MaterialTheme.colors.cardcol) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AdvertView()
             AccentsCard()
@@ -1170,7 +1177,9 @@ fun ColorsTab() {
 }
 @Composable
 fun IconsTab() {
-    Surface( color = MaterialTheme.colors.cardcol) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = 56.dp), color = MaterialTheme.colors.cardcol) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AdvertView()
             QSTileCard()
@@ -1180,7 +1189,8 @@ fun IconsTab() {
     }
 
 }
-@Preview
+
+@Preview()
 @Composable
 fun QSTileCard() {
 
@@ -1220,14 +1230,30 @@ fun QSTileCard() {
                     }
                 }
 
-                Divider(thickness = 1.dp)
+                Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
                 AnimatedVisibility(expanded) {
                     Surface {
                         Column {
                             Row() {
-                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(testdp.dp)) {
-                                    Image(painter = , contentDescription = )
+                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
+                                    Image( modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                        painter = painterResource(R.drawable.circlewithdualtone), contentDescription = "CirclewithDualTone")
                                 }
+                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
+                                    Image( modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                        painter = painterResource(R.drawable.circlewithgradient), contentDescription = "CirclewithDualTone")
+                                }
+                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
+                                    Image( modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                        painter = painterResource(R.drawable.cookie), contentDescription = "CirclewithDualTone",)
+                                }
+
                             }
                         }
                     }
