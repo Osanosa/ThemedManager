@@ -6,7 +6,7 @@
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager
@@ -30,17 +30,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigation
@@ -48,9 +44,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.ui.theme.*
 
@@ -81,19 +74,17 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
- //   @Preview
+    //   @Preview
     @Composable
     fun Main() {
-        Column(
-        ) {
+        Column {
 
 
             val navController = rememberNavController()
 
             Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
-                topBar = { TopAppBar()},
-                bottomBar = { BottomNavigationBar(navController) }
-            ) {
+                topBar = { TopAppBar() },
+                bottomBar = { BottomNavigationBar(navController) }) {
                 Box {
                     PaddingValues(bottom = 200.dp)
                     Navigation(navController)
@@ -111,23 +102,22 @@ private operator fun Navigation.invoke(navController: NavHostController) {
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        NavigationItems.ColorsTab,
-        NavigationItems.IconsTab)
+        NavigationItems.ColorsTab, NavigationItems.IconsTab
+    )
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.cardcol,
-        contentColor = MaterialTheme.colors.textcol, elevation = 0.dp
+        contentColor = MaterialTheme.colors.textcol,
+        elevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach { items ->
-            BottomNavigationItem(
-                icon = {
-                    Icon(
-                        painter = painterResource(id = items.icon),
-                        contentDescription = items.title
-                    )
-                },
+            BottomNavigationItem(icon = {
+                Icon(
+                    painter = painterResource(id = items.icon), contentDescription = items.title
+                )
+            },
                 label = { Text(text = items.title) },
                 selectedContentColor = MaterialTheme.colors.textcol,
                 unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
@@ -145,30 +135,29 @@ fun BottomNavigationBar(navController: NavController) {
                         restoreState = true
                     }
 
-                }
-            )
+                })
         }
     }
 
 }
 
 @Composable
-fun Navigation(navController: NavHostController){
+fun Navigation(navController: NavHostController) {
 
-    NavHost(navController, startDestination = NavigationItems.ColorsTab.route){
+    NavHost(navController, startDestination = NavigationItems.ColorsTab.route) {
 
-        composable(NavigationItems.ColorsTab.route){
+        composable(NavigationItems.ColorsTab.route) {
             ColorsTab()
         }
 
-        composable(NavigationItems.IconsTab.route){
+        composable(NavigationItems.IconsTab.route) {
             IconsTab()
         }
     }
 
 }
 
-
+//@Preview
 @Composable
 fun InfoCard() {
     Card(
@@ -180,14 +169,13 @@ fun InfoCard() {
             .wrapContentHeight()
             .padding(8.dp)
             .padding(top = 0.dp),
-        shape = RoundedCornerShape(8.dp),elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = (0.dp),
         backgroundColor = MaterialTheme.colors.cardcol
     ) {
         Text(
             modifier = Modifier.padding(12.dp),
-            text = "Please note that on older devices updating systemUI can take up to 30s. " +
-                    "It is recommended that you'd install bootloop protector module. " +
-                    "\r\nPlease report testing to telegram support group.",
+            text = "Please note that on older devices updating systemUI can take up to 30s. " + "It is recommended that you'd install bootloop protector module. " + "\r\nPlease report testing to telegram support group.",
             fontSize = 14.sp
         )
     }
@@ -215,8 +203,7 @@ fun TopAppBar() {
                 val webIntent =
                     Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
                 val webIntent1 = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
+                    Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
                 )
                 val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
 
@@ -1134,39 +1121,16 @@ fun AccentsDarkCard() {
 }
 
 
-@SuppressLint("VisibleForTests")
-@Composable
-fun AdvertView(modifier: Modifier = Modifier) {
-    val isInEditMode = LocalInspectionMode.current
-    if (isInEditMode) {
-        Text(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(Red)
-                .padding(horizontal = 2.dp, vertical = 6.dp),
-            textAlign = TextAlign.Center,
-            color = White,
-            text = "Advert Here",
-        )
-    } else {
-        AndroidView(modifier = modifier.fillMaxWidth(), factory = { context ->
-            AdView(context).apply {
-                setAdSize(AdSize.BANNER)
-                adUnitId = context.getString(R.string.ad_id_banner)
-                loadAd(AdRequest.Builder().build())
-            }
-        })
-    }
-}
-
 //@Preview
 @Composable
 fun ColorsTab() {
-    Surface(modifier = Modifier
-        .fillMaxSize()
-        .padding(bottom = 56.dp), color = MaterialTheme.colors.cardcol) {
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            AdvertView()
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 56.dp),
+        color = MaterialTheme.colors.cardcol
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AccentsCard()
             AccentsDarkCard()
             InfoCard()
@@ -1176,13 +1140,16 @@ fun ColorsTab() {
 
 
 }
+
 @Composable
 fun IconsTab() {
-    Surface(modifier = Modifier
-        .fillMaxSize()
-        .padding(bottom = 56.dp), color = MaterialTheme.colors.cardcol) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 56.dp),
+        color = MaterialTheme.colors.cardcol
+    ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            AdvertView()
             QSTileCard()
             InfoCard()
 
@@ -1191,205 +1158,463 @@ fun IconsTab() {
 
 }
 
-@Preview()
+//@Preview
 @Composable
 fun QSTileCard() {
 
-        Card(
-            border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(8.dp),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = MaterialTheme.colors.cardcol
-        ) {
-            val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
+    Card(
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp),
+        elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
 
-            var expanded by remember { mutableStateOf(true) }
-            Column(modifier = Modifier.clickable { expanded = !expanded }) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .padding(start = 8.dp),
-                        text = "QSTiles",
-                        fontSize = 24.sp
+        var expanded by remember { mutableStateOf(true) }
+        Column(modifier = Modifier.clickable { expanded = !expanded }) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "QSTiles",
+                    fontSize = 24.sp
+                )
+                IconButton(onClick = {
+                    resetQSTiles()
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.restart_alt_48px),
+                        contentDescription = null
                     )
-                    IconButton(onClick = {
-                        resetQSTiles()
-                    }) {
-                        Image(
-                            painter = painterResource(R.drawable.restart_alt_48px),
-                            contentDescription = null
-                        )
+                }
+            }
+
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+            AnimatedVisibility(expanded) {
+                Surface {
+                    Column {
+                        Row {
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircle") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qscirclewithdualtone),
+                                    contentDescription = "Circle with Dual Tone"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circlegradient") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qscirclewithgradient),
+                                    contentDescription = "Circle with Gradient"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circletrim") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qscirclewithtrim),
+                                    contentDescription = "Circle with Trim",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cookie") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qscookie),
+                                    contentDescription = "Cookie",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cosmos") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qscosmos),
+                                    contentDescription = "Cosmos",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.default") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsdefault),
+                                    contentDescription = "Default",
+                                )
+                            }
+
+                        }
+                        Row {
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dividedcircle") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsdividedcircle),
+                                    contentDescription = "Divided Circle"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dottedcircle") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsdottedcircle),
+                                    contentDescription = "Dotted Circle"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircletrim") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsdualtonecircletrim),
+                                    contentDescription = "DualTone Circle with Trim",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ink") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsink),
+                                    contentDescription = "Ink",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.inkdrop") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsinkdrop),
+                                    contentDescription = "Inkdrop",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.justicons") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsjusticons),
+                                    contentDescription = "Just Icons",
+                                )
+                            }
+
+                        }
+                        Row {
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.mountain") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsmountain),
+                                    contentDescription = "Mountain"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.neonlike") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsneonlike),
+                                    contentDescription = "NeonLike"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ninja") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsninja),
+                                    contentDescription = "Ninja",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreocircletrim") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsoreocircletrim),
+                                    contentDescription = "Oreo (Circle Trim)",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreosquircletrim") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsoreosquircletrim),
+                                    contentDescription = "Oreo (Squircle Trim)",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.pokesign") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qspokesign),
+                                    contentDescription = "Pokesign",
+                                )
+                            }
+
+                        }
+                        Row {
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squaremedo") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qssquaremedo),
+                                    contentDescription = "Squaremedo"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircle") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qssquircle),
+                                    contentDescription = "Squircle"
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircletrim") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qssquircletrim),
+                                    contentDescription = "Squircle with trim",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.teardrop") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qsteardrop),
+                                    contentDescription = "TearDrop",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.triangle") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qstriangle),
+                                    contentDescription = "Triangle",
+                                )
+                            }
+                            IconButton(
+                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.wavey") },
+                                modifier = Modifier
+                                    .size(testdp.dp)
+                                    .background(color = MaterialTheme.colors.cardcol)
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    painter = painterResource(R.drawable.qswavey),
+                                    contentDescription = "Wavey",
+                                )
+                            }
+
+                        }
                     }
                 }
+            }
+        }
+    }
+}
 
-                Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
-                AnimatedVisibility(expanded) {
-                    Surface {
-                        Column {
-                            Row() {
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircle") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qscirclewithdualtone), contentDescription = "Circle with Dual Tone")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circlegradient")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qscirclewithgradient), contentDescription = "Circle with Gradient")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circletrim")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qscirclewithtrim), contentDescription = "Circle with Trim",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cookie")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qscookie), contentDescription = "Cookie",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cosmos")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qscosmos), contentDescription = "Cosmos",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.default") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsdefault), contentDescription = "Default",)
-                                }
+@Preview
+@Composable
+fun NavbarCard() {
 
-                            }
-                            Row() {
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dividedcircle") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsdividedcircle), contentDescription = "Divided Circle")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dottedcircle")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsdottedcircle), contentDescription = "Dotted Circle")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircletrim")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsdualtonecircletrim), contentDescription = "DualTone Circle with Trim",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ink")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsink), contentDescription = "Ink",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.inkdrop")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsinkdrop), contentDescription = "Inkdrop",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.justicons") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsjusticons), contentDescription = "Just Icons",)
-                                }
+    Card(
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp),
+        elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 8
 
-                            }
-                            Row() {
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.mountain") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsmountain), contentDescription = "Mountain")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.neonlike")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsneonlike), contentDescription = "NeonLike")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ninja")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsninja), contentDescription = "Ninja",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreocircletrim")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsoreocircletrim), contentDescription = "Oreo (Circle Trim)",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreosquircletrim")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsoreosquircletrim), contentDescription = "Oreo (Squircle Trim)",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.pokesign") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qspokesign), contentDescription = "Pokesign",)
-                                }
+        var expanded by remember { mutableStateOf(true) }
+        Column(modifier = Modifier.clickable { expanded = !expanded }) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "Navbars",
+                    fontSize = 24.sp
+                )
+                IconButton(onClick = {
+                    resetQSTiles()
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.restart_alt_48px),
+                        contentDescription = null
+                    )
+                }
+            }
 
-                            }
-                            Row() {
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squaremedo") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qssquaremedo), contentDescription = "Squaremedo")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircle")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qssquircle), contentDescription = "Squircle")
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircletrim")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qssquircletrim), contentDescription = "Squircle with trim",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.teardrop")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qsteardrop), contentDescription = "TearDrop",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.triangle")  }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qstriangle), contentDescription = "Triangle",)
-                                }
-                                IconButton(onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.wavey") }, modifier = Modifier.size(testdp.dp).background(color = MaterialTheme.colors.cardcol)) {
-                                    Image( modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        painter = painterResource(R.drawable.qswavey), contentDescription = "Wavey",)
-                                }
-
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+            AnimatedVisibility(expanded) {
+                Surface {
+                    Column {
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_android_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_android_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_android_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
                             }
                         }
                     }
@@ -1397,6 +1622,7 @@ fun QSTileCard() {
             }
         }
     }
+}
 
 fun resetQSTiles() {
     SU.run("cmd overlay disable themed.qstile.dualtonecircle")

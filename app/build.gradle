@@ -13,8 +13,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 23
         targetSdk 33
-        versionCode 5
-        versionName '0.2'
+        versionCode 6
+        versionName '0.3'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -59,13 +59,15 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation "androidx.compose.ui:ui:1.3.0"
+    implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.3.0'
+    implementation "androidx.compose.material:material:$compose_ui_version"
     implementation 'androidx.browser:browser:1.4.0'
+/*
     implementation 'com.google.android.gms:play-services-ads-lite:21.3.0'
-    implementation 'com.google.firebase:firebase-perf-ktx:20.2.0'
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
+*/
+    implementation 'com.google.firebase:firebase-perf-ktx:20.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -73,7 +75,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-     implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation "androidx.navigation:navigation-compose:2.5.3"
     implementation platform('com.google.firebase:firebase-bom:31.0.2')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
