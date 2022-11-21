@@ -6,7 +6,8 @@
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager
@@ -374,6 +375,7 @@ fun resetAccentsDark() {
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccentsCard() {
 
@@ -478,268 +480,268 @@ fun AccentsCard() {
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(197, 17, 98)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPinkA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialPinkA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(233, 30, 99)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPink500") }) {}
+                                onClick = { overlayEnable("accents.MaterialPink500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 64, 129)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPinkA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialPinkA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(245, 0, 87)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPinkA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialPinkA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(213, 0, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialRedA700") }) { }
+                                onClick = { overlayEnable("accents.MaterialRedA700") }) { }
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(244, 67, 54)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialRed500") }) {}
+                                onClick = { overlayEnable("accents.MaterialRed500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 82, 82)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialRedA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialRedA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 23, 68)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialRedA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialRedA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(221, 44, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepOrangeA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepOrangeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 87, 34)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepOrange500") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepOrange500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 110, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepOrangeA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepOrangeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 61, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepOrangeA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepOrangeA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 109, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialOrangeA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialOrangeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 152, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialOrange500") }) {}
+                                onClick = { overlayEnable("accents.MaterialOrange500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 171, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialOrangeA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialOrangeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 145, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialOrangeA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialOrangeA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 171, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialAmberA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialAmberA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 193, 7)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialAmber500") }) {}
+                                onClick = { overlayEnable("accents.MaterialAmber500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 215, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialAmberA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialAmberA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 196, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialAmberA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialAmberA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 214, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialYellowA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialYellowA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 235, 59)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialYellow500") }) {}
+                                onClick = { overlayEnable("accents.MaterialYellow500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 255, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialYellowA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialYellowA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 234, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialYellowA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialYellowA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(174, 234, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLimeA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialLimeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(205, 220, 57)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLime500") }) {}
+                                onClick = { overlayEnable("accents.MaterialLime500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(238, 255, 65)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLimeA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialLimeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(198, 255, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLimeA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialLimeA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(100, 221, 23)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightGreenA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightGreenA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(139, 195, 74)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightGreen500") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightGreen500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(178, 255, 89)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightGreenA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightGreenA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(118, 255, 3)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightGreenA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightGreenA400") }) {}
                         }
                         Row {
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 200, 83)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialGreenA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialGreenA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(76, 175, 80)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialGreen500") }) {}
+                                onClick = { overlayEnable("accents.MaterialGreen500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(105, 240, 174)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialGreenA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialGreenA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 230, 118)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialGreenA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialGreenA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 191, 165)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialTealA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialTealA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 150, 136)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialTeal500") }) {}
+                                onClick = { overlayEnable("accents.MaterialTeal500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(100, 255, 218)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialTealA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialTealA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(29, 233, 182)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialTealA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialTealA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 184, 212)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialCyanA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialCyanA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 188, 212)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialCyan500") }) {}
+                                onClick = { overlayEnable("accents.MaterialCyan500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(24, 255, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialCyanA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialCyanA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 229, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialCyanA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialCyanA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 145, 234)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightBlueA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightBlueA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(3, 169, 244)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightBlue500") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightBlue500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(64, 196, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightBlueA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightBlueA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 176, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialLightBlueA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialLightBlueA400") }) {}
                         }
                         Row {
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(41, 98, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialBlueA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialBlueA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(33, 150, 243)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialBlue500") }) {}
+                                onClick = { overlayEnable("accents.MaterialBlue500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(68, 138, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialBlueA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialBlueA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(41, 121, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialBlueA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialBlueA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(48, 79, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialIndigoA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialIndigoA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(63, 81, 181)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialIndigo500") }) {}
+                                onClick = { overlayEnable("accents.MaterialIndigo500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(83, 109, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialIndigoA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialIndigoA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(61, 90, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialIndigoA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialIndigoA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(98, 0, 234)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepPurpleA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepPurpleA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(103, 58, 183)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepPurple500") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepPurple500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(124, 77, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepPurpleA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepPurpleA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(101, 31, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialDeepPurpleA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialDeepPurpleA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(170, 0, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPurpleA700") }) {}
+                                onClick = { overlayEnable("accents.MaterialPurpleA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(156, 39, 176)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPurple500") }) {}
+                                onClick = { overlayEnable("accents.MaterialPurple500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(224, 64, 251)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPurpleA200") }) {}
+                                onClick = { overlayEnable("accents.MaterialPurpleA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(213, 0, 249)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.MaterialPurpleA400") }) {}
+                                onClick = { overlayEnable("accents.MaterialPurpleA400") }) {}
                         }
                     }
                 }
@@ -850,268 +852,268 @@ fun AccentsDarkCard() {
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(197, 17, 98)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPinkA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPinkA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(233, 30, 99)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPink500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPink500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 64, 129)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPinkA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPinkA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(245, 0, 87)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPinkA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPinkA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(213, 0, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialRedA700") }) { }
+                                onClick = { overlayEnable("accents.dark.MaterialRedA700") }) { }
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(244, 67, 54)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialRed500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialRed500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 82, 82)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialRedA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialRedA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 23, 68)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialRedA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialRedA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(221, 44, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepOrangeA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepOrangeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 87, 34)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepOrange500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepOrange500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 110, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepOrangeA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepOrangeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 61, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepOrangeA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepOrangeA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 109, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialOrangeA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialOrangeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 152, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialOrange500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialOrange500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 171, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialOrangeA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialOrangeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 145, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialOrangeA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialOrangeA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 171, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialAmberA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialAmberA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 193, 7)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialAmber500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialAmber500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 215, 64)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialAmberA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialAmberA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 196, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialAmberA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialAmberA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 214, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialYellowA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialYellowA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 235, 59)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialYellow500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialYellow500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 255, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialYellowA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialYellowA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(255, 234, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialYellowA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialYellowA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(174, 234, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLimeA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLimeA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(205, 220, 57)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLime500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLime500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(238, 255, 65)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLimeA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLimeA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(198, 255, 0)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLimeA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLimeA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(100, 221, 23)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightGreenA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightGreenA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(139, 195, 74)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightGreen500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightGreen500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(178, 255, 89)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightGreenA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightGreenA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(118, 255, 3)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightGreenA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightGreenA400") }) {}
                         }
                         Row {
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 200, 83)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialGreenA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialGreenA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(76, 175, 80)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialGreen500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialGreen500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(105, 240, 174)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialGreenA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialGreenA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 230, 118)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialGreenA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialGreenA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 191, 165)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialTealA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialTealA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 150, 136)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialTeal500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialTeal500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(100, 255, 218)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialTealA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialTealA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(29, 233, 182)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialTealA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialTealA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 184, 212)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialCyanA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialCyanA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 188, 212)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialCyan500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialCyan500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(24, 255, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialCyanA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialCyanA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 229, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialCyanA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialCyanA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 145, 234)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightBlueA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightBlueA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(3, 169, 244)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightBlue500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightBlue500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(64, 196, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightBlueA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightBlueA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(0, 176, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialLightBlueA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialLightBlueA400") }) {}
                         }
                         Row {
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(41, 98, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialBlueA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialBlueA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(33, 150, 243)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialBlue500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialBlue500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(68, 138, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialBlueA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialBlueA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(41, 121, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialBlueA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialBlueA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(48, 79, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialIndigoA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialIndigoA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(63, 81, 181)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialIndigo500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialIndigo500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(83, 109, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialIndigoA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialIndigoA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(61, 90, 254)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialIndigoA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialIndigoA400") }) {}
                         }
                         Row {
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(98, 0, 234)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepPurpleA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepPurpleA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(103, 58, 183)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepPurple500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepPurple500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(124, 77, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepPurpleA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepPurpleA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(101, 31, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialDeepPurpleA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialDeepPurpleA400") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(170, 0, 255)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPurpleA700") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPurpleA700") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(156, 39, 176)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPurple500") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPurple500") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(224, 64, 251)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPurpleA200") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPurpleA200") }) {}
 
                             Surface(modifier = Modifier.size(testdp.dp),
                                 color = Color(rgb(213, 0, 249)),
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.accents.dark.MaterialPurpleA400") }) {}
+                                onClick = { overlayEnable("accents.dark.MaterialPurpleA400") }) {}
                         }
                     }
                 }
@@ -1158,7 +1160,7 @@ fun IconsTab() {
 
 }
 
-//@Preview
+@Preview
 @Composable
 fun QSTileCard() {
 
@@ -1203,50 +1205,28 @@ fun QSTileCard() {
                 Surface {
                     Column {
                         Row {
+                            MyIconButton(
+                                overlayname = "qstile.dualtonecircle",
+                                sizedp = testdp,
+                                contentdescription = "Circle with Dual Tone",
+                                iconname = R.drawable.qscirclewithdualtone
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.circlegradient",
+                                sizedp = testdp,
+                                contentdescription = "Circle with Gradient",
+                                iconname = R.drawable.qscirclewithgradient
+                            )
+
+                            MyIconButton(
+                                overlayname = "qstile.circletrim",
+                                sizedp = testdp,
+                                contentdescription = "Circle with Trim",
+                                iconname = R.drawable.qscirclewithtrim
+                            )
+                          
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircle") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qscirclewithdualtone),
-                                    contentDescription = "Circle with Dual Tone"
-                                )
-                            }
-                            IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circlegradient") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qscirclewithgradient),
-                                    contentDescription = "Circle with Gradient"
-                                )
-                            }
-                            IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.circletrim") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qscirclewithtrim),
-                                    contentDescription = "Circle with Trim",
-                                )
-                            }
-                            IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cookie") },
+                                onClick = {  overlayEnable("qstile.cookie") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1260,7 +1240,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.cosmos") },
+                                onClick = { overlayEnable("qstile.cosmos") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1274,7 +1254,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.default") },
+                                onClick = {  overlayEnable("qstile.default") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1291,7 +1271,7 @@ fun QSTileCard() {
                         }
                         Row {
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dividedcircle") },
+                                onClick = { overlayEnable("qstile.dividedcircle") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1305,7 +1285,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dottedcircle") },
+                                onClick = {  overlayEnable("qstile.dottedcircle") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1319,7 +1299,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.dualtonecircletrim") },
+                                onClick = { overlayEnable("qstile.dualtonecircletrim") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1333,7 +1313,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ink") },
+                                onClick = { overlayEnable("qstile.ink") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1347,7 +1327,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.inkdrop") },
+                                onClick = { overlayEnable("qstile.inkdrop") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1361,7 +1341,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.justicons") },
+                                onClick = { overlayEnable("qstile.justicons") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1378,7 +1358,7 @@ fun QSTileCard() {
                         }
                         Row {
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.mountain") },
+                                onClick = { overlayEnable("qstile.mountain") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1392,7 +1372,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.neonlike") },
+                                onClick = { overlayEnable("qstile.neonlike") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1406,7 +1386,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.ninja") },
+                                onClick = { overlayEnable("qstile.ninja") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1420,7 +1400,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreocircletrim") },
+                                onClick = {  overlayEnable("qstile.oreocircletrim") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1434,7 +1414,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.oreosquircletrim") },
+                                onClick = { overlayEnable("qstile.oreosquircletrim") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1448,7 +1428,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.pokesign") },
+                                onClick = { overlayEnable("qstile.pokesign") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1465,7 +1445,7 @@ fun QSTileCard() {
                         }
                         Row {
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squaremedo") },
+                                onClick = { overlayEnable("qstile.squaremedo") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1479,7 +1459,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircle") },
+                                onClick = { overlayEnable("qstile.squircle") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1493,7 +1473,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.squircletrim") },
+                                onClick = { overlayEnable("qstile.squircletrim") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1507,7 +1487,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.teardrop") },
+                                onClick = { overlayEnable("qstile.teardrop") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1521,7 +1501,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.triangle") },
+                                onClick = { overlayEnable("qstile.triangle") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1535,7 +1515,7 @@ fun QSTileCard() {
                                 )
                             }
                             IconButton(
-                                onClick = { SU.run("cmd overlay enable-exclusive --category themed.qstile.wavey") },
+                                onClick = { overlayEnable("qstile.wavey") },
                                 modifier = Modifier
                                     .size(testdp.dp)
                                     .background(color = MaterialTheme.colors.cardcol)
@@ -1557,7 +1537,7 @@ fun QSTileCard() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun NavbarCard() {
 
@@ -1601,7 +1581,9 @@ fun NavbarCard() {
             AnimatedVisibility(expanded) {
                 Surface {
                     Column {
-                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol) {
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("test")
+                        } ) {
                             Row(horizontalArrangement = Arrangement.SpaceAround) {
                                 Image(
                                     painter = painterResource(R.drawable.navbar_android_back),
@@ -1622,6 +1604,29 @@ fun NavbarCard() {
             }
         }
     }
+}
+
+fun overlayEnable(overlayname: String) {
+    SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
+}
+
+@Composable
+fun MyIconButton(overlayname: String, sizedp: Int, contentdescription: String, iconname: Int){
+    IconButton(
+        onClick = {  overlayEnable(overlayname) },
+        modifier = Modifier
+            .size(sizedp.dp)
+            .background(color = MaterialTheme.colors.cardcol)
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            painter = painterResource(iconname),
+            contentDescription = contentdescription,
+        )
+    }
+
 }
 
 fun resetQSTiles() {
