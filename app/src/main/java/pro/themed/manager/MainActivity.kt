@@ -7,7 +7,7 @@
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager
@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -158,7 +159,7 @@ fun Navigation(navController: NavHostController) {
 
 }
 
-//@Preview
+@Preview
 @Composable
 fun InfoCard() {
     Card(
@@ -176,7 +177,7 @@ fun InfoCard() {
     ) {
         Text(
             modifier = Modifier.padding(12.dp),
-            text = "Please note that on older devices updating systemUI can take up to 30s. " + "It is recommended that you'd install bootloop protector module. " + "\r\nPlease report testing to telegram support group.",
+            text = stringResource(R.string.infocard),
             fontSize = 14.sp
         )
     }
@@ -1153,6 +1154,7 @@ fun IconsTab() {
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             QSTileCard()
+            NavbarCard()
             InfoCard()
 
         }
@@ -1160,7 +1162,7 @@ fun IconsTab() {
 
 }
 
-@Preview
+//@Preview
 @Composable
 fun QSTileCard() {
 
@@ -1224,136 +1226,64 @@ fun QSTileCard() {
                                 contentdescription = "Circle with Trim",
                                 iconname = R.drawable.qscirclewithtrim
                             )
-                          
-                            IconButton(
-                                onClick = {  overlayEnable("qstile.cookie") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qscookie),
-                                    contentDescription = "Cookie",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.cosmos") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qscosmos),
-                                    contentDescription = "Cosmos",
-                                )
-                            }
-                            IconButton(
-                                onClick = {  overlayEnable("qstile.default") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsdefault),
-                                    contentDescription = "Default",
-                                )
-                            }
+                            MyIconButton(
+                                overlayname = "qstile.cookie",
+                                sizedp = testdp,
+                                contentdescription = "Cookie",
+                                iconname = R.drawable.qscookie
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.cosmos",
+                                sizedp = testdp,
+                                contentdescription = "Cosmos",
+                                iconname = R.drawable.qscosmos
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.default",
+                                sizedp = testdp,
+                                contentdescription = "Default",
+                                iconname = R.drawable.qsdefault
+                            )
 
                         }
                         Row {
-                            IconButton(
-                                onClick = { overlayEnable("qstile.dividedcircle") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsdividedcircle),
-                                    contentDescription = "Divided Circle"
-                                )
-                            }
-                            IconButton(
-                                onClick = {  overlayEnable("qstile.dottedcircle") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsdottedcircle),
-                                    contentDescription = "Dotted Circle"
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.dualtonecircletrim") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsdualtonecircletrim),
-                                    contentDescription = "DualTone Circle with Trim",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.ink") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsink),
-                                    contentDescription = "Ink",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.inkdrop") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsinkdrop),
-                                    contentDescription = "Inkdrop",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.justicons") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsjusticons),
-                                    contentDescription = "Just Icons",
-                                )
-                            }
+                            MyIconButton(
+                                overlayname = "qstile.dividedcircle",
+                                sizedp = testdp,
+                                contentdescription = "Divided Circle",
+                                iconname = R.drawable.qsdividedcircle
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.dottedcircle",
+                                sizedp = testdp,
+                                contentdescription = "Dotted Circle",
+                                iconname = R.drawable.qsdottedcircle
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.dualtonecircletrim",
+                                sizedp = testdp,
+                                contentdescription = "DualTone Circle with Trim",
+                                iconname = R.drawable.qsdualtonecircletrim
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.ink",
+                                sizedp = testdp,
+                                contentdescription = "Ink",
+                                iconname = R.drawable.qsink
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.inkdrop",
+                                sizedp = testdp,
+                                contentdescription = "Inkdrop",
+                                iconname = R.drawable.qsinkdrop
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.justicons",
+                                sizedp = testdp,
+                                contentdescription = "Just Icons",
+                                iconname = R.drawable.qsjusticons
+                            )
+
 
                         }
                         Row {
@@ -1537,7 +1467,7 @@ fun QSTileCard() {
     }
 }
 
-//@Preview
+@Preview
 @Composable
 fun NavbarCard() {
 
@@ -1569,8 +1499,7 @@ fun NavbarCard() {
                 )
                 IconButton(onClick = {
                     resetQSTiles()
-                }) {
-                    Image(
+                }) {Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
                         contentDescription = null
                     )
@@ -1582,7 +1511,7 @@ fun NavbarCard() {
                 Surface {
                     Column {
                         Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("test")
+                            overlayEnable("navbar.android")
                         } ) {
                             Row(horizontalArrangement = Arrangement.SpaceAround) {
                                 Image(
@@ -1595,6 +1524,151 @@ fun NavbarCard() {
                                 )
                                 Image(
                                     painter = painterResource(R.drawable.navbar_android_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.asus")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_asus_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_asus_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_asus_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.dora")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_dora_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_dora_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_dora_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.moto")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_moto_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_moto_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_moto_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.nexus")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_nexus_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_nexus_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_nexus_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.old")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_old_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_old_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_old_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.oneplus")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_oneplus_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_oneplus_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_oneplus_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.sammy")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_sammy_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_sammy_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_sammy_recent),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colors.cardcol, onClick = {
+                            overlayEnable("navbar.tecnocamon")
+                        } ) {
+                            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_tecnocamon_back),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_tecnocamon_home),
+                                    contentDescription = null, Modifier.size(testdp.dp)
+                                )
+                                Image(
+                                    painter = painterResource(R.drawable.navbar_tecnocamon_recent),
                                     contentDescription = null, Modifier.size(testdp.dp)
                                 )
                             }

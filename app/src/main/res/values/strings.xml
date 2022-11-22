@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Themed Manager</string>
-    <string name="ad_id_banner">ca-app-pub-5920419856758740/9976311451</string>
+    <string name="app_name" translatable="false">Themed Manager</string>
+    <string name="infocard">Please note that on older devices updating systemUI can take up to 15-30s. It is recommended that you\'d install bootloop protector module. \nPlease report testing to telegram support group.</string>
 </resources>
