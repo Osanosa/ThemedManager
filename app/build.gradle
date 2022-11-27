@@ -13,8 +13,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 23
         targetSdk 33
-        versionCode 6
-        versionName '0.3'
+        versionCode 7
+        versionName '0.4'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -30,8 +30,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility "11"
-        targetCompatibility "11"
+        sourceCompatibility "1.8"
+        targetCompatibility "1.8"
     }
     kotlinOptions {
         jvmTarget = '1.8'
