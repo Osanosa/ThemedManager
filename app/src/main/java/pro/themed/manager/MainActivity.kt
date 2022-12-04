@@ -176,7 +176,7 @@ fun InfoCard() {
     }
 }
 
-//@Preview(uiMode = UI_MODE_NIGHT_YES)
+//@Preview()
 @Composable
 fun TopAppBar() {
     var showMenu by remember { mutableStateOf(false) }
@@ -190,7 +190,9 @@ fun TopAppBar() {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
 
-            IconButton(onClick = { showMenu = !showMenu }) {
+            IconButton(onClick = {
+                context.startActivity(Intent(context, AboutActivity::class.java))
+            }) {
                 Icon(Icons.Default.Info, contentDescription = "list")
             }
 
@@ -1117,7 +1119,7 @@ fun AccentsDarkCard() {
 }
 
 
-//@Preview
+@Preview
 @Composable
 fun ColorsTab() {
     Surface(
@@ -1702,7 +1704,7 @@ fun NavbarCard() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun IconPackCard() {
 

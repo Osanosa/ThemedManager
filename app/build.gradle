@@ -13,8 +13,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 23
         targetSdk 33
-        versionCode 7
-        versionName '0.4'
+        versionCode 8
+        versionName '0.5'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -27,6 +27,7 @@ android {
             minifyEnabled true
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -68,7 +69,14 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads-lite:21.3.0'
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
 */
+
     implementation 'com.google.firebase:firebase-perf-ktx:20.3.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.1.0'
+
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
@@ -77,8 +85,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
     implementation "androidx.navigation:navigation-compose:2.5.3"
-    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+    implementation platform('com.google.firebase:firebase-bom:31.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
+    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
 
 }
