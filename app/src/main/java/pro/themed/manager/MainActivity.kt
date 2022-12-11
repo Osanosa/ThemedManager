@@ -2340,6 +2340,18 @@ fun resetQSTiles() {
     SU.run("cmd overlay disable themed.qstile.triangle")
     SU.run("cmd overlay disable themed.qstile.wavey")
 }
+fun resetCorners() {
+    SU.run("cmd overlay disable themed.roundedcorners0")
+    SU.run("cmd overlay disable themed.roundedcorners4")
+    SU.run("cmd overlay disable themed.roundedcorners8")
+    SU.run("cmd overlay disable themed.roundedcorners12")
+    SU.run("cmd overlay disable themed.roundedcorners16")
+    SU.run("cmd overlay disable themed.roundedcorners20")
+    SU.run("cmd overlay disable themed.roundedcorners24")
+    SU.run("cmd overlay disable themed.roundedcorners28")
+    SU.run("cmd overlay disable themed.roundedcorners32")
+    SU.run("cmd overlay disable themed.roundedcorners36")
+}
 
 //@Preview
 @Composable
@@ -2372,7 +2384,7 @@ var rounddp = sliderPosition.roundToInt()
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {
-                    resetQSTiles()
+                    resetCorners()
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
