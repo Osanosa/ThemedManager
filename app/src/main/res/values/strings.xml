@@ -19,4 +19,5 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_main2">MainActivity2</string>
+    <string name="CornersTip">If resets to zero aim more precisely at number this is a bug and it\'ll be fixed later.</string>
 </resources>

@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Themed Manager</string>
     <string name="infocard">Обратите внимание, что на старых устройствах обновление интерфейса может занять до 15-30 секунд. Рекомендуется установить модуль Bootloop protector.\nПожалуйста, сообщите о тестировании в группу поддержки в Telegram.</string>
+    <string name="CornersTip">Если сбрасываеться на ноль цельтесь лучше выбирая номер, это баг и он будет исправлен в будущем.</string>
 </resources>

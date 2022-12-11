@@ -1,5 +1,5 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
-    ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
 
     )
 
@@ -41,6 +41,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.ui.theme.*
+import kotlin.math.roundToInt
 
 @get:Composable
 val Colors.bordercol: Color
@@ -69,10 +70,10 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
-    //   @Preview
+    //@Preview
     @Composable
     fun Main() {
-        Column {
+        Column() {
 
 
             val navController = rememberNavController()
@@ -90,14 +91,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private operator fun Navigation.invoke(navController: NavHostController) {
+private operator fun Navigation.invoke() {
 
 }
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        NavigationItems.ColorsTab, NavigationItems.IconsTab
+        NavigationItems.ColorsTab, NavigationItems.IconsTab, NavigationItems.MiscTab
     )
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.cardcol,
@@ -148,6 +149,9 @@ fun Navigation(navController: NavHostController) {
         composable(NavigationItems.IconsTab.route) {
             IconsTab()
         }
+        composable(NavigationItems.MiscTab.route){
+            MiscTab()
+        }
     }
 
 }
@@ -186,7 +190,10 @@ fun TopAppBar() {
         title = { Text("Themed Manager") },
         backgroundColor = MaterialTheme.colors.cardcol,
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                context.startActivity(Intent(context, SettingsActivity::class.java))
+
+            }) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
 
@@ -1119,7 +1126,7 @@ fun AccentsDarkCard() {
 }
 
 
-@Preview
+//@Preview
 @Composable
 fun ColorsTab() {
     Surface(
@@ -1152,6 +1159,22 @@ fun IconsTab() {
             NavbarCard()
             IconPackCard()
             InfoCard()
+
+        }
+    }
+
+}
+@Preview
+@Composable
+fun MiscTab() {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 56.dp),
+        color = MaterialTheme.colors.cardcol
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+           RoundedCornersCard()
 
         }
     }
@@ -2318,4 +2341,85 @@ fun resetQSTiles() {
     SU.run("cmd overlay disable themed.qstile.wavey")
 }
 
+//@Preview
+@Composable
+fun RoundedCornersCard() {
 
+
+    var sliderPosition by remember { mutableStateOf(0f) }
+var rounddp = sliderPosition.roundToInt()
+    Card(
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp),
+        elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "Corners",
+                    fontSize = 24.sp
+                )
+                IconButton(onClick = {
+                    resetQSTiles()
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.restart_alt_48px),
+                        contentDescription = null
+                    )
+                }
+            }
+
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+           Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = stringResource(R.string.CornersTip), modifier = Modifier.padding(4.dp))
+
+            Text(text = rounddp.toString())
+        }
+            Slider(modifier = Modifier.padding(horizontal = 4.dp),
+                value = sliderPosition,
+                onValueChange = { sliderPosition = it },
+                valueRange = 0f..36f,
+                onValueChangeFinished = {
+                    overlayEnable("roundedcorners$rounddp")
+                },
+                steps = 8,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colors.cardcol,
+                    activeTrackColor = MaterialTheme.colors.bordercol
+                )
+            )
+            Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+            Text(text = " 0")
+            Text(text = " 4")
+            Text(text = " 8")
+            Text(text = "12")
+            Text(text = "16")
+            Text(text = "20")
+            Text(text = "24")
+            Text(text = "28")
+            Text(text = "32")
+            Text(text = "36")
+
+        }
+        }
+    }
+}
