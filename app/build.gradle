@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId "pro.themed.manager"
-        minSdk 23
+        minSdk 26
         targetSdk 33
-        versionCode 8
-        versionName '0.5'
+        versionCode 9
+        versionName '0.5.1'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
