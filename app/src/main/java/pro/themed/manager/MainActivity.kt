@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.Color.rgb
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -318,143 +319,6 @@ fun TopAppBar() {
 }
 
 
-fun resetAccents() {
-    SU.run("cmd overlay disable themed.accents.MaterialPinkA700")
-    SU.run("cmd overlay disable themed.accents.MaterialPink500")
-    SU.run("cmd overlay disable themed.accents.MaterialPinkA200")
-    SU.run("cmd overlay disable themed.accents.MaterialPinkA400")
-    SU.run("cmd overlay disable themed.accents.MaterialRedA700")
-    SU.run("cmd overlay disable themed.accents.MaterialRed500")
-    SU.run("cmd overlay disable themed.accents.MaterialRedA200")
-    SU.run("cmd overlay disable themed.accents.MaterialRedA400")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepOrangeA700")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepOrange500")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepOrangeA200")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepOrangeA400")
-    SU.run("cmd overlay disable themed.accents.MaterialOrangeA700")
-    SU.run("cmd overlay disable themed.accents.MaterialOrange500")
-    SU.run("cmd overlay disable themed.accents.MaterialOrangeA200")
-    SU.run("cmd overlay disable themed.accents.MaterialOrangeA400")
-    SU.run("cmd overlay disable themed.accents.MaterialAmberA700")
-    SU.run("cmd overlay disable themed.accents.MaterialAmber500")
-    SU.run("cmd overlay disable themed.accents.MaterialAmberA200")
-    SU.run("cmd overlay disable themed.accents.MaterialAmberA400")
-    SU.run("cmd overlay disable themed.accents.MaterialYellowA700")
-    SU.run("cmd overlay disable themed.accents.MaterialYellow500")
-    SU.run("cmd overlay disable themed.accents.MaterialYellowA200")
-    SU.run("cmd overlay disable themed.accents.MaterialYellowA400")
-    SU.run("cmd overlay disable themed.accents.MaterialLimeA700")
-    SU.run("cmd overlay disable themed.accents.MaterialLime500")
-    SU.run("cmd overlay disable themed.accents.MaterialLimeA200")
-    SU.run("cmd overlay disable themed.accents.MaterialLimeA400")
-    SU.run("cmd overlay disable themed.accents.MaterialLightGreenA700")
-    SU.run("cmd overlay disable themed.accents.MaterialLightGreen500")
-    SU.run("cmd overlay disable themed.accents.MaterialLightGreenA200")
-    SU.run("cmd overlay disable themed.accents.MaterialLightGreenA400")
-    SU.run("cmd overlay disable themed.accents.MaterialGreenA700")
-    SU.run("cmd overlay disable themed.accents.MaterialGreen500")
-    SU.run("cmd overlay disable themed.accents.MaterialGreenA200")
-    SU.run("cmd overlay disable themed.accents.MaterialGreenA400")
-    SU.run("cmd overlay disable themed.accents.MaterialTealA700")
-    SU.run("cmd overlay disable themed.accents.MaterialTeal500")
-    SU.run("cmd overlay disable themed.accents.MaterialTealA200")
-    SU.run("cmd overlay disable themed.accents.MaterialTealA400")
-    SU.run("cmd overlay disable themed.accents.MaterialCyanA700")
-    SU.run("cmd overlay disable themed.accents.MaterialCyan500")
-    SU.run("cmd overlay disable themed.accents.MaterialCyanA200")
-    SU.run("cmd overlay disable themed.accents.MaterialCyanA400")
-    SU.run("cmd overlay disable themed.accents.MaterialLightBlueA700")
-    SU.run("cmd overlay disable themed.accents.MaterialLightBlue500")
-    SU.run("cmd overlay disable themed.accents.MaterialLightBlueA200")
-    SU.run("cmd overlay disable themed.accents.MaterialLightBlueA400")
-    SU.run("cmd overlay disable themed.accents.MaterialBlueA700")
-    SU.run("cmd overlay disable themed.accents.MaterialBlue500")
-    SU.run("cmd overlay disable themed.accents.MaterialBlueA200")
-    SU.run("cmd overlay disable themed.accents.MaterialBlueA400")
-    SU.run("cmd overlay disable themed.accents.MaterialIndigoA700")
-    SU.run("cmd overlay disable themed.accents.MaterialIndigo500")
-    SU.run("cmd overlay disable themed.accents.MaterialIndigoA200")
-    SU.run("cmd overlay disable themed.accents.MaterialIndigoA400")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepPurpleA700")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepPurple500")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepPurpleA200")
-    SU.run("cmd overlay disable themed.accents.MaterialDeepPurpleA400")
-    SU.run("cmd overlay disable themed.accents.MaterialPurpleA700")
-    SU.run("cmd overlay disable themed.accents.MaterialPurple500")
-    SU.run("cmd overlay disable themed.accents.MaterialPurpleA200")
-    SU.run("cmd overlay disable themed.accents.MaterialPurpleA400")
-
-}
-
-fun resetAccentsDark() {
-
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPinkA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPink500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPinkA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPinkA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialRedA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialRed500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialRedA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialRedA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepOrangeA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepOrange500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepOrangeA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepOrangeA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialOrangeA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialOrange500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialOrangeA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialOrangeA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialAmberA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialAmber500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialAmberA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialAmberA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialYellowA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialYellow500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialYellowA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialYellowA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLimeA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLime500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLimeA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLimeA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightGreenA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightGreen500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightGreenA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightGreenA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialGreenA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialGreen500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialGreenA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialGreenA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialTealA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialTeal500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialTealA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialTealA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialCyanA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialCyan500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialCyanA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialCyanA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightBlueA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightBlue500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightBlueA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialLightBlueA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialBlueA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialBlue500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialBlueA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialBlueA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialIndigoA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialIndigo500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialIndigoA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialIndigoA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepPurpleA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepPurple500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepPurpleA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialDeepPurpleA400")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPurpleA700")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPurple500")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPurpleA200")
-    SU.run("cmd overlay disable themed.accents.dark.MaterialPurpleA400")
-
-}
-
 @Preview
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -486,7 +350,7 @@ fun AccentsCard() {
                     fontSize = 24.sp
                 )
                 IconButton(modifier = Modifier, onClick = {
-                    resetAccents()
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.accents.M' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
@@ -857,7 +721,10 @@ fun AccentsDarkCard() {
                     text = "Accents Dark",
                     fontSize = 24.sp
                 )
-                IconButton(onClick = { resetAccentsDark() }) {
+                IconButton(onClick = {
+
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.accents.dark' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$"+"ol\"; done")
+                }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
                         contentDescription = null
@@ -1299,7 +1166,7 @@ fun QSTileCard() {
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {
-                    resetQSTiles()
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qstile' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$"+"ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
@@ -1604,7 +1471,7 @@ fun NavbarCard() {
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {
-                    resetNavbars()
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.navbar' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$"+"ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
@@ -1845,7 +1712,7 @@ fun IconPackCard() {
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {
-                    resetIconPacks()
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.iconpack' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$"+"ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
@@ -2310,73 +2177,6 @@ fun IconPackCard() {
     }
 }
 
-fun resetIconPacks() {
-    SU.run("cmd overlay disable themed.iconpack.archerus.android")
-    SU.run("cmd overlay disable themed.iconpack.archerus.launcher")
-    SU.run("cmd overlay disable themed.iconpack.archerus.settings")
-    SU.run("cmd overlay disable themed.iconpack.archerus.systemui")
-    SU.run("cmd overlay disable themed.iconpack.archerus.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.circular.android")
-    SU.run("cmd overlay disable themed.iconpack.circular.launcher")
-    SU.run("cmd overlay disable themed.iconpack.circular.settings")
-    SU.run("cmd overlay disable themed.iconpack.circular.systemui")
-    SU.run("cmd overlay disable themed.iconpack.circular.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.filled.android")
-    SU.run("cmd overlay disable themed.iconpack.filled.launcher")
-    SU.run("cmd overlay disable themed.iconpack.filled.settings")
-    SU.run("cmd overlay disable themed.iconpack.filled.systemui")
-    SU.run("cmd overlay disable themed.iconpack.filled.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.kai.android")
-    SU.run("cmd overlay disable themed.iconpack.kai.launcher")
-    SU.run("cmd overlay disable themed.iconpack.kai.settings")
-    SU.run("cmd overlay disable themed.iconpack.kai.systemui")
-    SU.run("cmd overlay disable themed.iconpack.kai.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.oos.android")
-    SU.run("cmd overlay disable themed.iconpack.oos.launcher")
-    SU.run("cmd overlay disable themed.iconpack.oos.settings")
-    SU.run("cmd overlay disable themed.iconpack.oos.systemui")
-    SU.run("cmd overlay disable themed.iconpack.oos.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.outline.android")
-    SU.run("cmd overlay disable themed.iconpack.outline.launcher")
-    SU.run("cmd overlay disable themed.iconpack.outline.settings")
-    SU.run("cmd overlay disable themed.iconpack.outline.systemui")
-    SU.run("cmd overlay disable themed.iconpack.outline.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.pui.android")
-    SU.run("cmd overlay disable themed.iconpack.pui.launcher")
-    SU.run("cmd overlay disable themed.iconpack.pui.settings")
-    SU.run("cmd overlay disable themed.iconpack.pui.systemui")
-    SU.run("cmd overlay disable themed.iconpack.pui.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.rounded.android")
-    SU.run("cmd overlay disable themed.iconpack.rounded.launcher")
-    SU.run("cmd overlay disable themed.iconpack.rounded.settings")
-    SU.run("cmd overlay disable themed.iconpack.rounded.systemui")
-    SU.run("cmd overlay disable themed.iconpack.rounded.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.sam.android")
-    SU.run("cmd overlay disable themed.iconpack.sam.launcher")
-    SU.run("cmd overlay disable themed.iconpack.sam.settings")
-    SU.run("cmd overlay disable themed.iconpack.sam.systemui")
-    SU.run("cmd overlay disable themed.iconpack.sam.themepicker")
-    SU.run("cmd overlay disable themed.iconpack.victor.android")
-    SU.run("cmd overlay disable themed.iconpack.victor.launcher")
-    SU.run("cmd overlay disable themed.iconpack.victor.settings")
-    SU.run("cmd overlay disable themed.iconpack.victor.systemui")
-    SU.run("cmd overlay disable themed.iconpack.victor.themepicker")
-
-}
-
-
-fun resetNavbars() {
-    SU.run("cmd overlay disable themed.navbar.android")
-    SU.run("cmd overlay disable themed.navbar.asus")
-    SU.run("cmd overlay disable themed.navbar.dora")
-    SU.run("cmd overlay disable themed.navbar.moto")
-    SU.run("cmd overlay disable themed.navbar.nexus")
-    SU.run("cmd overlay disable themed.navbar.old")
-    SU.run("cmd overlay disable themed.navbar.oneplus")
-    SU.run("cmd overlay disable themed.navbar.oneui")
-    SU.run("cmd overlay disable themed.navbar.sammy")
-    SU.run("cmd overlay disable themed.navbar.tecno")
-}
 
 fun overlayEnable(overlayname: String) {
     SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
@@ -2401,45 +2201,6 @@ fun MyIconButton(overlayname: String, sizedp: Int, contentdescription: String, i
 
 }
 
-fun resetQSTiles() {
-    SU.run("cmd overlay disable themed.qstile.dualtonecircle")
-    SU.run("cmd overlay disable themed.qstile.circlegradient")
-    SU.run("cmd overlay disable themed.qstile.circletrim")
-    SU.run("cmd overlay disable themed.qstile.cookie")
-    SU.run("cmd overlay disable themed.qstile.cosmos")
-    SU.run("cmd overlay disable themed.qstile.default")
-    SU.run("cmd overlay disable themed.qstile.dividedcircle")
-    SU.run("cmd overlay disable themed.qstile.dottedcircle")
-    SU.run("cmd overlay disable themed.qstile.dualtonecircletrim")
-    SU.run("cmd overlay disable themed.qstile.ink")
-    SU.run("cmd overlay disable themed.qstile.inkdrop")
-    SU.run("cmd overlay disable themed.qstile.justicons")
-    SU.run("cmd overlay disable themed.qstile.mountain")
-    SU.run("cmd overlay disable themed.qstile.neonlike")
-    SU.run("cmd overlay disable themed.qstile.ninja")
-    SU.run("cmd overlay disable themed.qstile.oreocircletrim")
-    SU.run("cmd overlay disable themed.qstile.oreosquircletrim")
-    SU.run("cmd overlay disable themed.qstile.pokesign")
-    SU.run("cmd overlay disable themed.qstile.squaremedo")
-    SU.run("cmd overlay disable themed.qstile.squircle")
-    SU.run("cmd overlay disable themed.qstile.squircletrim")
-    SU.run("cmd overlay disable themed.qstile.teardrop")
-    SU.run("cmd overlay disable themed.qstile.triangle")
-    SU.run("cmd overlay disable themed.qstile.wavey")
-}
-
-fun resetCorners() {
-    SU.run("cmd overlay disable themed.roundedcorners0")
-    SU.run("cmd overlay disable themed.roundedcorners4")
-    SU.run("cmd overlay disable themed.roundedcorners8")
-    SU.run("cmd overlay disable themed.roundedcorners12")
-    SU.run("cmd overlay disable themed.roundedcorners16")
-    SU.run("cmd overlay disable themed.roundedcorners20")
-    SU.run("cmd overlay disable themed.roundedcorners24")
-    SU.run("cmd overlay disable themed.roundedcorners28")
-    SU.run("cmd overlay disable themed.roundedcorners32")
-    SU.run("cmd overlay disable themed.roundedcorners36")
-}
 
 //@Preview
 @Composable
@@ -2447,7 +2208,7 @@ fun RoundedCornersCard() {
 
 
     var sliderPosition by remember { mutableStateOf(0f) }
-    var rounddp = sliderPosition.roundToInt()
+
     Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
         modifier = Modifier
@@ -2472,7 +2233,7 @@ fun RoundedCornersCard() {
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {
-                    resetCorners()
+                    SU.run("for ol in \$(cmd overlay list | grep -E 'themed.rounded' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$"+"ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.restart_alt_48px),
@@ -2484,15 +2245,17 @@ fun RoundedCornersCard() {
             Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
             Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = stringResource(R.string.CornersTip), modifier = Modifier.padding(4.dp))
-
+                var rounddp = sliderPosition.roundToInt()
                 Text(text = rounddp.toString())
-            }
+
+                val context = LocalContext.current
             Slider(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+                onValueChange = { sliderPosition = it; rounddp = it.roundToInt() },
                 valueRange = 0f..36f,
                 onValueChangeFinished = {
+                    Toast.makeText(context, "$rounddp", Toast.LENGTH_SHORT).show()
                     overlayEnable("roundedcorners$rounddp")
                 },
                 steps = 8,
@@ -2523,4 +2286,4 @@ fun RoundedCornersCard() {
             }
         }
     }
-}
+}}
