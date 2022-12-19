@@ -3,6 +3,6 @@
 
     <style name="Theme.ThemedManager" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/BackgroundColor</item>
-    <item name="android:windowBackground">@color/BackgroundColor</item>
+        <item name="android:windowBackground">@color/BackgroundColor</item>
     </style>
 </resources>

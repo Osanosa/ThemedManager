@@ -19,7 +19,7 @@ val LightColorPalette = lightColors(
     primary = Color.Transparent,
     primaryVariant = Color.Transparent,
     background = backgroundLight,
-surface = backgroundLight
+    surface = backgroundLight
 
     /* Other default colors to override
 

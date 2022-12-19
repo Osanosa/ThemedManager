@@ -1,5 +1,5 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
 
     )
 
@@ -8,7 +8,6 @@ package pro.themed.manager
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color.rgb
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -33,6 +32,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -257,10 +257,61 @@ fun InfoCard() {
     }
 }
 
+@Preview
+@Composable
+fun MagiskInfoCard() {
+    Card(
+        border = BorderStroke(
+            width = 1.dp, color = Color.Red
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp)
+            .padding(top = 0.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = (0.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "This app requires root access and installed Themed Project modules. It won't work other way.",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+
+        )
+    }
+}
+
+@Preview
+@Composable
+fun AdrodInfoCard() {
+    Card(
+        border = BorderStroke(
+            width = 1.dp, color = Color.Red
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp)
+            .padding(top = 0.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = (0.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "A12+ does not support landscape grid",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+
+        )
+    }
+}
+
 //@Preview()
 @Composable
 fun TopAppBar() {
-    var showMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     TopAppBar(elevation = 0.dp,
@@ -280,40 +331,9 @@ fun TopAppBar() {
                 Icon(Icons.Default.Info, contentDescription = "list")
             }
 
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                val webIntent =
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
-                val webIntent1 = Intent(
-                    Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
-                )
-                val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
 
-                DropdownMenuItem(onClick = { context.startActivity(webIntent) }) {
-                    Image(
-                        painter = painterResource(R.drawable.telegram_svgrepo_com),
-                        contentDescription = "Telegram support group"
-                    )
-                }
+            })
 
-                DropdownMenuItem(onClick = { context.startActivity(webIntent1) }) {
-                    Row {
-                        Image(
-                            painter = painterResource(R.drawable.iconmonstr_github_1),
-                            contentDescription = null
-                        )
-                        Text(text = "GitHub")
-                    }
-                }
-
-
-                DropdownMenuItem(onClick = { context.startActivity(webIntent2) }) {
-                    Image(
-                        painter = painterResource(R.drawable.baseline_language_24),
-                        contentDescription = null
-                    )
-                }
-            }
-        })
 }
 
 
@@ -1083,6 +1103,7 @@ fun ColorsTab() {
             }, front = {
                 AccentsCard()
             })
+           MagiskInfoCard()
             InfoCard()
         }
 
@@ -1122,6 +1143,7 @@ fun MiscTab() {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             RoundedCornersCard()
             QsGridCard()
+            AdrodInfoCard()
         }
     }
 
@@ -2305,7 +2327,7 @@ fun RoundedCornersCard() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun QsGridCard() {
     var rowspositionportrait by remember { mutableStateOf(1f) }
