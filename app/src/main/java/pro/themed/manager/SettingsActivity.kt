@@ -4,8 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -40,7 +43,7 @@ class SettingsActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 TopAppBarSettings()
                 Card(
                     border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
@@ -77,7 +80,7 @@ class SettingsActivity : ComponentActivity() {
                             OutlinedButton(
                                 onClick = {
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
-
+                                    //idmap2 create /system/framework/frame
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -307,24 +310,79 @@ class SettingsActivity : ComponentActivity() {
                             fontSize = 18.sp
                         )
 
-                        Row {
+                        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                             Spacer(modifier = Modifier.width(8.dp))
 
                             OutlinedButton(
                                 onClick = {
-                                    Shell.SU.run("cmd package compile -m speed -f -a")
+                                    Shell.SU.run("cmd package compile -m speed -a")
 
                                 },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+                                  //  .fillMaxWidth()
+                                   // .weight(1f)
+                                         ,
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.cardcol,
                                 )
 
                             ) {
-                                Text(text = "Odex now")
+                                Text(text = "Speed")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedButton(
+                                onClick = {
+                                    Shell.SU.run("cmd package compile -m everything -a")
+
+                                },
+                                modifier = Modifier
+                                   // .fillMaxWidth()
+                                   // .weight(1f)
+                                        ,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.cardcol,
+                                )
+
+                            ) {
+                                Text(text = "Everything")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedButton(
+                                onClick = {
+                                    Shell.SU.run("cmd package compile --compile-layouts -a")
+
+                                },
+                                modifier = Modifier
+                                   // .fillMaxWidth()
+                                   // .weight(1f)
+                                        ,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.cardcol,
+                                )
+
+                            ) {
+                                Text(text = "Layouts")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedButton(
+                                onClick = {
+                                    Shell.SU.run("cmd package compile --reset -a")
+
+                                },
+                                modifier = Modifier
+                                   // .fillMaxWidth()
+                                    //.weight(1f)
+                                ,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.cardcol,
+                                )
+
+                            ) {
+                                Text(text = "Reset")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
 
