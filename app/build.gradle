@@ -14,8 +14,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 28
         targetSdk 33
-        versionCode 13
-        versionName '0.6.2'
+        versionCode 221225
+        versionName '0.6.4'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -78,6 +78,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.2.0'
     implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:+'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
