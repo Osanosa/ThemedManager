@@ -1,10 +1,10 @@
 package pro.themed.manager
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ class SettingsActivity : ComponentActivity() {
     @Preview
     @Composable
     fun SettingsPage() {
+        val context = LocalContext.current
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
@@ -79,8 +81,13 @@ class SettingsActivity : ComponentActivity() {
 
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
-                                    //idmap2 create /system/framework/frame
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -96,8 +103,15 @@ class SettingsActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+
 
                                 },
                                 modifier = Modifier
@@ -114,7 +128,14 @@ class SettingsActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E '^....themed.' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+
 
                                 },
                                 modifier = Modifier
@@ -310,36 +331,38 @@ class SettingsActivity : ComponentActivity() {
                             fontSize = 18.sp
                         )
 
-                        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            OutlinedButton(
-                                onClick = {
-                                    Shell.SU.run("cmd package compile -m speed -a")
-
-                                },
-                                modifier = Modifier
-                                  //  .fillMaxWidth()
-                                   // .weight(1f)
-                                         ,
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = MaterialTheme.colors.cardcol,
-                                )
-
-                            ) {
-                                Text(text = "Speed")
-                            }
+                        Row(modifier = Modifier) {
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "This will take a lot of time at first time, please be patient",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "You can minimize app to background",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "If your phone freezes badly you can safely reboot it to stop the process",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
                                     Shell.SU.run("cmd package compile -m everything -a")
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
                                 },
                                 modifier = Modifier
-                                   // .fillMaxWidth()
-                                   // .weight(1f)
-                                        ,
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.cardcol,
@@ -351,13 +374,34 @@ class SettingsActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "This will take a lot of time at first time, please be patient",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "You can minimize app to background",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "If your phone freezes badly you can safely reboot it to stop the process",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
                                     Shell.SU.run("cmd package compile --compile-layouts -a")
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
                                 },
                                 modifier = Modifier
-                                   // .fillMaxWidth()
-                                   // .weight(1f)
-                                        ,
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.cardcol,
@@ -369,13 +413,29 @@ class SettingsActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(
                                 onClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "Process started, now wait",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "This may take a lot of time, please be patient",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Toast.makeText(
+                                        context,
+                                        "You can minimize app to background",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
                                     Shell.SU.run("cmd package compile --reset -a")
+                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
                                 },
                                 modifier = Modifier
-                                   // .fillMaxWidth()
-                                    //.weight(1f)
-                                ,
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.cardcol,

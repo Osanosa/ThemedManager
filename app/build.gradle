@@ -14,8 +14,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 28
         targetSdk 33
-        versionCode 221225
-        versionName '0.6.4'
+        versionCode 221229
+        versionName '0.7.1'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

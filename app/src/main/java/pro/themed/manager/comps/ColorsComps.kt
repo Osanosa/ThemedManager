@@ -466,6 +466,66 @@ fun AccentsNewTemp(
         }
     }
 }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun UIBGDark() {
+
+    val tilesize = (LocalConfiguration.current.smallestScreenWidthDp - 16) / 8
+    Card(
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        Column(modifier = Modifier) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "UIBG Dark",
+                    fontSize = 24.sp
+                )
+                IconButton(modifier = Modifier, onClick = {
+                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.uibg.d' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.reset),
+                        contentDescription = null,
+                    )
+                }
+            }
+            Column {
+                    Row {
+                        Surface(modifier = Modifier.size(tilesize.dp),
+                            color = uibgAmoled,
+                            onClick = { overlayEnable("uibg.dark.amoled") }) {}
+
+                        Surface(modifier = Modifier.size(tilesize.dp),
+                            color = uibgCharcoal,
+                            onClick = { overlayEnable("uibg.dark.charcoal") }) {}
+
+                        Surface(modifier = Modifier.size(tilesize.dp),
+                            color = uibgCharcoal,
+                            onClick = { overlayEnable("uibg.dark.charcoalf2") }) {
+                            Text(text = "f2")
+                        }
+
+
+                    }
+
+
+            }
+        }
+    }
+}
 
 
 //@Preview
@@ -489,6 +549,8 @@ fun ColorsTab() {
             }, front = {
                 AccentsNewTemp("accents", "Accents")
             })
+            Spacer(modifier = Modifier.height(8.dp))
+            UIBGDark()
             Spacer(modifier = Modifier.height(8.dp))
             MagiskInfoCard()
             Spacer(modifier = Modifier.height(8.dp))

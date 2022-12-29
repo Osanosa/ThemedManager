@@ -334,6 +334,7 @@ fun TopAppBar() {
 
 fun overlayEnable(overlayname: String) {
     SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
+    SU.run("cmd overlay enable themed.$overlayname")
 }
 
 @Composable

@@ -10,7 +10,14 @@ val backgroundLight = Color(0xfff9f9f9)
 val backgroundDark = Color(0xff0f1012)
 
 val borderLight = Color(0xffd9d9d9)
-val borderDark = Color(0xFF1a1b1e)
+val borderDark = Color(0xFF2c2e33)
+
+
+val uibgAmoled = Color(0xFF000000)
+val uibgCharcoal = Color(0xFF151618)
+
+
+
 
 
 //Reds
