@@ -1,5 +1,6 @@
 package pro.themed.manager
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -457,6 +459,7 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     fun TopAppBarSettings() {
+        val context = LocalContext.current
         val navController = rememberNavController()
         TopAppBar(
             elevation = 0.dp,
@@ -470,9 +473,21 @@ class SettingsActivity : ComponentActivity() {
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             },
+            actions = {
+                IconButton(onClick = {
+                    context.startActivity(Intent(context, DebugActivity::class.java))
 
+                }) {
+                    Icon(painter = painterResource(id = R.drawable.baseline_bug_report_24), contentDescription = "debug")
+                }
 
-            )
+                IconButton(onClick = {
+                    context.startActivity(Intent(context, FaqActivity::class.java))
+                }) {
+                    Icon(painter = painterResource(id = R.drawable.baseline_help_24), contentDescription = "faq")
+                }
+            }
+        )
     }
 }
 

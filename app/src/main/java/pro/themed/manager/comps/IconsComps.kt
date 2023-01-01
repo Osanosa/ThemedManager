@@ -1,5 +1,6 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
-    ExperimentalMaterialApi::class )
+    ExperimentalMaterialApi::class, ExperimentalPagerApi::class
+)
 package pro.themed.manager.comps
 
 import androidx.compose.animation.AnimatedVisibility
@@ -12,8 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.*
 import pro.themed.manager.R
@@ -38,7 +42,14 @@ fun IconsTab() {
 }
 
 
-//@Preview
+@Preview
+@Composable
+fun QsPanel() {
+    HorizontalPager(count = 10) {
+
+    }
+
+}
 @Composable
 fun QSTileCard() {
 
@@ -163,90 +174,42 @@ fun QSTileCard() {
 
                         }
                         Row {
-                            IconButton(
-                                onClick = { overlayEnable("qstile.mountain") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsmountain),
-                                    contentDescription = "Mountain"
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.neonlike") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsneonlike),
-                                    contentDescription = "NeonLike"
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.ninja") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsninja),
-                                    contentDescription = "Ninja",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.oreocircletrim") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsoreocircletrim),
-                                    contentDescription = "Oreo (Circle Trim)",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.oreosquircletrim") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsoreosquircletrim),
-                                    contentDescription = "Oreo (Squircle Trim)",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.pokesign") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qspokesign),
-                                    contentDescription = "Pokesign",
-                                )
-                            }
+                            MyIconButton(
+                                overlayname = "qstile.mountain",
+                                sizedp = testdp,
+                                contentdescription = "Mountain",
+                                iconname = R.drawable.qsmountain
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.neonlike",
+                                sizedp = testdp,
+                                contentdescription = "NeonLike",
+                                iconname = R.drawable.qsneonlike
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.ninja",
+                                sizedp = testdp,
+                                contentdescription = "Ninja",
+                                iconname = R.drawable.qsninja
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.oreocircletrim",
+                                sizedp = testdp,
+                                contentdescription = "Oreo (Circle Trim)",
+                                iconname = R.drawable.qsoreocircletrim
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.oreosquircletrim",
+                                sizedp = testdp,
+                                contentdescription = "Oreo (Squircle Trim)",
+                                iconname = R.drawable.qsoreosquircletrim
+                            )
+                            MyIconButton(
+                                overlayname = "qstile.pokesign",
+                                sizedp = testdp,
+                                contentdescription = "Pokesign",
+                                iconname = R.drawable.qspokesign
+                            )
 
                         }
                         Row {

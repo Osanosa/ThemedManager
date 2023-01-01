@@ -40,6 +40,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.ColorsTab
+import pro.themed.manager.comps.FontsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
@@ -173,7 +174,7 @@ private operator fun Navigation.invoke() {
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        NavigationItems.ColorsTab, NavigationItems.IconsTab, NavigationItems.MiscTab
+        NavigationItems.ColorsTab, NavigationItems.IconsTab, NavigationItems.FontsTab, NavigationItems.MiscTab
     )
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.cardcol,
@@ -186,7 +187,8 @@ fun BottomNavigationBar(navController: NavController) {
         items.forEach { items ->
             BottomNavigationItem(icon = {
                 Icon(
-                    painter = painterResource(id = items.icon), contentDescription = items.title
+                    painter = painterResource(id = items.icon), contentDescription = items.title,
+                    modifier = Modifier.size(24.dp)
                 )
             },
                 label = { Text(text = items.title) },
@@ -220,9 +222,11 @@ fun Navigation(navController: NavHostController) {
         composable(NavigationItems.ColorsTab.route) {
             ColorsTab()
         }
-
         composable(NavigationItems.IconsTab.route) {
             IconsTab()
+        }
+        composable(NavigationItems.FontsTab.route) {
+            FontsTab()
         }
         composable(NavigationItems.MiscTab.route) {
             MiscTab()
