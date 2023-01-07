@@ -21,7 +21,18 @@
             android:name=".DebugActivity"
             android:exported="false"
             android:label="@string/title_activity_debug"
-            android:theme="@style/Theme.ThemedManager" />
+            android:theme="@style/Theme.ThemedManager">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="themed.pro" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".FaqActivity"
             android:exported="false"

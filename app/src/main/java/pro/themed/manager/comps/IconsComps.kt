@@ -1,6 +1,8 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalPagerApi::class
+    ExperimentalMaterialApi::class, ExperimentalPagerApi::class, ExperimentalPagerApi::class,
+    ExperimentalPagerApi::class, ExperimentalPagerApi::class
 )
+
 package pro.themed.manager.comps
 
 import androidx.compose.animation.AnimatedVisibility
@@ -11,16 +13,18 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
+import androidx.compose.ui.util.lerp
+import com.google.accompanist.pager.*
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.*
 import pro.themed.manager.R
+import kotlin.math.absoluteValue
 
 @Composable
 fun IconsTab() {
@@ -42,14 +46,13 @@ fun IconsTab() {
 }
 
 
-@Preview
 @Composable
 fun QsPanel() {
-    HorizontalPager(count = 10) {
-
-    }
 
 }
+
+@OptIn(ExperimentalPagerApi::class)
+@Preview
 @Composable
 fun QSTileCard() {
 
@@ -65,8 +68,115 @@ fun QSTileCard() {
     ) {
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
 
-        var expanded by remember { mutableStateOf(true) }
-        Column(modifier = Modifier.clickable { expanded = !expanded }) {
+        Column(modifier = Modifier) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "QsPanels",
+                    fontSize = 24.sp
+                )
+                IconButton(onClick = {
+                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qstile' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.reset), contentDescription = null
+                    )
+                }
+            }
+
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+            val pagerState = rememberPagerState()
+
+            HorizontalPager(
+                count = 3, state = pagerState,
+                // Add 32.dp horizontal padding to 'center' the pages
+                contentPadding = PaddingValues(horizontal = 32.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) { index ->
+                if (index == 0) {
+                    Card(
+                        Modifier
+                            .graphicsLayer {
+                                // Calculate the absolute offset for the current page from the
+                                // scroll position. We use the absolute value which allows us to mirror
+                                // any effects for both directions
+                                val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
+
+                                // We animate the scaleX + scaleY, between 85% and 100%
+                                lerp(
+                                    start = 0.85f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                ).also { scale ->
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+
+                                // We animate the alpha, between 50% and 100%
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            }
+                            .fillMaxWidth()
+
+                    ) {
+                        Image(
+                        painter = painterResource(R.drawable.main_logo), contentDescription = null
+                    )
+                    }
+                } else if (index == 1) {
+                    Card(
+                        Modifier
+                            .graphicsLayer {
+                                // Calculate the absolute offset for the current page from the
+                                // scroll position. We use the absolute value which allows us to mirror
+                                // any effects for both directions
+                                val pageOffset = calculateCurrentOffsetForPage(page = 1).absoluteValue
+
+                                // We animate the scaleX + scaleY, between 85% and 100%
+                                lerp(
+                                    start = 0.85f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                ).also { scale ->
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+
+                                // We animate the alpha, between 50% and 100%
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            }
+                            .fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.main_logo), contentDescription = null
+                        )
+                    }
+
+                }
+
+            }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp),
+            )
+
+            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -83,225 +193,224 @@ fun QSTileCard() {
                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qstile' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset),
-                        contentDescription = null
+                        painter = painterResource(R.drawable.reset), contentDescription = null
                     )
                 }
             }
 
             Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
-            AnimatedVisibility(expanded) {
-                Surface {
-                    Column {
-                        Row {
-                            MyIconButton(
-                                overlayname = "qstile.dualtonecircle",
-                                sizedp = testdp,
-                                contentdescription = "Circle with Dual Tone",
-                                iconname = R.drawable.qscirclewithdualtone
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.circlegradient",
-                                sizedp = testdp,
-                                contentdescription = "Circle with Gradient",
-                                iconname = R.drawable.qscirclewithgradient
-                            )
 
-                            MyIconButton(
-                                overlayname = "qstile.circletrim",
-                                sizedp = testdp,
-                                contentdescription = "Circle with Trim",
-                                iconname = R.drawable.qscirclewithtrim
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.cookie",
-                                sizedp = testdp,
-                                contentdescription = "Cookie",
-                                iconname = R.drawable.qscookie
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.cosmos",
-                                sizedp = testdp,
-                                contentdescription = "Cosmos",
-                                iconname = R.drawable.qscosmos
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.default",
-                                sizedp = testdp,
-                                contentdescription = "Default",
-                                iconname = R.drawable.qsdefault
-                            )
+            Surface {
+                Column {
+                    Row {
+                        MyIconButton(
+                            overlayname = "qstile.dualtonecircle",
+                            sizedp = testdp,
+                            contentdescription = "Circle with Dual Tone",
+                            iconname = R.drawable.qscirclewithdualtone
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.circlegradient",
+                            sizedp = testdp,
+                            contentdescription = "Circle with Gradient",
+                            iconname = R.drawable.qscirclewithgradient
+                        )
 
+                        MyIconButton(
+                            overlayname = "qstile.circletrim",
+                            sizedp = testdp,
+                            contentdescription = "Circle with Trim",
+                            iconname = R.drawable.qscirclewithtrim
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.cookie",
+                            sizedp = testdp,
+                            contentdescription = "Cookie",
+                            iconname = R.drawable.qscookie
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.cosmos",
+                            sizedp = testdp,
+                            contentdescription = "Cosmos",
+                            iconname = R.drawable.qscosmos
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.default",
+                            sizedp = testdp,
+                            contentdescription = "Default",
+                            iconname = R.drawable.qsdefault
+                        )
+
+                    }
+                    Row {
+                        MyIconButton(
+                            overlayname = "qstile.dividedcircle",
+                            sizedp = testdp,
+                            contentdescription = "Divided Circle",
+                            iconname = R.drawable.qsdividedcircle
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.dottedcircle",
+                            sizedp = testdp,
+                            contentdescription = "Dotted Circle",
+                            iconname = R.drawable.qsdottedcircle
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.dualtonecircletrim",
+                            sizedp = testdp,
+                            contentdescription = "DualTone Circle with Trim",
+                            iconname = R.drawable.qsdualtonecircletrim
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.ink",
+                            sizedp = testdp,
+                            contentdescription = "Ink",
+                            iconname = R.drawable.qsink
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.inkdrop",
+                            sizedp = testdp,
+                            contentdescription = "Inkdrop",
+                            iconname = R.drawable.qsinkdrop
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.justicons",
+                            sizedp = testdp,
+                            contentdescription = "Just Icons",
+                            iconname = R.drawable.qsjusticons
+                        )
+
+
+                    }
+                    Row {
+                        MyIconButton(
+                            overlayname = "qstile.mountain",
+                            sizedp = testdp,
+                            contentdescription = "Mountain",
+                            iconname = R.drawable.qsmountain
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.neonlike",
+                            sizedp = testdp,
+                            contentdescription = "NeonLike",
+                            iconname = R.drawable.qsneonlike
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.ninja",
+                            sizedp = testdp,
+                            contentdescription = "Ninja",
+                            iconname = R.drawable.qsninja
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.oreocircletrim",
+                            sizedp = testdp,
+                            contentdescription = "Oreo (Circle Trim)",
+                            iconname = R.drawable.qsoreocircletrim
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.oreosquircletrim",
+                            sizedp = testdp,
+                            contentdescription = "Oreo (Squircle Trim)",
+                            iconname = R.drawable.qsoreosquircletrim
+                        )
+                        MyIconButton(
+                            overlayname = "qstile.pokesign",
+                            sizedp = testdp,
+                            contentdescription = "Pokesign",
+                            iconname = R.drawable.qspokesign
+                        )
+
+                    }
+                    Row {
+                        IconButton(
+                            onClick = { overlayEnable("qstile.squaremedo") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qssquaremedo),
+                                contentDescription = "Squaremedo"
+                            )
                         }
-                        Row {
-                            MyIconButton(
-                                overlayname = "qstile.dividedcircle",
-                                sizedp = testdp,
-                                contentdescription = "Divided Circle",
-                                iconname = R.drawable.qsdividedcircle
+                        IconButton(
+                            onClick = { overlayEnable("qstile.squircle") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qssquircle),
+                                contentDescription = "Squircle"
                             )
-                            MyIconButton(
-                                overlayname = "qstile.dottedcircle",
-                                sizedp = testdp,
-                                contentdescription = "Dotted Circle",
-                                iconname = R.drawable.qsdottedcircle
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.dualtonecircletrim",
-                                sizedp = testdp,
-                                contentdescription = "DualTone Circle with Trim",
-                                iconname = R.drawable.qsdualtonecircletrim
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.ink",
-                                sizedp = testdp,
-                                contentdescription = "Ink",
-                                iconname = R.drawable.qsink
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.inkdrop",
-                                sizedp = testdp,
-                                contentdescription = "Inkdrop",
-                                iconname = R.drawable.qsinkdrop
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.justicons",
-                                sizedp = testdp,
-                                contentdescription = "Just Icons",
-                                iconname = R.drawable.qsjusticons
-                            )
-
-
                         }
-                        Row {
-                            MyIconButton(
-                                overlayname = "qstile.mountain",
-                                sizedp = testdp,
-                                contentdescription = "Mountain",
-                                iconname = R.drawable.qsmountain
+                        IconButton(
+                            onClick = { overlayEnable("qstile.squircletrim") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qssquircletrim),
+                                contentDescription = "Squircle with trim",
                             )
-                            MyIconButton(
-                                overlayname = "qstile.neonlike",
-                                sizedp = testdp,
-                                contentdescription = "NeonLike",
-                                iconname = R.drawable.qsneonlike
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.ninja",
-                                sizedp = testdp,
-                                contentdescription = "Ninja",
-                                iconname = R.drawable.qsninja
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.oreocircletrim",
-                                sizedp = testdp,
-                                contentdescription = "Oreo (Circle Trim)",
-                                iconname = R.drawable.qsoreocircletrim
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.oreosquircletrim",
-                                sizedp = testdp,
-                                contentdescription = "Oreo (Squircle Trim)",
-                                iconname = R.drawable.qsoreosquircletrim
-                            )
-                            MyIconButton(
-                                overlayname = "qstile.pokesign",
-                                sizedp = testdp,
-                                contentdescription = "Pokesign",
-                                iconname = R.drawable.qspokesign
-                            )
-
                         }
-                        Row {
-                            IconButton(
-                                onClick = { overlayEnable("qstile.squaremedo") },
+                        IconButton(
+                            onClick = { overlayEnable("qstile.teardrop") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
                                 modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qssquaremedo),
-                                    contentDescription = "Squaremedo"
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.squircle") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qssquircle),
-                                    contentDescription = "Squircle"
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.squircletrim") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qssquircletrim),
-                                    contentDescription = "Squircle with trim",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.teardrop") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qsteardrop),
-                                    contentDescription = "TearDrop",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.triangle") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qstriangle),
-                                    contentDescription = "Triangle",
-                                )
-                            }
-                            IconButton(
-                                onClick = { overlayEnable("qstile.wavey") },
-                                modifier = Modifier
-                                    .size(testdp.dp)
-                                    .background(color = MaterialTheme.colors.cardcol)
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    painter = painterResource(R.drawable.qswavey),
-                                    contentDescription = "Wavey",
-                                )
-                            }
-
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qsteardrop),
+                                contentDescription = "TearDrop",
+                            )
                         }
+                        IconButton(
+                            onClick = { overlayEnable("qstile.triangle") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qstriangle),
+                                contentDescription = "Triangle",
+                            )
+                        }
+                        IconButton(
+                            onClick = { overlayEnable("qstile.wavey") },
+                            modifier = Modifier
+                                .size(testdp.dp)
+                                .background(color = MaterialTheme.colors.cardcol)
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                painter = painterResource(R.drawable.qswavey),
+                                contentDescription = "Wavey",
+                            )
+                        }
+
                     }
                 }
             }
+
         }
     }
 }
@@ -340,8 +449,7 @@ fun NavbarCard() {
                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.navbar' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset),
-                        contentDescription = null
+                        painter = painterResource(R.drawable.reset), contentDescription = null
                     )
                 }
             }
@@ -599,8 +707,7 @@ fun IconPackCard() {
                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.iconpack' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset),
-                        contentDescription = null
+                        painter = painterResource(R.drawable.reset), contentDescription = null
                     )
                 }
             }
@@ -1090,3 +1197,5 @@ fun IconPackCard() {
         }
     }
 }
+
+

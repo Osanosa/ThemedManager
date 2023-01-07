@@ -40,45 +40,69 @@ class DebugActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp)) {
+            Column(modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp)) {
                 TopAppBarDebug()
-                OutlinedButton(
-                    onClick = {
-                        Toast.makeText(
-                            context, "Creating directory", Toast.LENGTH_SHORT
-                        ).show()
-                        Shell.SU.run("mkdir /sdcard/themeddebug")
-                        Toast.makeText(
-                            context, "Checking overlays", Toast.LENGTH_SHORT
-                        ).show()
-                        Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/cmdoverlaylist.txt")
-                        Toast.makeText(
-                            context, "Checking installed modules", Toast.LENGTH_SHORT
-                        ).show()
-                        Shell.SU.run("cd /data/adb/modules ; ls | tee -a /sdcard/themeddebug/modules.txt")
-                        Toast.makeText(
-                            context, "Copying framework-res.apk", Toast.LENGTH_SHORT
-                        ).show()
-                        Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/")
-                        Toast.makeText(
-                            context, "Copying SystemUI.apk", Toast.LENGTH_SHORT
-                        ).show()
-                        Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/")
+
+                Row {
+                    OutlinedButton(
+                        onClick = {
+                            Toast.makeText(
+                                context, "Creating directory", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("mkdir /sdcard/themeddebug")
+                            Toast.makeText(
+                                context, "Checking overlays", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/cmdoverlaylist.txt")
+                            Toast.makeText(
+                                context, "Checking installed modules", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("cd /data/adb/modules ; ls | tee -a /sdcard/themeddebug/modules.txt")
+                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+
+
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                        .weight(1f),
+                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.cardcol,
+                        )
+
+                    ) {
+                        Text(text = "Collect logs")
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            Toast.makeText(
+                                context, "Creating directory", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("mkdir /sdcard/themeddebug")
+                            Toast.makeText(
+                                context, "Copying framework-res.apk", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/")
+                            Toast.makeText(
+                                context, "Copying SystemUI.apk", Toast.LENGTH_SHORT
+                            ).show()
+                            Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/")
 
 
 
-                        Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
 
-                    }, modifier = Modifier
-                     .fillMaxWidth()
-                    //.weight(1f),
-                    , shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.cardcol,
-                    )
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                        .weight(1f),
+                         shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.cardcol,
+                        )
 
-                ) {
-                    Text(text = "Collect files")
+                    ) {
+                        Text(text = "Collect files")
+                    }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
 
