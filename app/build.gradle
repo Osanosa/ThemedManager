@@ -14,8 +14,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 26
         targetSdk 33
-        versionCode 230101
-        versionName '0.7.2'
+        versionCode 230108
+        versionName '0.8 Pre-Release'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,7 +79,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.2.0'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.compose.material:material-icons-core:1.3.1'
+    implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
@@ -88,9 +88,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation 'androidx.navigation:navigation-compose:2.6.0-alpha04'
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.2.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
 
 
