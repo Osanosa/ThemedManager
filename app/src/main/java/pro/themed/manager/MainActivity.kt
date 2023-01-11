@@ -341,23 +341,4 @@ fun overlayEnable(overlayname: String) {
     SU.run("cmd overlay enable themed.$overlayname")
 }
 
-@Composable
-fun MyIconButton(overlayname: String, sizedp: Int, contentdescription: String, iconname: Int) {
-    IconButton(
-        onClick = { overlayEnable(overlayname) },
-        modifier = Modifier
-            .size(sizedp.dp)
-            .background(color = MaterialTheme.colors.cardcol)
-    ) {
-        Image(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            painter = painterResource(iconname),
-            contentDescription = contentdescription,
-        )
-    }
-
-}
-
 
