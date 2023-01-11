@@ -159,7 +159,7 @@ fun QSTileCard() {
                                 qspanelstyle = "default"
                                 overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
                 }) {
-                Text(text = "default")
+                Text(text = "default", Modifier.padding(24.dp))
             }
             } else if (index == 1) {
             Card(
@@ -187,7 +187,7 @@ fun QSTileCard() {
                     .clickable { qspanelstyle = "clear"
                         overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
                     }) {
-                Text(text = "clear")
+                Text(text = "clear", Modifier.padding(24.dp))
             }
         }
 

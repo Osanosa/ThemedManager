@@ -112,6 +112,7 @@ class SettingsActivity : ComponentActivity() {
                                     ).show()
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                                     Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
 
