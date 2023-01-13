@@ -323,6 +323,60 @@ class SettingsActivity : ComponentActivity() {
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                text = "Clear app caches",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = "Clears cache of all apps (data is safe)",
+                            fontSize = 18.sp
+                        )
+
+                        Row {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            OutlinedButton(
+                                onClick = {
+                                    Shell.SU.run("pm trim-caches 100g")
+
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.cardcol,
+                                )
+
+                            ) {
+                                Text(text = "Clear all")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                        }
+                    }
+                }
+
+                Card(
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp),
+                    elevation = (0.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    backgroundColor = MaterialTheme.colors.cardcol
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                 text = "Dex2oat",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
