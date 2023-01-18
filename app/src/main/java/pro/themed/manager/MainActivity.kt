@@ -1,4 +1,4 @@
-@file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
+@file:OptIn(
     ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
 
     )
@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +37,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
+import com.google.firebase.perf.FirebasePerformance
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.FontsTab
@@ -132,6 +133,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
+            FirebaseApp.initializeApp(this)
+            FirebasePerformance.getInstance().isPerformanceCollectionEnabled = true
+
 
             ThemedManagerTheme {
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
@@ -316,10 +321,10 @@ fun TopAppBar() {
         backgroundColor = MaterialTheme.colors.cardcol,
         actions = {
             IconButton(onClick = {
-                context.startActivity(Intent(context, SettingsActivity::class.java))
+                context.startActivity(Intent(context, ToolboxActivity::class.java))
 
             }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                Icon(painterResource(id = R.drawable.toolbox), contentDescription = "Settings")
             }
 
             IconButton(onClick = {

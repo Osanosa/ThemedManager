@@ -6,7 +6,7 @@ val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 
-val backgroundLight = Color(0xfff9f9f9)
+val backgroundLight = Color(0xffffffff)
 val backgroundDark = Color(0xff0f1012)
 
 val borderLight = Color(0xffd9d9d9)
