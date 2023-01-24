@@ -37,8 +37,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.FirebaseApp
-import com.google.firebase.perf.FirebasePerformance
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.FontsTab
@@ -134,10 +132,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-            FirebaseApp.initializeApp(this)
-            FirebasePerformance.getInstance().isPerformanceCollectionEnabled = true
-
-
+           
             ThemedManagerTheme {
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
                 Surface(
