@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,12 +33,14 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -262,7 +265,7 @@ class ToolboxActivity : ComponentActivity() {
             elevation = (0.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Column {
+            Column(Modifier.padding(vertical = 2.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -308,6 +311,7 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
 
                 }
+
             }
         }
     }
@@ -324,7 +328,7 @@ class ToolboxActivity : ComponentActivity() {
             elevation = (0.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Column {
+            Column(Modifier.padding(vertical = 2.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -362,13 +366,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
                     ) {
                         Row {
-                            /*
-                                                                Image(
-                                                                    painter = painterResource(R.drawable.baseline_light_mode_24),
-                                                                    contentDescription = null,
-                                                                    contentScale = ContentScale.Fit
-                                                                )
-                            */                                    Text(text = "Light")
+                            Text(text = "Light")
 
                         }
                     }
@@ -425,7 +423,7 @@ class ToolboxActivity : ComponentActivity() {
             elevation = (0.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Column {
+            Column(Modifier.padding(vertical = 2.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -490,7 +488,7 @@ class ToolboxActivity : ComponentActivity() {
             elevation = (0.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Column {
+            Column(Modifier.padding(vertical = 2.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -504,7 +502,8 @@ class ToolboxActivity : ComponentActivity() {
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Pre-compiles code of all installed apps to reduce lag ans stutter",
+                    text = "Pre-compiles code of all installed apps to reduce lag ans stutter\n" +
+                            "(App won't respond until process finishes)",
                     fontSize = 18.sp
                 )
 
@@ -530,9 +529,9 @@ class ToolboxActivity : ComponentActivity() {
                             ).show()
 
                             val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_dex2oat_everything")
+                                .newTrace("toolbox_dex2oat_speed")
                             myTrace.start()
-                            Shell.SU.run("cmd package compile -m everything -a")
+                            Shell.SU.run("cmd package compile -m speed -a")
                             myTrace.stop()
                             Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
@@ -546,7 +545,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Everything")
+                        Text(text = "Speed")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -662,7 +661,7 @@ class ToolboxActivity : ComponentActivity() {
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Changes resolution and density",
+                    text = "Changes resolution and density. Please click custom first",
                     fontSize = 18.sp
                 )
                 var customresShown by remember { mutableStateOf(false) }
@@ -670,44 +669,80 @@ class ToolboxActivity : ComponentActivity() {
                 if (customresShown) {
                     AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
                         title = { Text("Enter your custom resolution") },
-                        text = { Text("Are you sure you want to proceed?") },
+                        text = { Text("On some roms such as MIUI setting resolution to smaller then 480p may cause issues. Test button will reset size after 10s.") },
                         buttons = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(modifier = Modifier.width(8.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 TextField(
-                                    modifier = Modifier.fillMaxWidth().weight(1f),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
                                     value = customres,
                                     singleLine = true,
                                     onValueChange = { customres = it },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(modifier = Modifier.fillMaxWidth().weight(1f), onClick = {
 
 
-                                }) { Text(text = "Test") }
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(8.dp)
+                                ) {
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        onClick = {
+                                            downscalebynumber(width = "$customres")
+                                            Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
 
-                                Button(
-                                    modifier = Modifier.fillMaxWidth().weight(1f),
-                                    onClick = {
-                                        customresShown = false
-                                    },
-                                ) { Text(text = "Apply") }
-                                Spacer(modifier = Modifier.width(8.dp))
+                                        }) { Text(text = "Test") }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        onClick = {
+                                            downscalebynumber(width = "$customres")
+                                        },
+                                    ) { Text(text = "Apply") }
+                                }
+                                Text(text = "close",
+                                    modifier = Modifier.clickable { customresShown = false })
+                                Spacer(modifier = Modifier.height(8.dp))
 
                             }
                         })
                 }
-                Row(modifier = Modifier) {
-                    Spacer(modifier = Modifier.width(8.dp))
+                val switchState = remember { mutableStateOf(true) }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        text = "Reset to defaults after 10 seconds \n(App won't respond until reset happen)"
+                    )
+                    Switch(
+                        checked = switchState.value,
+                        onCheckedChange = { switchState.value = it })
+                }
+
+                Row(modifier = Modifier.padding(horizontal = 8.dp)) {
                     OutlinedButton(
                         onClick = {
                             downscalebydivisor("2")
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
+                            }
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                            .wrapContentWidth()
+                        ,
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -720,10 +755,13 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
                             downscalebydivisor("3")
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
+                            }
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                            .wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -736,10 +774,14 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
                             downscalebydivisor("4")
+
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
+                            }
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                            .wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -764,7 +806,6 @@ class ToolboxActivity : ComponentActivity() {
                     ) {
                         Text(text = "Custom")
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
 
                 }
             }
@@ -773,10 +814,76 @@ class ToolboxActivity : ComponentActivity() {
 
     fun downscalebydivisor(divisor: String) {
 
+        Shell.SU.run(
+            command = """
+                # Set the number of division
+                divisor=$divisor
+                
+                # Get the current resolution
+                resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
+                
+                # Extract the width and height values
+                width=${'$'}(echo ${'$'}resolution | awk -F 'x' '{print ${'$'}1}')
+                height=${'$'}(echo ${'$'}resolution | awk -F 'x' '{print ${'$'}2}')
+                
+                # Get the current density
+                density=${'$'}(wm density | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
+                
+                # Check if width and height are odd
+                if [ ${'$'}((width % ${'$'}divisor)) -eq 1 ]; then
+                    width=${'$'}((${'$'}width - 1))
+                fi
+                
+                if [ ${'$'}((height % ${'$'}divisor)) -eq 1 ]; then
+                    height=${'$'}((${'$'}height - 1))
+                fi
+                
+                # Divide the width, height and density by divisor
+                width=${'$'}((${'$'}width / ${'$'}divisor))
+                height=${'$'}((${'$'}height / ${'$'}divisor))
+                density=${'$'}((${'$'}density / ${'$'}divisor))
+                
+                # Set the new resolution and density
+                wm size ${'$'}width"x"${'$'}height
+                wm density ${'$'}density
+                """
+        )
+
+    }
+
+    fun downscalebynumber(width: String) {
 
         Shell.SU.run(
-            command = """divisor=$divisor ; resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}') ; width=${'$'}(echo ${'$'}resolution | awk -F 'x' '{print ${'$'}1}') ; height=${'$'}(echo ${'$'}resolution | awk -F 'x' '{print ${'$'}2}') ; density=${'$'}(wm density | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}') ; if [ ${'$'}((width % ${'$'}divisor)) -eq 1 ] ; then width=${'$'}((${'$'}width - 1)) ; fi ; if [ ${'$'}((height % ${'$'}divisor)) -eq 1 ] ; then height=${'$'}((${'$'}height - 1)) ; fi ; width=${'$'}((${'$'}width / ${'$'}divisor)) ; height=${'$'}((${'$'}height / ${'$'}divisor)) ; density=${'$'}((${'$'}density / ${'$'}divisor)) ; wm size ${'$'}width"x"${'$'}height ; wm density ${'$'}density
-"""
+            command = """
+                # Get current screen resolution
+                resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
+                
+                # Extract width and height from resolution
+                width=${'$'}(echo ${'$'}resolution | cut -d'x' -f1 | cut -d':' -f2)
+                height=${'$'}(echo ${'$'}resolution | cut -d'x' -f2)
+                
+                # Calculate aspect ratio
+                aspect_ratio=${'$'}(echo "scale=2; ${'$'}width/${'$'}height" | bc)
+                
+                # Calculate new height
+                new_height=${'$'}(echo "scale=0; $width/${'$'}aspect_ratio" | bc)
+                
+                # Get current density
+                density=${'$'}(wm density | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
+                
+                
+                
+                #Calculate new density
+                density_ratio=${'$'}(echo "scale=2; ${'$'}width/$width" | bc)
+                new_density=${'$'}(echo "scale=0; ${'$'}density/${'$'}density_ratio" | bc)
+                
+                # Set new resolution
+                wm size $width"x"${'$'}new_height
+                
+                # Set new density
+                wm density ${'$'}(printf "%.0f" ${'$'}new_density)
+                
+                """
         )
 
     }
