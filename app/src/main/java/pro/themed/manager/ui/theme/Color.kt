@@ -17,9 +17,6 @@ val uibgAmoled = Color(0xFF000000)
 val uibgCharcoal = Color(0xFF151618)
 
 
-
-
-
 //Reds
 val MaterialRed50 = Color(0xffFFEBEE)
 val MaterialRed100 = Color(0xffFFCDD2)

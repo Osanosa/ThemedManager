@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
@@ -32,7 +33,7 @@ import pro.themed.manager.ui.theme.*
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccentsNewTemp(
-     name: String, Header: String
+    name: String, Header: String
 ) {
     var redvisible by remember { mutableStateOf(false) }
     var orangevisible by remember { mutableStateOf(false) }
@@ -466,6 +467,7 @@ fun AccentsNewTemp(
         }
     }
 }
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UIBGDark() {
@@ -503,23 +505,23 @@ fun UIBGDark() {
                 }
             }
             Column {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = uibgAmoled,
-                            onClick = { overlayEnable("uibg.dark.amoled") }) {}
+                Row {
+                    Surface(modifier = Modifier.size(tilesize.dp),
+                        color = uibgAmoled,
+                        onClick = { overlayEnable("uibg.dark.amoled") }) {}
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = uibgCharcoal,
-                            onClick = { overlayEnable("uibg.dark.charcoal") }) {}
+                    Surface(modifier = Modifier.size(tilesize.dp),
+                        color = uibgCharcoal,
+                        onClick = { overlayEnable("uibg.dark.charcoal") }) {}
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = uibgCharcoal,
-                            onClick = { overlayEnable("uibg.dark.charcoalf2") }) {
-                            Text(text = "f2")
-                        }
-
-
+                    Surface(modifier = Modifier.size(tilesize.dp),
+                        color = uibgCharcoal,
+                        onClick = { overlayEnable("uibg.dark.charcoalf2") }) {
+                        Text(text = "f2")
                     }
+
+
+                }
 
 
             }
@@ -537,17 +539,19 @@ fun ColorsTab() {
             .padding(bottom = 56.dp),
         color = MaterialTheme.colors.cardcol
     ) {
-        Column(modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp)
+        ) {
 
             var state by remember { mutableStateOf(CardFace.Front) }
             FlipCard(cardFace = state, onClick = {
                 state = it.next
             }, axis = RotationAxis.AxisY, back = {
-                AccentsNewTemp("accents.dark", "Accents Dark")
+                AccentsNewTemp("accents.dark", stringResource(R.string.accents_dark))
             }, front = {
-                AccentsNewTemp("accents", "Accents")
+                AccentsNewTemp("accents", stringResource(R.string.accents))
             })
             Spacer(modifier = Modifier.height(8.dp))
             UIBGDark()

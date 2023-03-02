@@ -4,11 +4,24 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -40,9 +53,11 @@ class DebugActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
-            Column(modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(8.dp)
+            ) {
                 TopAppBarDebug()
                 Row {
                     OutlinedButton(
@@ -81,7 +96,7 @@ class DebugActivity : ComponentActivity() {
                         }, modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                         shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
                         )
 

@@ -15,6 +15,11 @@
         <activity
             android:name=".ToolboxActivity"
             android:exported="false"
+            android:label="Toolbox"
+            android:theme="@style/Theme.ThemedManager" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.ThemedManager" />
         <activity

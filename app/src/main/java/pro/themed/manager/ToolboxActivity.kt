@@ -40,7 +40,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +58,9 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 
@@ -446,16 +448,18 @@ class ToolboxActivity : ComponentActivity() {
 
                     OutlinedButton(
                         onClick = {
-
-                            val myTrace: Trace =
-                                FirebasePerformance.getInstance().newTrace("toolbox_cache_clear")
-                            myTrace.start()
-                            Shell.SU.run("pm trim-caches 100g")
-                            myTrace.stop()
-
+                                val myTrace: Trace =
+                                    FirebasePerformance.getInstance().newTrace("toolbox_cache_clear")
+                                myTrace.start()
+                                Shell.SU.run("pm trim-caches 100g")
+                                myTrace.stop()
 
 
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+
+                                Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+
+
+
 
                         },
                         modifier = Modifier
@@ -502,8 +506,7 @@ class ToolboxActivity : ComponentActivity() {
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Pre-compiles code of all installed apps to reduce lag ans stutter\n" +
-                            "(App won't respond until process finishes)",
+                    text = "Pre-compiles code of all installed apps aswell as it's layouts to reduce lag ans stutter\n",
                     fontSize = 18.sp
                 )
 
@@ -511,67 +514,33 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Toast.makeText(
-                                context, "Process started, now wait", Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context,
-                                "This will take a lot of time at first time, please be patient",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context, "You can minimize app to background", Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context,
-                                "If your phone freezes badly you can safely reboot it to stop the process",
-                                Toast.LENGTH_LONG
-                            ).show()
 
-                            val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_dex2oat_speed")
-                            myTrace.start()
-                            Shell.SU.run("cmd package compile -m speed -a")
-                            myTrace.stop()
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
 
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
 
-                    ) {
-                        Text(text = "Speed")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
                             Toast.makeText(
-                                context, "Process started, now wait", Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context,
-                                "This will take a lot of time at first time, please be patient",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context, "You can minimize app to background", Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context,
-                                "If your phone freezes badly you can safely reboot it to stop the process",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_dex2oat_layouts")
-                            myTrace.start()
-                            Shell.SU.run("cmd package compile --compile-layouts -a")
-                            myTrace.stop()
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                                    context, "Precompiling dex files", Toast.LENGTH_SHORT
+                                ).show()
+
+                                val SpeedTrace: Trace = FirebasePerformance.getInstance()
+                                    .newTrace("toolbox_dex2oat_speed")
+                                SpeedTrace.start()
+                                Shell.SU.run("cmd package compile -m speed-profile -a")
+                                Shell.SU.run("cmd package compile -m speed-profile --secondary-dex -a")
+                                SpeedTrace.stop()
+
+                                Toast.makeText(
+                                    context, "Precompiling layouts", Toast.LENGTH_SHORT
+                                ).show()
+
+                                val LayoutsTrace: Trace = FirebasePerformance.getInstance()
+                                    .newTrace("toolbox_dex2oat_layouts")
+                                LayoutsTrace.start()
+                                Shell.SU.run("cmd package compile --compile-layouts -a")
+                                LayoutsTrace.stop()
+                                Toast.makeText(
+                                    context, "Done", Toast.LENGTH_SHORT
+                                ).show()
+
 
                         },
                         modifier = Modifier
@@ -583,40 +552,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Layouts")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-                            Toast.makeText(
-                                context, "Process started, now wait", Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context,
-                                "This may take a lot of time, please be patient",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            Toast.makeText(
-                                context, "You can minimize app to background", Toast.LENGTH_SHORT
-                            ).show()
-                            val myTrace: Trace =
-                                FirebasePerformance.getInstance().newTrace("toolbox_dex2oat_reset")
-                            myTrace.start()
-                            Shell.SU.run("cmd package compile --reset -a")
-                            myTrace.stop()
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = "Reset")
+                        Text(text = "Optimize")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -692,8 +628,11 @@ class ToolboxActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .weight(1f),
                                         onClick = {
-                                            downscalebynumber(width = "$customres")
-                                            Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
+
+                                                downscalebynumber(width = "$customres")
+                                                Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
+
+
 
                                         }) { Text(text = "Test") }
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -703,6 +642,8 @@ class ToolboxActivity : ComponentActivity() {
                                             .weight(1f),
                                         onClick = {
                                             downscalebynumber(width = "$customres")
+
+
                                         },
                                     ) { Text(text = "Apply") }
                                 }
@@ -724,7 +665,7 @@ class ToolboxActivity : ComponentActivity() {
                 ) {
                     Text(
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        text = "Reset to defaults after 10 seconds \n(App won't respond until reset happen)"
+                        text = "Reset to defaults after 10 seconds \n"
                     )
                     Switch(
                         checked = switchState.value,
@@ -741,8 +682,7 @@ class ToolboxActivity : ComponentActivity() {
                             }
                         },
                         modifier = Modifier
-                            .wrapContentWidth()
-                        ,
+                            .wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,

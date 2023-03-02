@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,13 +39,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import com.jaredrummler.ktsh.Shell.Companion.SU
+import pro.themed.manager.comps.AppsTab
 import pro.themed.manager.comps.ColorsTab
-import pro.themed.manager.comps.FontsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
-
 
 
 @get:Composable
@@ -132,7 +136,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-           
+
             ThemedManagerTheme {
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
                 Surface(
@@ -144,6 +148,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
     //@Preview
@@ -174,7 +179,10 @@ private operator fun Navigation.invoke() {
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        NavigationItems.ColorsTab, NavigationItems.IconsTab, NavigationItems.FontsTab, NavigationItems.MiscTab
+        NavigationItems.ColorsTab,
+        NavigationItems.IconsTab,
+        NavigationItems.FontsTab,
+        NavigationItems.MiscTab
     )
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.cardcol,
@@ -187,7 +195,8 @@ fun BottomNavigationBar(navController: NavController) {
         items.forEach { items ->
             BottomNavigationItem(icon = {
                 Icon(
-                    painter = painterResource(id = items.icon), contentDescription = items.title,
+                    painter = painterResource(id = items.icon),
+                    contentDescription = items.title,
                     modifier = Modifier.size(24.dp)
                 )
             },
@@ -214,6 +223,7 @@ fun BottomNavigationBar(navController: NavController) {
 
 }
 
+@ExperimentalMaterial3Api
 @Composable
 fun Navigation(navController: NavHostController) {
 
@@ -226,7 +236,7 @@ fun Navigation(navController: NavHostController) {
             IconsTab()
         }
         composable(NavigationItems.FontsTab.route) {
-            FontsTab()
+            AppsTab()
         }
         composable(NavigationItems.MiscTab.route) {
             MiscTab()
@@ -323,22 +333,34 @@ fun TopAppBar() {
             }
 
             IconButton(onClick = {
+                context.startActivity(Intent(context, SettingsActivity::class.java))
+
+            }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings")
+            }
+
+            IconButton(onClick = {
                 context.startActivity(Intent(context, AboutActivity::class.java))
             }) {
                 Icon(Icons.Default.Info, contentDescription = "list")
             }
 
 
-            })
+        })
 
 }
-
-
 
 
 fun overlayEnable(overlayname: String) {
     SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
     SU.run("cmd overlay enable themed.$overlayname")
+
+    Firebase.analytics.logEvent("Overlay_Selected") {
+        param ("Overlay_Name" , overlayname)
+    }
+
+
+
 }
 
 

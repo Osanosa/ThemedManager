@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+@file:OptIn(
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class
 )
 
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 class AboutActivity : ComponentActivity() {
@@ -52,9 +54,12 @@ class AboutActivity : ComponentActivity() {
     @Composable
     fun AboutPage() {
         Surface(color = MaterialTheme.colors.cardcol) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState()), horizontalAlignment = CenterHorizontally) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                horizontalAlignment = CenterHorizontally
+            ) {
                 var easteregg by remember { mutableStateOf(false) }
-                var tapcount by remember { mutableStateOf(0)}
+                var tapcount by remember { mutableStateOf(0) }
                 TopAppBarAbout()
                 Surface(
                     shape = CircleShape,
@@ -63,7 +68,7 @@ class AboutActivity : ComponentActivity() {
                         .align(alignment = CenterHorizontally)
                         .padding(12.dp),
                     onClick = {
-                        if (tapcount>= 9) easteregg = true else tapcount +=1
+                        if (tapcount >= 9) easteregg = true else tapcount += 1
 
                     }
                 ) {
@@ -78,11 +83,18 @@ class AboutActivity : ComponentActivity() {
                 val versionName = BuildConfig.VERSION_NAME
                 val versionCode = BuildConfig.VERSION_CODE
                 Text(text = "Themed Project by Osanosa")
-                Text(text = "Installed manager version is v$versionName built on $versionCode", textAlign = TextAlign.Center)
+                Text(
+                    text = "Installed manager version is v$versionName built on $versionCode",
+                    textAlign = TextAlign.Center
+                )
                 OutlinedButton(
                     onClick = {
-                        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip"))
-                        context.startActivity(webIntent) },
+
+                            Shell.SU.run("cd /sdcard/themeddebug")
+                            Shell.SU.run("curl -O -s -L https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
+                            Shell.SU.run("magisk --install-module /sdcard/themeddebug/ThemedProject.zip")
+
+                    },
                     modifier = Modifier,
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(

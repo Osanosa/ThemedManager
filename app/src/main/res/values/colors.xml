@@ -8,9 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey_outline">#EEEEEE</color>
-    <color name="DrawableColor">#7F7F7F</color>
+    <color name="DrawableColor">#3C3C3C</color>
     <color name="BackgroundColor">#f9f9f9</color>
-
 
 
 </resources>
