@@ -1,4 +1,4 @@
-@file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
+@file:OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
@@ -33,7 +33,7 @@ import pro.themed.manager.ui.theme.*
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccentsNewTemp(
-    name: String, Header: String
+    name: String, header: String
 ) {
     var redvisible by remember { mutableStateOf(false) }
     var orangevisible by remember { mutableStateOf(false) }
@@ -64,7 +64,7 @@ fun AccentsNewTemp(
                     modifier = Modifier
                         .padding(8.dp)
                         .padding(start = 8.dp),
-                    text = Header,
+                    text = header,
                     fontSize = 24.sp
                 )
                 IconButton(modifier = Modifier, onClick = {
@@ -323,7 +323,7 @@ fun AccentsNewTemp(
                     }
                 }
                 AnimatedVisibility(tealvisible) {
-                    Row() {
+                    Row {
                         Surface(modifier = Modifier.size(tilesize.dp),
                             color = MaterialGreenA700,
                             onClick = { overlayEnable("$name.MaterialGreenA700") }) {}
@@ -359,7 +359,7 @@ fun AccentsNewTemp(
                     }
                 }
                 AnimatedVisibility(lightbluevisible) {
-                    Row() {
+                    Row {
                         Surface(modifier = Modifier.size(tilesize.dp),
                             color = MaterialCyanA700,
                             onClick = { overlayEnable("$name.MaterialCyanA700") }) {}
@@ -394,7 +394,7 @@ fun AccentsNewTemp(
                     }
                 }
                 AnimatedVisibility(indigovisible) {
-                    Row() {
+                    Row {
                         Surface(modifier = Modifier.size(tilesize.dp),
                             color = MaterialBlueA700,
                             onClick = { overlayEnable("$name.MaterialBlueA700") }) {}
@@ -429,7 +429,7 @@ fun AccentsNewTemp(
                     }
                 }
                 AnimatedVisibility(purplevisible) {
-                    Row() {
+                    Row {
                         Surface(modifier = Modifier.size(tilesize.dp),
                             color = MaterialDeepPurpleA700,
                             onClick = { overlayEnable("$name.MaterialDeepPurpleA700") }) {}
@@ -531,6 +531,7 @@ fun UIBGDark() {
 
 
 //@Preview
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ColorsTab() {
     Surface(
@@ -549,14 +550,66 @@ fun ColorsTab() {
             FlipCard(cardFace = state, onClick = {
                 state = it.next
             }, axis = RotationAxis.AxisY, back = {
-                AccentsNewTemp("accents.dark", stringResource(R.string.accents_dark))
+                if (!overlayList.any { it.contains("accents.dark") }) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = ""
+                    )
+
+                } else {
+                    if (unsupportedOverlays.any { it.contains("accents.dark") }) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = ""
+                        )
+                    } else {
+                        AccentsNewTemp("accents.dark", stringResource(R.string.accents_dark))
+
+                    }
+                }
+
+
             }, front = {
-                AccentsNewTemp("accents", stringResource(R.string.accents))
+
+                if (!overlayList.any { it.contains("accents.M") }) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "" )
+
+                } else {
+                    if (unsupportedOverlays.any { it.contains("accents.M") }) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = ""
+                        )
+                    } else {
+                        AccentsNewTemp("accents", stringResource(R.string.accents))
+
+                    }
+                }
+
             })
             Spacer(modifier = Modifier.height(8.dp))
-            UIBGDark()
+            if (!overlayList.any { it.contains("uibg") }) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = ""
+                )
+
+            } else {
+                if (unsupportedOverlays.any { it.contains("uibg") }) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = ""
+                    )
+                } else {
+                    UIBGDark()
+
+                }
+            }
+
+
             Spacer(modifier = Modifier.height(8.dp))
-            MagiskInfoCard()
             Spacer(modifier = Modifier.height(8.dp))
             InfoCard()
 

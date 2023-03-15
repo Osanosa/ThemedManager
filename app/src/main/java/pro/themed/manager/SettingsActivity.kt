@@ -1,14 +1,24 @@
 package pro.themed.manager
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 class SettingsActivity : ComponentActivity() {
@@ -26,23 +36,61 @@ class SettingsActivity : ComponentActivity() {
 
 
                     Column {
-                        /* Button(onClick = {
 
-                            // if [pro.themed.manager.DataStore(context).getAutoRestartSystemUIValue = true] ()
+                        TopAppBarSettings()
 
-                             CoroutineScope(Dispatchers.IO).launch {
-                                 DataStore(context).setAutoRestartSystemUI(false)
-                             }
-                         }) {
-                             Text(text = DataStore(context).getAutoRestartSystemUIValue.collectAsState(
-                                 initial = ""
-                             ).toString())
 
-                         }*/
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun TopAppBarSettings() {
+        val context = LocalContext.current
+        val navController = rememberNavController()
+        androidx.compose.material.TopAppBar(elevation = 0.dp,
+            title = { Text(text = "Settings") },
+            backgroundColor = MaterialTheme.colors.cardcol,
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.navigateUp()
+                    finish()
+                }) {
+                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+                    context.startActivity(
+                        Intent(
+                            context,
+                            DebugActivity::class.java
+                        )
+                    )
+
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_bug_report_24),
+                        contentDescription = "debug"
+                    )
+                }
+
+                IconButton(onClick = {
+                    context.startActivity(
+                        Intent(
+                            context,
+                            FaqActivity::class.java
+                        )
+                    )
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_help_24),
+                        contentDescription = "faq"
+                    )
+                }
+            })
     }
 }
 

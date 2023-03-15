@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pro.themed.manager.cardcol
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun AppsTab() {

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -45,7 +46,7 @@ class FaqActivity : ComponentActivity() {
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 TopAppBarFaq()
-                Column() {
+                Column {
                     Text(text = "To be filled")
                 }
             }
@@ -59,7 +60,7 @@ class FaqActivity : ComponentActivity() {
         val navController = rememberNavController()
         TopAppBar(
             elevation = 0.dp,
-            title = { Text(text = "Faq") },
+            title = { Text(text = stringResource(R.string.faq)) },
             backgroundColor = MaterialTheme.colors.cardcol,
             navigationIcon = {
                 IconButton(onClick = {

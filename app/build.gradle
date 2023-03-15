@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -7,6 +9,16 @@ plugins {
 }
 
 android {
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            def appName = "ThemedManager"
+            def versionName = defaultConfig.versionName
+            outputFileName = "${appName}-v${versionName}-${variant.buildType.name}.apk"
+        }
+    }
+
+
     namespace 'pro.themed.manager'
     compileSdk 33
 
@@ -15,7 +27,7 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 230302
-        versionName '0.8.4'
+        versionName '23.03.11'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -51,7 +63,7 @@ android {
         }
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
         }
@@ -61,7 +73,7 @@ android {
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
@@ -73,12 +85,12 @@ dependencies {
 */
 
     implementation 'com.google.firebase:firebase-perf-ktx:20.3.1'
-    implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.google.android.material:material:1.8.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.1'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
     implementation platform('androidx.compose:compose-bom:2023.01.00')
@@ -90,8 +102,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'androidx.navigation:navigation-compose:2.6.0-alpha06'
-    implementation platform('com.google.firebase:firebase-bom:31.2.2')
+    implementation 'androidx.navigation:navigation-compose:2.6.0-alpha07'
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.2.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
     implementation 'com.google.firebase:firebase-perf:20.3.1'
@@ -101,7 +113,7 @@ dependencies {
     implementation 'androidx.core:core-splashscreen:1.0.0'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.6.0-alpha06')
+    implementation('androidx.navigation:navigation-compose:2.6.0-alpha07')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.28.0'
@@ -117,10 +129,10 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
 
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
-    implementation 'androidx.compose.material3:material3:1.1.0-alpha07'
+    implementation 'androidx.compose.material3:material3:1.1.0-alpha08'
 
     implementation "androidx.compose.ui:ui-util:$compose_ui_version"
 }

@@ -43,12 +43,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,9 +60,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 
@@ -84,7 +83,7 @@ class ToolboxActivity : ComponentActivity() {
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                TopAppBarSettings()
+                TopAppToolbox()
 
                 Column(Modifier.padding(horizontal = 8.dp)) {
 
@@ -131,12 +130,12 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 4.dp
-                        ), text = "Disable overlays", fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ), text = stringResource(R.string.disable_overlays), fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Disable all overlays, stock  android themes, or only themed project's",
+                    text = stringResource(R.string.disable_all_overlays_stock_android_themes_or_only_themed_project_s),
                     fontSize = 18.sp
                 )
 
@@ -145,8 +144,8 @@ class ToolboxActivity : ComponentActivity() {
                     var isDialogShown by remember { mutableStateOf(false) }
                     if (isDialogShown) {
                         AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                            title = { Text("Disabling all overlays may cause some system settings to reset") },
-                            text = { Text("Are you sure you want to proceed?") },
+                            title = { Text(stringResource(R.string.disabling_all_overlays_may_cause_some_system_settings_to_reset)) },
+                            text = { Text(stringResource(R.string.are_you_sure_you_want_to_proceed)) },
                             buttons = {
                                 Row {
 
@@ -154,15 +153,15 @@ class ToolboxActivity : ComponentActivity() {
                                     Button(onClick = {
                                         Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
                                         Toast.makeText(
-                                            context, "Done", Toast.LENGTH_SHORT
+                                            context, getString(R.string.done), Toast.LENGTH_SHORT
                                         ).show()
 
-                                    }) { Text(text = "Yes") }
+                                    }) { Text(text = stringResource(R.string.yes)) }
                                     Button(
                                         onClick = {
                                             isDialogShown = false
                                         },
-                                    ) { Text(text = "No") }
+                                    ) { Text(text = stringResource(R.string.no)) }
                                 }
                             })
                     }
@@ -191,13 +190,14 @@ class ToolboxActivity : ComponentActivity() {
                             backgroundColor = MaterialTheme.colors.cardcol, contentColor = Color.Red
                         )
                     ) {
-                        Text(text = "All")
+                        Text(text = stringResource(R.string.all))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
                             Toast.makeText(
-                                context, "Process started, now wait", Toast.LENGTH_SHORT
+                                context,
+                                getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
                             ).show()
                             val myTrace: Trace = FirebasePerformance.getInstance()
                                 .newTrace("toolbox_overlay_reset_stock")
@@ -207,7 +207,8 @@ class ToolboxActivity : ComponentActivity() {
                             Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
                             myTrace.stop()
 
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
+
 
 
                         },
@@ -220,20 +221,20 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Stock")
+                        Text(text = stringResource(R.string.stock))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
                             Toast.makeText(
-                                context, "Process started, now wait", Toast.LENGTH_SHORT
+                                context, getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
                             ).show()
                             val myTrace: Trace = FirebasePerformance.getInstance()
                                 .newTrace("toolbox_overlay_reset_themed")
                             myTrace.start()
                             Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E '^....themed.' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
                             myTrace.stop()
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
 
                         },
@@ -246,7 +247,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Themed")
+                        Text(text = stringResource(R.string.themed))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -276,12 +277,12 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = "Restart SystemUI", fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ), text = stringResource(R.string.restart_systemui), fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Restarts SystemUI in case if your rom doesn't refreshes it automatically",
+                    text = stringResource(R.string.restarts_systemui_in_case_if_your_rom_doesn_t_refreshes_it_automatically),
                     fontSize = 18.sp
                 )
 
@@ -308,7 +309,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Restart now")
+                        Text(text = stringResource(R.string.restart_now))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -340,14 +341,14 @@ class ToolboxActivity : ComponentActivity() {
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
                         ),
-                        text = "Change system theme",
+                        text = stringResource(R.string.change_system_theme),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Change a theme of your device",
+                    text = stringResource(R.string.change_a_theme_of_your_device),
                     fontSize = 18.sp
                 )
 
@@ -368,7 +369,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
                     ) {
                         Row {
-                            Text(text = "Light")
+                            Text(text = stringResource(R.string.light))
 
                         }
                     }
@@ -387,7 +388,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Dark")
+                        Text(text = stringResource(R.string.dark))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -404,7 +405,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Auto")
+                        Text(text = stringResource(R.string.auto))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -434,12 +435,12 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = "Clear app caches", fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ), text = stringResource(R.string.clear_app_caches), fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Clears cache of all apps (data is safe)",
+                    text = stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
                     fontSize = 18.sp
                 )
 
@@ -456,7 +457,7 @@ class ToolboxActivity : ComponentActivity() {
 
 
 
-                                Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
 
 
@@ -471,7 +472,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Clear all")
+                        Text(text = stringResource(R.string.clear_all))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -501,12 +502,12 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = "Dex2oat", fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ), text = stringResource(R.string.dex2oat), fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Pre-compiles code of all installed apps aswell as it's layouts to reduce lag ans stutter\n",
+                    text = stringResource(R.string.pre_compiles_code_of_all_installed_apps_aswell_as_it_s_layouts_to_reduce_lag_ans_stutter),
                     fontSize = 18.sp
                 )
 
@@ -518,7 +519,8 @@ class ToolboxActivity : ComponentActivity() {
 
 
                             Toast.makeText(
-                                    context, "Precompiling dex files", Toast.LENGTH_SHORT
+                                    context,
+                                getString(R.string.precompiling_dex_files), Toast.LENGTH_SHORT
                                 ).show()
 
                                 val SpeedTrace: Trace = FirebasePerformance.getInstance()
@@ -529,7 +531,8 @@ class ToolboxActivity : ComponentActivity() {
                                 SpeedTrace.stop()
 
                                 Toast.makeText(
-                                    context, "Precompiling layouts", Toast.LENGTH_SHORT
+                                    context,
+                                    getString(R.string.precompiling_layouts), Toast.LENGTH_SHORT
                                 ).show()
 
                                 val LayoutsTrace: Trace = FirebasePerformance.getInstance()
@@ -538,7 +541,7 @@ class ToolboxActivity : ComponentActivity() {
                                 Shell.SU.run("cmd package compile --compile-layouts -a")
                                 LayoutsTrace.stop()
                                 Toast.makeText(
-                                    context, "Done", Toast.LENGTH_SHORT
+                                    context, getString(R.string.done), Toast.LENGTH_SHORT
                                 ).show()
 
 
@@ -552,7 +555,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Optimize")
+                        Text(text = stringResource(R.string.optimize))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -583,7 +586,7 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = "Downscale", fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ), text = stringResource(R.string.downscale), fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                     IconButton(modifier = Modifier, onClick = {
                         Shell.SU.run("wm size reset ; wm density reset")
@@ -597,15 +600,15 @@ class ToolboxActivity : ComponentActivity() {
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "Changes resolution and density. Please click custom first",
+                    text = stringResource(R.string.changes_resolution_and_density_please_click_custom_first),
                     fontSize = 18.sp
                 )
                 var customresShown by remember { mutableStateOf(false) }
                 var customres by remember { mutableStateOf("") }
                 if (customresShown) {
                     AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                        title = { Text("Enter your custom resolution") },
-                        text = { Text("On some roms such as MIUI setting resolution to smaller then 480p may cause issues. Test button will reset size after 10s.") },
+                        title = { Text(stringResource(R.string.enter_your_custom_resolution)) },
+                        text = { Text(stringResource(R.string.on_some_roms_such_as_miui_setting_resolution_to_smaller_then_480p_may_cause_issues_test_button_will_reset_size_after_10s)) },
                         buttons = {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 TextField(
@@ -629,32 +632,32 @@ class ToolboxActivity : ComponentActivity() {
                                             .weight(1f),
                                         onClick = {
 
-                                                downscalebynumber(width = "$customres")
+                                                downscalebynumber(width = customres)
                                                 Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
 
 
 
-                                        }) { Text(text = "Test") }
+                                        }) { Text(text = stringResource(R.string.test)) }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Button(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
                                         onClick = {
-                                            downscalebynumber(width = "$customres")
+                                            downscalebynumber(width = customres)
 
 
                                         },
-                                    ) { Text(text = "Apply") }
+                                    ) { Text(text = stringResource(R.string.apply)) }
                                 }
-                                Text(text = "close",
+                                Text(text = stringResource(R.string.close),
                                     modifier = Modifier.clickable { customresShown = false })
                                 Spacer(modifier = Modifier.height(8.dp))
 
                             }
                         })
                 }
-                val switchState = remember { mutableStateOf(true) }
+                val switchState = rememberSaveable { mutableStateOf(true) }
 
                 Row(
                     modifier = Modifier
@@ -665,7 +668,7 @@ class ToolboxActivity : ComponentActivity() {
                 ) {
                     Text(
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        text = "Reset to defaults after 10 seconds \n"
+                        text = stringResource(R.string.reset_to_defaults_after_10_seconds)
                     )
                     Switch(
                         checked = switchState.value,
@@ -689,7 +692,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "0.5x")
+                        Text(text = stringResource(R.string._0_5x))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -708,7 +711,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "0.33x")
+                        Text(text = stringResource(R.string._0_33x))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -728,7 +731,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "0.25x")
+                        Text(text = stringResource(R.string._0_25x))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -744,7 +747,7 @@ class ToolboxActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Custom")
+                        Text(text = stringResource(R.string.custom))
                     }
 
                 }
@@ -752,7 +755,7 @@ class ToolboxActivity : ComponentActivity() {
         }
     }
 
-    fun downscalebydivisor(divisor: String) {
+    private fun downscalebydivisor(divisor: String) {
 
         Shell.SU.run(
             command = """
@@ -791,7 +794,7 @@ class ToolboxActivity : ComponentActivity() {
 
     }
 
-    fun downscalebynumber(width: String) {
+    private fun downscalebynumber(width: String) {
 
         Shell.SU.run(
             command = """
@@ -829,11 +832,11 @@ class ToolboxActivity : ComponentActivity() {
     }
 
     @Composable
-    fun TopAppBarSettings() {
+    fun TopAppToolbox() {
         val context = LocalContext.current
         val navController = rememberNavController()
         TopAppBar(elevation = 0.dp,
-            title = { Text(text = "Settings") },
+            title = { Text(text = stringResource(R.string.toolbox)) },
             backgroundColor = MaterialTheme.colors.cardcol,
             navigationIcon = {
                 IconButton(onClick = {

@@ -1,6 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager
@@ -8,12 +7,14 @@ package pro.themed.manager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,7 +55,7 @@ class AboutActivity : ComponentActivity() {
     @Preview
     @Composable
     fun AboutPage() {
-        Surface(color = MaterialTheme.colors.cardcol) {
+        Surface(color = MaterialTheme.colors.cardcol, modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 horizontalAlignment = CenterHorizontally
@@ -61,8 +63,7 @@ class AboutActivity : ComponentActivity() {
                 var easteregg by remember { mutableStateOf(false) }
                 var tapcount by remember { mutableStateOf(0) }
                 TopAppBarAbout()
-                Surface(
-                    shape = CircleShape,
+                Surface(shape = CircleShape,
                     modifier = Modifier
                         .fillMaxWidth(0.5F)
                         .align(alignment = CenterHorizontally)
@@ -70,8 +71,7 @@ class AboutActivity : ComponentActivity() {
                     onClick = {
                         if (tapcount >= 9) easteregg = true else tapcount += 1
 
-                    }
-                ) {
+                    }) {
                     Image(
                         contentDescription = null,
                         painter = painterResource(id = R.drawable.main_logo),
@@ -82,17 +82,28 @@ class AboutActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val versionName = BuildConfig.VERSION_NAME
                 val versionCode = BuildConfig.VERSION_CODE
-                Text(text = "Themed Project by Osanosa")
+                Text(text = stringResource(R.string.themed_project_by_osanosa))
                 Text(
-                    text = "Installed manager version is v$versionName built on $versionCode",
-                    textAlign = TextAlign.Center
+                    text = stringResource(R.string.installed_manager_version_is, versionName), textAlign = TextAlign.Center
                 )
                 OutlinedButton(
                     onClick = {
 
-                            Shell.SU.run("cd /sdcard/themeddebug")
-                            Shell.SU.run("curl -O -s -L https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
-                            Shell.SU.run("magisk --install-module /sdcard/themeddebug/ThemedProject.zip")
+                        Toast.makeText(context, getString(R.string.creating_folder), Toast.LENGTH_SHORT).show()
+
+                        Shell.SU.run("rm /sdcard/themeddebug")
+                        Shell.SU.run("mkdir /sdcard/themeddebug")
+                        Shell.SU.run("cd /sdcard/themeddebug")
+
+                        Toast.makeText(context,
+                            getString(R.string.downloading), Toast.LENGTH_SHORT).show()
+
+                        Shell.SU.run("curl -O -s -L https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
+                        Toast.makeText(context,
+                            getString(R.string.installing), Toast.LENGTH_SHORT).show()
+
+                        Shell.SU.run("magisk --install-module $" + "PWD/ThemedProject.zip")
+                        Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
                     },
                     modifier = Modifier,
@@ -102,7 +113,7 @@ class AboutActivity : ComponentActivity() {
                     )
                 ) {
                     Row {
-                        Text(text = "Download latest module")
+                        Text(text = stringResource(R.string.download_latest_module))
                     }
                 }
 
@@ -117,7 +128,7 @@ class AboutActivity : ComponentActivity() {
                             contentScale = ContentScale.FillWidth
 
                         )
-                        Text(text = "Thank you for using the app. Please report testing, it is very important!")
+                        Text(text = stringResource(R.string.thank_you_for_using_the_app_please_report_testing_it_is_very_important))
                     }
                 }
 
@@ -130,7 +141,7 @@ class AboutActivity : ComponentActivity() {
     fun TopAppBarAbout() {
         val navController = rememberNavController()
         TopAppBar(elevation = 0.dp,
-            title = { Text(text = "About") },
+            title = { Text(text = stringResource(R.string.about)) },
             backgroundColor = MaterialTheme.colors.cardcol,
             navigationIcon = {
                 IconButton(onClick = {

@@ -1,4 +1,4 @@
-@file:Suppress("OPT_IN_IS_NOT_ENABLED") @file:OptIn(
+@file:OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalPagerApi::class,
     ExperimentalPagerApi::class,
@@ -39,6 +39,7 @@ fun IconsTab() {
         color = MaterialTheme.colors.cardcol
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+
             QSTileCard()
             NavbarCard()
             IconPackCard()
@@ -206,7 +207,7 @@ fun QSTileCard() {
                     .padding(16.dp),
             )
 
-            Text(text = "$qstilestyle")
+            Text(text = qstilestyle)
 
             Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
 

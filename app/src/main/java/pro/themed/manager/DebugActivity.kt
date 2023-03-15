@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -62,13 +63,14 @@ class DebugActivity : ComponentActivity() {
                 Row {
                     OutlinedButton(
                         onClick = {
+
                             Shell.SU.run("rm /sdcard/themeddebug")
                             Shell.SU.run("mkdir /sdcard/themeddebug")
 
                             Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/cmdoverlaylist.txt")
                             Shell.SU.run("cd /data/adb/modules ; ls | tee -a /sdcard/themeddebug/modules.txt")
 
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
 
                         }, modifier = Modifier
@@ -79,7 +81,7 @@ class DebugActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Collect logs")
+                        Text(text = stringResource(R.string.collect_logs))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
@@ -90,7 +92,7 @@ class DebugActivity : ComponentActivity() {
                             Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/")
                             Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/")
 
-                            Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
 
                         }, modifier = Modifier
@@ -101,7 +103,7 @@ class DebugActivity : ComponentActivity() {
                         )
 
                     ) {
-                        Text(text = "Collect files")
+                        Text(text = stringResource(R.string.collect_files))
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -117,7 +119,7 @@ class DebugActivity : ComponentActivity() {
         val navController = rememberNavController()
         TopAppBar(
             elevation = 0.dp,
-            title = { Text(text = "Debug") },
+            title = { Text(text = stringResource(R.string.debug)) },
             backgroundColor = MaterialTheme.colors.cardcol,
             navigationIcon = {
                 IconButton(onClick = {

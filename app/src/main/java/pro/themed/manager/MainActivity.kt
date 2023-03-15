@@ -7,7 +7,10 @@ package pro.themed.manager
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -29,7 +32,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,6 +44,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.AppsTab
 import pro.themed.manager.comps.ColorsTab
@@ -49,6 +53,9 @@ import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
 
+
+val overlayList = SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+val unsupportedOverlays = overlayList.filter { it.contains("---") }
 
 @get:Composable
 val Colors.bordercol: Color
@@ -91,7 +98,7 @@ fun FlipCard(
         targetValue = cardFace.angle, animationSpec = tween(
             durationMillis = 400,
             easing = FastOutSlowInEasing,
-        )
+        ), label = ""
     )
     Card(
         elevation = 0.dp,
@@ -136,8 +143,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-
             ThemedManagerTheme {
+                SH.run("su")
+                if ("root" !in SH.run("whoami").stdout()) {
+                    Toast.makeText(LocalContext.current,
+                        getString(R.string.no_root_access), Toast.LENGTH_SHORT)
+                        .show()
+                }
+                if (BuildConfig.DEBUG) {
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                        Log.d("FCM Token", "Token: $token")
+                    }
+                }
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
@@ -147,30 +164,31 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
-    //@Preview
-    @Composable
-    fun Main() {
-        Column {
+//@Preview
+@Composable
+fun Main() {
+    Column {
 
 
-            val navController = rememberNavController()
+        val navController = rememberNavController()
 
-            Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
-                topBar = { TopAppBar() },
-                bottomBar = { BottomNavigationBar(navController) }) {
-                Box {
-                    PaddingValues(bottom = 200.dp)
-                    Navigation(navController)
-                }
+        Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
+            topBar = { TopAppBar() },
+            bottomBar = { BottomNavigationBar(navController) }) {
+            Box {
+                PaddingValues(bottom = 200.dp)
+                Navigation(navController)
             }
-            //ColorsTab()
         }
+        //ColorsTab()
     }
 }
+
 
 private operator fun Navigation.invoke() {
 
@@ -261,60 +279,15 @@ fun InfoCard() {
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = stringResource(R.string.infocard),
+            text = "",
             fontSize = 14.sp
         )
     }
 }
 
-//@Preview
-@Composable
-fun MagiskInfoCard() {
-    Card(
-        border = BorderStroke(
-            width = 1.dp, color = Color.Red
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(8.dp),
-        elevation = (0.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
-    ) {
-        Text(
-            modifier = Modifier.padding(12.dp),
-            text = "This app requires root access and installed Themed Project modules. It won't work other way.",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-
-        )
-    }
-}
 
 
-//@Preview
-@Composable
-fun AdrodInfoCard() {
-    Card(
-        border = BorderStroke(width = 1.dp, color = Color.Red),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(8.dp)
-            .padding(top = 0.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = (0.dp),
-        backgroundColor = Color.Red.copy(0.4f)
-    ) {
-        Text(
-            modifier = Modifier.padding(12.dp),
-            text = "A12+ does not support landscape grid",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
 
-        )
-    }
-}
 
 //@Preview()
 @Composable
@@ -322,7 +295,7 @@ fun TopAppBar() {
     val context = LocalContext.current
 
     TopAppBar(elevation = 0.dp,
-        title = { Text("Themed Manager") },
+        title = { Text(stringResource(R.string.app_name)) },
         backgroundColor = MaterialTheme.colors.cardcol,
         actions = {
             IconButton(onClick = {
@@ -352,13 +325,20 @@ fun TopAppBar() {
 
 
 fun overlayEnable(overlayname: String) {
-    SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
-    SU.run("cmd overlay enable themed.$overlayname")
+    @Composable
 
-    Firebase.analytics.logEvent("Overlay_Selected") {
-        param ("Overlay_Name" , overlayname)
+    if (Build.VERSION.SDK_INT >= 28) {
+        SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
+
+    } else {
+        SU.run("cmd overlay enable themed.$overlayname")
+
     }
 
+
+    Firebase.analytics.logEvent("Overlay_Selected") {
+        param("Overlay_Name", overlayname)
+    }
 
 
 }

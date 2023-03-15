@@ -1,27 +1,77 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Themed Manager</string>
-    <string name="infocard">Please note that on older devices updating systemUI can take up to 15-30s. It is recommended that you\'d install bootloop protector module. \nPlease report testing to telegram support group.</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings" tools:ignore="MissingTranslation">Settings</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_about" tools:ignore="MissingTranslation">About</string>
     <string name="title_activity_debug">Debug</string>
     <string name="title_activity_faq">Faq</string>
     <string name="accents">Accents</string>
     <string name="accents_dark">Accents Dark</string>
     <string name="qstiles">QSTiles</string>
     <string name="qspanels">QsPanels</string>
+    <string name="rounded_corners">Rounded corners</string>
+    <string name="columns_portrait">Columns (portrait)</string>
+    <string name="rows_portrait">Rows (portrait)</string>
+    <string name="columns_landscape">Columns (landscape)</string>
+    <string name="rows_landscape">Rows (landscape)</string>
+    <string name="qsquicktilesize">QsQuickTileSize</string>
+    <string name="qstileheight">QsTileHeight</string>
+    <string name="themed_project_by_osanosa">Themed Project by Osanosa</string>
+    <string name="installed_manager_version_is">Installed manager version is %1$s</string>
+    <string name="creating_folder">Creating folder</string>
+    <string name="downloading">Downloading</string>
+    <string name="installing">Installing module</string>
+    <string name="done">Done</string>
+    <string name="download_latest_module">Download latest module</string>
+    <string name="thank_you_for_using_the_app_please_report_testing_it_is_very_important">Thank you for using the app. Please report testing, it is very important!</string>
+    <string name="about">About</string>
+    <string name="collect_logs">Collect logs</string>
+    <string name="collect_files">Collect files</string>
+    <string name="debug">Debug</string>
+    <string name="faq">Faq</string>
+    <string name="no_root_access">No root access</string>
+    <string name="disable_overlays">Disable overlays</string>
+    <string name="disable_all_overlays_stock_android_themes_or_only_themed_project_s">Disable all overlays, stock android themes, or only themed project\'s</string>
+    <string name="disabling_all_overlays_may_cause_some_system_settings_to_reset">Disabling all overlays may cause some system settings to reset</string>
+    <string name="are_you_sure_you_want_to_proceed">Are you sure you want to proceed?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="all">All</string>
+    <string name="process_started_now_wait">Process started, now wait</string>
+    <string name="stock">Stock</string>
+    <string name="themed">Themed</string>
+    <string name="restart_systemui">Restart SystemUI</string>
+    <string name="restarts_systemui_in_case_if_your_rom_doesn_t_refreshes_it_automatically">Restarts SystemUI in case if your rom doesn\'t refreshes it automatically</string>
+    <string name="restart_now">Restart now</string>
+    <string name="change_system_theme">Change system theme</string>
+    <string name="change_a_theme_of_your_device">Change a theme of your device</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="auto">Auto</string>
+    <string name="clear_app_caches">Clear app caches</string>
+    <string name="clears_cache_of_all_apps_data_is_safe">Clears cache of all apps (data is safe)</string>
+    <string name="clear_all">Clear all</string>
+    <string name="dex2oat">Dex2oat</string>
+    <string name="pre_compiles_code_of_all_installed_apps_aswell_as_it_s_layouts_to_reduce_lag_ans_stutter">Pre-compiles code of all installed apps as well as it\'s layouts to reduce lag ans stutter</string>
+    <string name="precompiling_dex_files">Precompiling dex files</string>
+    <string name="precompiling_layouts">Precompiling layouts</string>
+    <string name="optimize">Optimize</string>
+    <string name="downscale">Downscale</string>
+    <string name="changes_resolution_and_density_please_click_custom_first">Changes resolution and density. Please click custom first</string>
+    <string name="enter_your_custom_resolution">Enter your custom resolution</string>
+    <string name="on_some_roms_such_as_miui_setting_resolution_to_smaller_then_480p_may_cause_issues_test_button_will_reset_size_after_10s">On some roms such as MIUI setting resolution to smaller then 480p may cause issues. Test button will reset size after 10s.</string>
+    <string name="test">Test</string>
+    <string name="apply">Apply</string>
+    <string name="close">close</string>
+    <string name="reset_to_defaults_after_10_seconds">Reset to defaults after 10 seconds \n</string>
+    <string name="_0_5x">0.5x</string>
+    <string name="_0_33x">0.33x</string>
+    <string name="_0_25x">0.25x</string>
+    <string name="custom">Custom</string>
+    <string name="toolbox">Toolbox</string>
 </resources>
