@@ -47,11 +47,15 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pro.themed.manager.comps.AppsTab
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
+import java.io.FileOutputStream
+import java.net.URL
 
 
 val overlayList = SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
@@ -155,6 +159,11 @@ class MainActivity : ComponentActivity() {
                         Log.d("FCM Token", "Token: $token")
                     }
                 }
+                val context = LocalContext.current
+
+
+
+
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
@@ -163,6 +172,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+
+
+
+suspend fun downloadFile(url: String, destination: String) {
+    withContext(Dispatchers.IO) {
+        val urlConnection = URL(url).openConnection()
+        urlConnection.connect()
+        val inputStream = urlConnection.getInputStream()
+        val outputStream = FileOutputStream(destination)
+        val buffer = ByteArray(1024)
+        var length: Int
+        while (inputStream.read(buffer).also { length = it } > 0) {
+            outputStream.write(buffer, 0, length)
+        }
+        outputStream.close()
+        inputStream.close()
     }
 }
 

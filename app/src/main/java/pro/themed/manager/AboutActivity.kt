@@ -84,26 +84,44 @@ class AboutActivity : ComponentActivity() {
                 val versionCode = BuildConfig.VERSION_CODE
                 Text(text = stringResource(R.string.themed_project_by_osanosa))
                 Text(
-                    text = stringResource(R.string.installed_manager_version_is, versionName), textAlign = TextAlign.Center
+                    text = stringResource(R.string.installed_manager_version_is, versionName),
+                    textAlign = TextAlign.Center
                 )
                 OutlinedButton(
                     onClick = {
 
-                        Toast.makeText(context, getString(R.string.creating_folder), Toast.LENGTH_SHORT).show()
 
-                        Shell.SU.run("rm /sdcard/themeddebug")
-                        Shell.SU.run("mkdir /sdcard/themeddebug")
-                        Shell.SU.run("cd /sdcard/themeddebug")
+                                /*runOnUiThread {
+                                    Toast.makeText(
+                                        context,
+                                        getString(R.string.creating_folder),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }*/
+                                Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
+                                /*runOnUiThread {
 
-                        Toast.makeText(context,
-                            getString(R.string.downloading), Toast.LENGTH_SHORT).show()
+                                }*/
+                                AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
-                        Shell.SU.run("curl -O -s -L https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
-                        Toast.makeText(context,
-                            getString(R.string.installing), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context, getString(R.string.installing), Toast.LENGTH_SHORT
+                        ).show()
 
-                        Shell.SU.run("magisk --install-module $" + "PWD/ThemedProject.zip")
-                        Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
+                                Shell.SU.run(
+                                    "while [ ! -f \"/sdcard/download/ThemedProject.zip\" ]\n" +
+                                            "do\n" +
+                                            "  sleep 1\n" +
+                                            "done" +
+                                            "; magisk --install-module /sdcard/Download/ThemedProject.zip"
+                                )
+
+                                runOnUiThread {
+                                    Toast.makeText(
+                                        context, getString(R.string.done), Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
 
                     },
                     modifier = Modifier,

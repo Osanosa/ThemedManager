@@ -60,6 +60,11 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 
@@ -130,7 +135,10 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 4.dp
-                        ), text = stringResource(R.string.disable_overlays), fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ),
+                        text = stringResource(R.string.disable_overlays),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
@@ -151,11 +159,18 @@ class ToolboxActivity : ComponentActivity() {
 
 
                                     Button(onClick = {
-                                        Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                                        Toast.makeText(
-                                            context, getString(R.string.done), Toast.LENGTH_SHORT
-                                        ).show()
-
+                                        MainScope().launch {
+                                            async(Dispatchers.Default) {
+                                                Shell.SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                                runOnUiThread {
+                                                    Toast.makeText(
+                                                        context,
+                                                        getString(R.string.done),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+                                        }
                                     }) { Text(text = stringResource(R.string.yes)) }
                                     Button(
                                         onClick = {
@@ -173,14 +188,6 @@ class ToolboxActivity : ComponentActivity() {
                             isDialogShown = true
 
 
-                            /* Toast.makeText(
-                                             context,
-                                             "Process started, now wait",
-                                             Toast.LENGTH_SHORT
-                                         ).show()
-                                         Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                                         Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
-                                    */
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -195,21 +202,34 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
-                            ).show()
-                            val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_overlay_reset_stock")
-                            myTrace.start()
-                            Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                            Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                            Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                            myTrace.stop()
 
-                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context,
+                                            getString(R.string.process_started_now_wait),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
 
+                                    }
+                                    val myTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_overlay_reset_stock")
+                                    myTrace.start()
+                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    myTrace.stop()
 
+                                    runOnUiThread {
+
+                                        Toast.makeText(
+                                            context, getString(R.string.done), Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+
+                            }
 
                         },
                         modifier = Modifier
@@ -226,16 +246,34 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Toast.makeText(
-                                context, getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
-                            ).show()
-                            val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_overlay_reset_themed")
-                            myTrace.start()
-                            Shell.SU.run("for ol in \${'$'}(cmd overlay list | grep -E '^....themed.' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\${'$'}ol\"; done")
-                            myTrace.stop()
-                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
 
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context,
+                                            getString(R.string.process_started_now_wait),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                    val myTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_overlay_reset_themed")
+                                    myTrace.start()
+                                    Shell.SU.run(
+                                        """for ol in $(cmd overlay list | grep -E '^.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done"""
+                                    )
+                                    myTrace.stop()
+
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context, getString(R.string.done), Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                }
+                            }
 
                         },
                         modifier = Modifier
@@ -277,7 +315,10 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = stringResource(R.string.restart_systemui), fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ),
+                        text = stringResource(R.string.restart_systemui),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
@@ -291,14 +332,16 @@ class ToolboxActivity : ComponentActivity() {
 
                     OutlinedButton(
                         onClick = {
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    val myTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_restart_systemui")
+                                    myTrace.start()
+                                    Shell.SU.run("su -c killall com.android.systemui")
 
-                            val myTrace: Trace = FirebasePerformance.getInstance()
-                                .newTrace("toolbox_restart_systemui")
-                            myTrace.start()
-                            Shell.SU.run("su -c killall com.android.systemui")
-
-                            myTrace.stop()
-
+                                    myTrace.stop()
+                                }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -357,8 +400,11 @@ class ToolboxActivity : ComponentActivity() {
 
                     OutlinedButton(
                         onClick = {
-                            Shell.SU.run("cmd uimode night no")
-
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    Shell.SU.run("cmd uimode night no")
+                                }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -376,8 +422,11 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Shell.SU.run("cmd uimode night yes")
-
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    Shell.SU.run("cmd uimode night yes")
+                                }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -393,8 +442,11 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Shell.SU.run("cmd uimode night auto")
-
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    Shell.SU.run("cmd uimode night auto")
+                                }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -435,7 +487,10 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = stringResource(R.string.clear_app_caches), fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ),
+                        text = stringResource(R.string.clear_app_caches),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
@@ -449,18 +504,22 @@ class ToolboxActivity : ComponentActivity() {
 
                     OutlinedButton(
                         onClick = {
-                                val myTrace: Trace =
-                                    FirebasePerformance.getInstance().newTrace("toolbox_cache_clear")
-                                myTrace.start()
-                                Shell.SU.run("pm trim-caches 100g")
-                                myTrace.stop()
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    val myTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_cache_clear")
+                                    myTrace.start()
+                                    Shell.SU.run("pm trim-caches 100g")
+                                    myTrace.stop()
 
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context, getString(R.string.done), Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
 
-
-                                Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
-
-
-
+                                }
+                            }
 
                         },
                         modifier = Modifier
@@ -502,7 +561,10 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = stringResource(R.string.dex2oat), fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ),
+                        text = stringResource(R.string.dex2oat),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Text(
@@ -516,35 +578,40 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
 
-
-
-                            Toast.makeText(
-                                    context,
-                                getString(R.string.precompiling_dex_files), Toast.LENGTH_SHORT
-                                ).show()
-
-                                val SpeedTrace: Trace = FirebasePerformance.getInstance()
-                                    .newTrace("toolbox_dex2oat_speed")
-                                SpeedTrace.start()
-                                Shell.SU.run("cmd package compile -m speed-profile -a")
-                                Shell.SU.run("cmd package compile -m speed-profile --secondary-dex -a")
-                                SpeedTrace.stop()
-
-                                Toast.makeText(
-                                    context,
-                                    getString(R.string.precompiling_layouts), Toast.LENGTH_SHORT
-                                ).show()
-
-                                val LayoutsTrace: Trace = FirebasePerformance.getInstance()
-                                    .newTrace("toolbox_dex2oat_layouts")
-                                LayoutsTrace.start()
-                                Shell.SU.run("cmd package compile --compile-layouts -a")
-                                LayoutsTrace.stop()
-                                Toast.makeText(
-                                    context, getString(R.string.done), Toast.LENGTH_SHORT
-                                ).show()
-
-
+                            MainScope().launch {
+                                async(Dispatchers.Default) {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context,
+                                            getString(R.string.precompiling_dex_files),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    val SpeedTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_dex2oat_speed")
+                                    SpeedTrace.start()
+                                    Shell.SU.run("cmd package compile -m speed-profile -a")
+                                    Shell.SU.run("cmd package compile -m speed-profile --secondary-dex -a")
+                                    SpeedTrace.stop()
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context,
+                                            getString(R.string.precompiling_layouts),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    val LayoutsTrace: Trace = FirebasePerformance.getInstance()
+                                        .newTrace("toolbox_dex2oat_layouts")
+                                    LayoutsTrace.start()
+                                    Shell.SU.run("cmd package compile --compile-layouts -a")
+                                    LayoutsTrace.stop()
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            context, getString(R.string.done), Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -586,10 +653,16 @@ class ToolboxActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.padding(
                             horizontal = 16.dp, vertical = 8.dp
-                        ), text = stringResource(R.string.downscale), fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        ),
+                        text = stringResource(R.string.downscale),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                     IconButton(modifier = Modifier, onClick = {
-                        Shell.SU.run("wm size reset ; wm density reset")
+
+                                Shell.SU.run("wm size reset ; wm density reset")
+
+
                     }) {
                         Image(
                             painter = painterResource(R.drawable.reset),
@@ -626,14 +699,13 @@ class ToolboxActivity : ComponentActivity() {
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(8.dp)
                                 ) {
-                                    Button(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f),
+                                    Button(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
                                         onClick = {
 
-                                                downscalebynumber(width = customres)
-                                                Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
+                                                    downscalebynumber(width = customres)
+                                                    Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
 
 
 
@@ -644,7 +716,8 @@ class ToolboxActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .weight(1f),
                                         onClick = {
-                                            downscalebynumber(width = customres)
+
+                                                    downscalebynumber(width = customres)
 
 
                                         },
@@ -670,22 +743,22 @@ class ToolboxActivity : ComponentActivity() {
                         modifier = Modifier.padding(horizontal = 8.dp),
                         text = stringResource(R.string.reset_to_defaults_after_10_seconds)
                     )
-                    Switch(
-                        checked = switchState.value,
+                    Switch(checked = switchState.value,
                         onCheckedChange = { switchState.value = it })
                 }
 
                 Row(modifier = Modifier.padding(horizontal = 8.dp)) {
                     OutlinedButton(
                         onClick = {
-                            downscalebydivisor("2")
-                            if (switchState.value) {
-                                Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
+
+                                downscalebydivisor("2")
+                                if (switchState.value) {
+                                    Thread.sleep(10000)
+                                    Shell.SU.run(" wm size reset ; wm density reset")
+
                             }
                         },
-                        modifier = Modifier
-                            .wrapContentWidth(),
+                        modifier = Modifier.wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -697,14 +770,15 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            downscalebydivisor("3")
-                            if (switchState.value) {
-                                Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
+
+                                downscalebydivisor("3")
+                                if (switchState.value) {
+                                    Thread.sleep(10000)
+                                    Shell.SU.run(" wm size reset ; wm density reset")
+
                             }
                         },
-                        modifier = Modifier
-                            .wrapContentWidth(),
+                        modifier = Modifier.wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -716,15 +790,16 @@ class ToolboxActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            downscalebydivisor("4")
 
-                            if (switchState.value) {
-                                Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
-                            }
+                                downscalebydivisor("4")
+
+                                if (switchState.value) {
+                                    Thread.sleep(10000)
+                                    Shell.SU.run(" wm size reset ; wm density reset")
+                                }
+
                         },
-                        modifier = Modifier
-                            .wrapContentWidth(),
+                        modifier = Modifier.wrapContentWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
@@ -757,8 +832,8 @@ class ToolboxActivity : ComponentActivity() {
 
     private fun downscalebydivisor(divisor: String) {
 
-        Shell.SU.run(
-            command = """
+            Shell.SU.run(
+                command = """
                 # Set the number of division
                 divisor=$divisor
                 
@@ -790,14 +865,13 @@ class ToolboxActivity : ComponentActivity() {
                 wm size ${'$'}width"x"${'$'}height
                 wm density ${'$'}density
                 """
-        )
+            )
 
     }
 
     private fun downscalebynumber(width: String) {
-
         Shell.SU.run(
-            command = """
+                    command = """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
                 
@@ -827,9 +901,10 @@ class ToolboxActivity : ComponentActivity() {
                 wm density ${'$'}(printf "%.0f" ${'$'}new_density)
                 
                 """
-        )
+                )
+            }
 
-    }
+
 
     @Composable
     fun TopAppToolbox() {

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,14 +36,14 @@ import pro.themed.manager.ui.theme.*
 fun AccentsNewTemp(
     name: String, header: String
 ) {
-    var redvisible by remember { mutableStateOf(false) }
-    var orangevisible by remember { mutableStateOf(false) }
-    var yellowvisible by remember { mutableStateOf(false) }
-    var lightgreenvisible by remember { mutableStateOf(false) }
-    var tealvisible by remember { mutableStateOf(false) }
-    var lightbluevisible by remember { mutableStateOf(false) }
-    var indigovisible by remember { mutableStateOf(false) }
-    var purplevisible by remember { mutableStateOf(false) }
+    var redvisible by rememberSaveable { mutableStateOf(false) }
+    var orangevisible by rememberSaveable { mutableStateOf(false) }
+    var yellowvisible by rememberSaveable { mutableStateOf(false) }
+    var lightgreenvisible by rememberSaveable { mutableStateOf(false) }
+    var tealvisible by rememberSaveable { mutableStateOf(false) }
+    var lightbluevisible by rememberSaveable { mutableStateOf(false) }
+    var indigovisible by rememberSaveable { mutableStateOf(false) }
+    var purplevisible by rememberSaveable { mutableStateOf(false) }
 
     val tilesize = (LocalConfiguration.current.smallestScreenWidthDp - 16) / 8
     Card(
@@ -546,7 +547,7 @@ fun ColorsTab() {
                 .padding(8.dp)
         ) {
 
-            var state by remember { mutableStateOf(CardFace.Front) }
+            var state by rememberSaveable { mutableStateOf(CardFace.Front) }
             FlipCard(cardFace = state, onClick = {
                 state = it.next
             }, axis = RotationAxis.AxisY, back = {
