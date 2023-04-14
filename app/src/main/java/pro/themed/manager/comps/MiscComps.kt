@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
 import pro.themed.manager.cardcol
+import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
-import pro.themed.manager.overlayList
-import pro.themed.manager.unsupportedOverlays
+
 import kotlin.math.roundToInt
 
 
@@ -64,6 +64,7 @@ fun Slideritem(
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
+    if (!getOverlayList().unsupportedOverlays.any { it.contains(overlayName) }) {
     Surface {
 
 
@@ -169,6 +170,10 @@ fun Slideritem(
 
     }
 }
+else {
+       null
+
+}}
 
 @Preview
 @Composable
@@ -180,27 +185,40 @@ fun HeaderRowWithSwitch(
     var showDescription by remember { mutableStateOf(false) }
     val transition = updateTransition(targetState = showDescription, label = "")
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clickable { showDescription = !showDescription }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = header,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.subtitle1
-                )
-                Text(
-                    text = subHeader, style = MaterialTheme.typography.body1
+    Surface {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .clickable { showDescription = !showDescription }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = header,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.subtitle1
+                    )
+                    Text(
+                        text = subHeader, style = MaterialTheme.typography.body1
+                    )
+                }
+                val switchState = remember { mutableStateOf(isChecked) }
+                androidx.compose.material.Switch(
+                    checked = switchState.value,
+                    onCheckedChange = { switchState.value = it
+
+                        if (switchState.value) {
+                            // Code block to be executed if switch is on
+                            // ...
+                            // ...
+                        } else {
+                            // Code block to be executed if switch is off
+                            // ...
+                            // ...
+                        }
+                                      },
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
-            val switchState = remember { mutableStateOf(isChecked) }
-            androidx.compose.material.Switch(
-                checked = switchState.value,
-                onCheckedChange = { switchState.value = it },
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
         }
     }
 }
@@ -218,13 +236,13 @@ fun MiscTab() {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
 
-            if (!overlayList.any { it.contains("roundedcorners") }) {
+            if (!getOverlayList().overlayList.any { it.contains("roundedcorners") }) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text = "" )
 
             } else {
-                if (unsupportedOverlays.any { it.contains("roundedcorners") }) {
+                if (getOverlayList().unsupportedOverlays.any { it.contains("roundedcorners") }) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = ""
@@ -245,17 +263,7 @@ fun MiscTab() {
 
             Divider()
 
-            if (!overlayList.any { it.contains("columnsportrait") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "")
 
-            } else {
-                if (unsupportedOverlays.any { it.contains("columnsportrait") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "" )
-                } else {
                     Slideritem(
                         drawable = R.drawable.view_week_48px,
                         header = stringResource(R.string.columns_portrait),
@@ -265,21 +273,10 @@ fun MiscTab() {
                         maxSliderValue = 10f,
                         overlayName = "columnsportrait"
                     )
-                }
-            }
 
-            if (!overlayList.any { it.contains("rowsportrait") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = ""  )
 
-            } else {
-                if (unsupportedOverlays.any { it.contains("rowsportrait") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
-                    )
-                } else {
+
+
                     Slideritem(
                         drawable = R.drawable.table_rows_48px,
                         header = stringResource(R.string.rows_portrait),
@@ -290,20 +287,8 @@ fun MiscTab() {
                         overlayName = "rowsportrait"
                     )
 
-                }
-            }
 
-            if (!overlayList.any { it.contains("columnslandscape") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "")
 
-            } else {
-                if (unsupportedOverlays.any { it.contains("columnslandscape") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "")
-                } else {
                     Slideritem(
                         drawable = R.drawable.view_week_48px,
                         header = stringResource(R.string.columns_landscape),
@@ -313,16 +298,15 @@ fun MiscTab() {
                         maxSliderValue = 10f,
                         overlayName = "columnslandscape"
                     )
-                }
-            }
 
-            if (!overlayList.any { it.contains("rowslandscape") }) {
+
+            if (!getOverlayList().overlayList.any { it.contains("rowslandscape") }) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text = "")
 
             } else {
-                if (unsupportedOverlays.any { it.contains("rowslandscape") }) {
+                if (getOverlayList().unsupportedOverlays.any { it.contains("rowslandscape") }) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = ""
@@ -341,13 +325,13 @@ fun MiscTab() {
             }
             Divider()
 
-            if (!overlayList.any { it.contains("qsquicktilesize") }) {
+            if (!getOverlayList().overlayList.any { it.contains("qsquicktilesize") }) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text ="" )
 
             } else {
-                if (unsupportedOverlays.any { it.contains("qsquicktilesize") }) {
+                if (getOverlayList().unsupportedOverlays.any { it.contains("qsquicktilesize") }) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = ""
@@ -365,13 +349,13 @@ fun MiscTab() {
                 }
             }
 
-            if (!overlayList.any { it.contains("qstileheight") }) {
+            if (!getOverlayList().overlayList.any { it.contains("qstileheight") }) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text = "" )
 
             } else {
-                if (unsupportedOverlays.any { it.contains("qstileheight") }) {
+                if (getOverlayList().unsupportedOverlays.any { it.contains("qstileheight") }) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = ""

@@ -107,7 +107,7 @@ class DebugActivity : ComponentActivity() {
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-
+Text(text = getOverlayList().overlayList.toString())
             }
         }
 

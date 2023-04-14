@@ -5,12 +5,12 @@ buildscript {
         mavenCentral()  // Maven Central repository
     }
     ext {
-        compose_ui_version = '1.4.0-rc01'
+        compose_ui_version = '1.5.0-alpha02'
         kotlin_version = '1.7.21'
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.14'
-        classpath 'com.android.tools.build:gradle:8.1.0-alpha09'
+        classpath 'com.android.tools.build:gradle:8.1.0-alpha11'
         classpath 'com.google.firebase:perf-plugin:1.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }

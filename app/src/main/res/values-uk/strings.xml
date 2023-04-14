@@ -23,8 +23,6 @@
     <string name="qstileheight">QsTileHeight</string>
     <string name="themed_project_by_osanosa">Тематичний проект від Osanosa</string>
     <string name="installed_manager_version_is">Встановлена ​​версія менеджера: %1$s</string>
-    <string name="creating_folder">Створення папки</string>
-    <string name="downloading">Завантаження</string>
     <string name="installing">Встановлення модуля</string>
     <string name="done">Готово</string>
     <string name="download_latest_module">Встановити найновішу версію</string>

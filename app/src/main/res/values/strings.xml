@@ -23,8 +23,6 @@
     <string name="qstileheight">QsTileHeight</string>
     <string name="themed_project_by_osanosa">Themed Project by Osanosa</string>
     <string name="installed_manager_version_is">Installed manager version is %1$s</string>
-    <string name="creating_folder">Creating folder</string>
-    <string name="downloading">Downloading</string>
     <string name="installing">Installing module</string>
     <string name="done">Done</string>
     <string name="download_latest_module">Download latest module</string>

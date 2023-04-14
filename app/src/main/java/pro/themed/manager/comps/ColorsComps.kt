@@ -8,6 +8,8 @@
 package pro.themed.manager.comps
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -20,15 +22,104 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.*
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.*
+
+
+@ExperimentalMaterialApi
+@Composable
+fun ColorTile(name: String, color: String, modifier: Modifier = Modifier) {
+
+
+    Surface(modifier = modifier,
+        color = Color(color.toColorInt()),
+        onClick = { overlayEnable("$name.${color.removePrefix("#")}") }) {
+
+        if (getOverlayList().enabledOverlays.any { it.contains(name + "." + color.removePrefix("#")) }) {
+
+            Icon(
+                painter = painterResource(id = R.drawable.check_small_48px),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(0.9f)
+            )
+        }
+    }
+}
+
+
+/*@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ColorTilesRow(name: String, colors: List<String>) {
+    Row(   verticalAlignment = CenterVertically) {
+        colors.forEach { color ->
+                ColorTile(name, color,  modifier = Modifier
+                    .aspectRatio(1f)
+                    .weight(1f))
+
+        }
+    }
+}*/
+
+@Composable
+fun VerticalGrid(
+    modifier: Modifier = Modifier, columns: Int = 2, content: @Composable () -> Unit
+) {
+    Layout(
+        content = content, modifier = modifier
+    ) { measurables, constraints ->
+        val itemWidth = constraints.maxWidth / columns
+
+        val itemConstraints = constraints.copy(
+            minWidth = itemWidth, maxWidth = itemWidth
+        )
+
+        val placeables = measurables.map { it.measure(itemConstraints) }
+
+        val columnHeights = Array(columns) { 0 }
+        placeables.forEachIndexed { index, placeable ->
+            val column = index % columns
+            columnHeights[column] += placeable.height
+        }
+        val height =
+            (columnHeights.maxOrNull() ?: constraints.minHeight).coerceAtMost(constraints.maxHeight)
+        layout(
+            width = constraints.maxWidth, height = height
+        ) {
+            val columnY = Array(columns) { 0 }
+            placeables.forEachIndexed { index, placeable ->
+                val column = index % columns
+                placeable.placeRelative(
+                    x = column * itemWidth, y = columnY[column]
+                )
+                columnY[column] += placeable.height
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ColorTilesRow(
+    name: String, colors: List<String>
+
+) {
+    VerticalGrid(columns = 8) {
+        colors.forEach { color ->
+            ColorTile(
+                name = name, color = color, modifier = Modifier.aspectRatio(1f)
+            )
+        }
+    }
+}
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -49,7 +140,7 @@ fun AccentsNewTemp(
     Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
         modifier = Modifier
-            .fillMaxWidth()
+            .wrapContentWidth()
             .wrapContentHeight(),
         elevation = (0.dp),
         shape = RoundedCornerShape(8.dp),
@@ -69,7 +160,22 @@ fun AccentsNewTemp(
                     fontSize = 24.sp
                 )
                 IconButton(modifier = Modifier, onClick = {
-                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.$name.M' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                    redvisible = !redvisible
+                    orangevisible = !orangevisible
+                    yellowvisible = !yellowvisible
+                    lightgreenvisible = !lightgreenvisible
+                    tealvisible = !tealvisible
+                    lightbluevisible = !lightbluevisible
+                    indigovisible = !indigovisible
+                    purplevisible = !purplevisible
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.expand_more_48px),
+                        contentDescription = null,
+                    )
+                }
+                IconButton(modifier = Modifier, onClick = {
+                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.$name' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                 }) {
                     Image(
                         painter = painterResource(R.drawable.reset),
@@ -78,10 +184,12 @@ fun AccentsNewTemp(
                 }
             }
             Column {
+                //this annoying piece of shit
                 Row {
-                    Surface(
-                        modifier = Modifier.size(tilesize.dp),
-                        color = MaterialRed500,
+
+
+                    Surface(modifier = Modifier.size(tilesize.dp),
+                        color = Color(0xFFF44336),
                         onClick = {
                             redvisible = !redvisible
                             orangevisible = false
@@ -91,9 +199,22 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = false
-                        }) {}
+                        }) {
+                        AnimatedVisibility(
+                            visible = redvisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
+
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialOrange500,
+                        color = Color(0xFFFF9800),
                         onClick = {
                             redvisible = false
                             orangevisible = !orangevisible
@@ -103,9 +224,21 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = false
-                        }) {}
+                        }) {
+                        AnimatedVisibility(
+                            visible = orangevisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialAmber500,
+                        color = Color(0xFFFFC107),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -115,9 +248,21 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = false
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = yellowvisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialLightGreen500,
+                        color = Color(0xFF8BC34A),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -127,9 +272,21 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = false
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = lightgreenvisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialTeal500,
+                        color = Color(0xFF009688),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -139,9 +296,21 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = false
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = tealvisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialLightBlue500,
+                        color = Color(0xFF03A9F4),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -151,9 +320,21 @@ fun AccentsNewTemp(
                             lightbluevisible = !lightbluevisible
                             indigovisible = false
                             purplevisible = false
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = lightbluevisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialIndigo500,
+                        color = Color(0xFF3F51B5),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -163,9 +344,21 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = !indigovisible
                             purplevisible = false
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = indigovisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                     Surface(modifier = Modifier.size(tilesize.dp),
-                        color = MaterialPurple500,
+                        color = Color(0xFF9C27B0),
                         onClick = {
                             redvisible = false
                             orangevisible = false
@@ -175,295 +368,112 @@ fun AccentsNewTemp(
                             lightbluevisible = false
                             indigovisible = false
                             purplevisible = !purplevisible
-                        }) { }
+                        }) {
+                        AnimatedVisibility(
+                            visible = purplevisible, enter = fadeIn(), exit = fadeOut()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.expand_less_48px),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(0.9f)
+                            )
+                        }
+
+
+                    }
                 }
+
                 AnimatedVisibility(redvisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPinkA700,
-                            onClick = { overlayEnable("$name.MaterialPinkA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
+                            "#FFC51162", "#FFE91E63", "#FFE91E63", "#FFF50057",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPink500,
-                            onClick = { overlayEnable("$name.MaterialPink500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPinkA200,
-                            onClick = { overlayEnable("$name.MaterialPinkA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPinkA400,
-                            onClick = { overlayEnable("$name.MaterialPinkA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialRedA700,
-                            onClick = { overlayEnable("$name.MaterialRedA700") }) { }
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialRed500,
-                            onClick = { overlayEnable("$name.MaterialRed500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialRedA200,
-                            onClick = { overlayEnable("$name.MaterialRedA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialRedA400,
-                            onClick = { overlayEnable("$name.MaterialRedA400") }) {}
-                    }
-
+                            "#FFD50000", "#FFF44336", "#FFFF5252", "#FFFF1744"
+                        )
+                    )
                 }
+
                 AnimatedVisibility(orangevisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(221, 44, 0)),
-                            onClick = { overlayEnable("$name.MaterialDeepOrangeA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 87, 34)),
-                            onClick = { overlayEnable("$name.MaterialDeepOrange500") }) {}
+                            "#FFDD2C00", "#FFDD2C00", "#FFFF6E40", "#FFFF3D00",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 110, 64)),
-                            onClick = { overlayEnable("$name.MaterialDeepOrangeA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 61, 0)),
-                            onClick = { overlayEnable("$name.MaterialDeepOrangeA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 109, 0)),
-                            onClick = { overlayEnable("$name.MaterialOrangeA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 152, 0)),
-                            onClick = { overlayEnable("$name.MaterialOrange500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 171, 64)),
-                            onClick = { overlayEnable("$name.MaterialOrangeA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = Color(android.graphics.Color.rgb(255, 145, 0)),
-                            onClick = { overlayEnable("$name.MaterialOrangeA400") }) {}
-                    }
-
+                            "#FFFF6D00", "#FFFF9800", "#FFFFAB40", "#FFFF9100"
+                        )
+                    )
                 }
                 AnimatedVisibility(yellowvisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialAmberA700,
-                            onClick = { overlayEnable("$name.MaterialAmberA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialAmber500,
-                            onClick = { overlayEnable("$name.MaterialAmber500") }) {}
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialAmberA200,
-                            onClick = { overlayEnable("$name.MaterialAmberA200") }) {}
+                            "#FFFFAB00", "#FFFFC107", "#FFFFD740", "#FFFFC400",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialAmberA400,
-                            onClick = { overlayEnable("$name.MaterialAmberA400") }) {}
+                            "#FFFFD600", "#FFFFEB3B", "#FFFFFF00", "#FFFFEA00"
+                        )
+                    )
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialYellowA700,
-                            onClick = { overlayEnable("$name.MaterialYellowA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialYellow500,
-                            onClick = { overlayEnable("$name.MaterialYellow500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialYellowA200,
-                            onClick = { overlayEnable("$name.MaterialYellowA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialYellowA400,
-                            onClick = { overlayEnable("$name.MaterialYellowA400") }) {}
-
-                    }
 
                 }
                 AnimatedVisibility(lightgreenvisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLimeA700,
-                            onClick = { overlayEnable("$name.MaterialLimeA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLime500,
-                            onClick = { overlayEnable("$name.MaterialLime500") }) {}
+                            "#FFAEEA00", "#FFCDDC39", "#FFEEFF41", "#FFC6FF00",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLimeA200,
-                            onClick = { overlayEnable("$name.MaterialLimeA200") }) {}
+                            "#FF64DD17", "#FF8BC34A", "#FFB2FF59", "#FF76FF03"
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLimeA400,
-                            onClick = { overlayEnable("$name.MaterialLimeA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightGreenA700,
-                            onClick = { overlayEnable("$name.MaterialLightGreenA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightGreen500,
-                            onClick = { overlayEnable("$name.MaterialLightGreen500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightGreenA200,
-                            onClick = { overlayEnable("$name.MaterialLightGreenA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightGreenA400,
-                            onClick = { overlayEnable("$name.MaterialLightGreenA400") }) {}
-
-
-                    }
+                        )
+                    )
                 }
                 AnimatedVisibility(tealvisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialGreenA700,
-                            onClick = { overlayEnable("$name.MaterialGreenA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialGreen500,
-                            onClick = { overlayEnable("$name.MaterialGreen500") }) {}
+                            "#FF00C853", "#FF4CAF50", "#FF69F0AE", "#FF00E676",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialGreenA200,
-                            onClick = { overlayEnable("$name.MaterialGreenA200") }) {}
+                            "#FF00BFA5", "#FF009688", "#FF64FFDA", "#FF1DE9B6"
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialGreenA400,
-                            onClick = { overlayEnable("$name.MaterialGreenA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialTealA700,
-                            onClick = { overlayEnable("$name.MaterialTealA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialTeal500,
-                            onClick = { overlayEnable("$name.MaterialTeal500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialTealA200,
-                            onClick = { overlayEnable("$name.MaterialTealA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialTealA400,
-                            onClick = { overlayEnable("$name.MaterialTealA400") }) {}
-
-                    }
+                        )
+                    )
                 }
                 AnimatedVisibility(lightbluevisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialCyanA700,
-                            onClick = { overlayEnable("$name.MaterialCyanA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialCyan500,
-                            onClick = { overlayEnable("$name.MaterialCyan500") }) {}
+                            "#FF0091EA", "#FF00BCD4", "#FF18FFFF", "#FF00E5FF",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialCyanA200,
-                            onClick = { overlayEnable("$name.") }) {}
+                            "#FF0091EA", "#FF03A9F4", "#FF40C4FF", "#FF00B0FF"
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialCyanA400,
-                            onClick = { overlayEnable("$name.MaterialCyanA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightBlueA700,
-                            onClick = { overlayEnable("$name.MaterialLightBlueA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightBlue500,
-                            onClick = { overlayEnable("$name.MaterialLightBlue500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightBlueA200,
-                            onClick = { overlayEnable("$name.MaterialLightBlueA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialLightBlueA400,
-                            onClick = { overlayEnable("$name.MaterialLightBlueA400") }) {}
-                    }
+                        )
+                    )
                 }
                 AnimatedVisibility(indigovisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialBlueA700,
-                            onClick = { overlayEnable("$name.MaterialBlueA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialBlue500,
-                            onClick = { overlayEnable("$name.MaterialBlue500") }) {}
+                            "#FF2962FF", "#FF2196F3", "#FF448AFF", "#FF2979FF",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialBlueA200,
-                            onClick = { overlayEnable("$name.MaterialBlueA200") }) {}
+                            "#FF304FFE", "#FF3F51B5", "#FF536DFE", "#FF3D5AFE"
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialBlueA400,
-                            onClick = { overlayEnable("$name.MaterialBlueA400") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialIndigoA700,
-                            onClick = { overlayEnable("$name.") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialIndigo500,
-                            onClick = { overlayEnable("$name.MaterialIndigo500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialIndigoA200,
-                            onClick = { overlayEnable("$name.MaterialIndigoA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialIndigoA400,
-                            onClick = { overlayEnable("$name.MaterialIndigoA400") }) {}
-                    }
+                        )
+                    )
                 }
                 AnimatedVisibility(purplevisible) {
-                    Row {
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialDeepPurpleA700,
-                            onClick = { overlayEnable("$name.MaterialDeepPurpleA700") }) {}
+                    ColorTilesRow(
+                        name, listOf(
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialDeepPurple500,
-                            onClick = { overlayEnable("$name.MaterialDeepPurple500") }) {}
+                            "#FF6200EA", "#FF673AB7", "#FF7C4DFF", "#FF651FFF",
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialDeepPurpleA200,
-                            onClick = { overlayEnable("$name.MaterialDeepPurpleA200") }) {}
+                            "#FFAA00FF", "#FF9C27B0", "#FFE040FB", "#FFD500F9"
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialDeepPurpleA400,
-                            onClick = { overlayEnable("$name.MaterialDeepPurpleA400") }) {}
 
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPurpleA700,
-                            onClick = { overlayEnable("$name.MaterialPurpleA700") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPurple500,
-                            onClick = { overlayEnable("$name.MaterialPurple500") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPurpleA200,
-                            onClick = { overlayEnable("$name.MaterialPurpleA200") }) {}
-
-                        Surface(modifier = Modifier.size(tilesize.dp),
-                            color = MaterialPurpleA400,
-                            onClick = { overlayEnable("$name.MaterialPurpleA400") }) {}
-                    }
+                        )
+                    )
                 }
+
+
             }
         }
     }
@@ -475,7 +485,9 @@ fun UIBGDark() {
 
     val tilesize = (LocalConfiguration.current.smallestScreenWidthDp - 16) / 8
     Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        border = BorderStroke(
+            width = 1.dp, color = MaterialTheme.colors.bordercol
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
@@ -520,11 +532,7 @@ fun UIBGDark() {
                         onClick = { overlayEnable("uibg.dark.charcoalf2") }) {
                         Text(text = "f2")
                     }
-
-
                 }
-
-
             }
         }
     }
@@ -547,24 +555,25 @@ fun ColorsTab() {
                 .padding(8.dp)
         ) {
 
+
             var state by rememberSaveable { mutableStateOf(CardFace.Front) }
             FlipCard(cardFace = state, onClick = {
                 state = it.next
             }, axis = RotationAxis.AxisY, back = {
-                if (!overlayList.any { it.contains("accents.dark") }) {
+                if (!getOverlayList().overlayList.any { it.contains("accents.dark") }) {
                     Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
+                        modifier = Modifier.padding(horizontal = 16.dp), text = ""
                     )
 
                 } else {
-                    if (unsupportedOverlays.any { it.contains("accents.dark") }) {
+                    if (getOverlayList().unsupportedOverlays.any { it.contains("accents.dark") }) {
                         Text(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = ""
+                            modifier = Modifier.padding(horizontal = 16.dp), text = ""
                         )
                     } else {
-                        AccentsNewTemp("accents.dark", stringResource(R.string.accents_dark))
+                        AccentsNewTemp(
+                            "accents.dark", stringResource(R.string.accents_dark)
+                        )
 
                     }
                 }
@@ -572,36 +581,35 @@ fun ColorsTab() {
 
             }, front = {
 
-                if (!overlayList.any { it.contains("accents.M") }) {
+                if (!getOverlayList().overlayList.any { it.contains("accents.F") }) {
                     Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "" )
+                        modifier = Modifier.padding(horizontal = 16.dp), text = ""
+                    )
 
                 } else {
-                    if (unsupportedOverlays.any { it.contains("accents.M") }) {
+                    if (getOverlayList().unsupportedOverlays.any { it.contains("accents.F") }) {
                         Text(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = ""
+                            modifier = Modifier.padding(horizontal = 16.dp), text = ""
                         )
                     } else {
-                        AccentsNewTemp("accents", stringResource(R.string.accents))
+                        AccentsNewTemp(
+                            "accents", stringResource(R.string.accents)
+                        )
 
                     }
                 }
 
             })
             Spacer(modifier = Modifier.height(8.dp))
-            if (!overlayList.any { it.contains("uibg") }) {
+            if (!getOverlayList().overlayList.any { it.contains("uibg") }) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = ""
+                    modifier = Modifier.padding(horizontal = 16.dp), text = ""
                 )
 
             } else {
-                if (unsupportedOverlays.any { it.contains("uibg") }) {
+                if (getOverlayList().unsupportedOverlays.any { it.contains("uibg") }) {
                     Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
+                        modifier = Modifier.padding(horizontal = 16.dp), text = ""
                     )
                 } else {
                     UIBGDark()

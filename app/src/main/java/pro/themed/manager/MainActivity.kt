@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -58,8 +59,28 @@ import java.io.FileOutputStream
 import java.net.URL
 
 
-val overlayList = SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
-val unsupportedOverlays = overlayList.filter { it.contains("---") }
+data class OverlayListData(
+    val overlayList: List<String>,
+    val unsupportedOverlays: List<String>,
+    val enabledOverlays: List<String>,
+    val disabledOverlays: List<String>,
+)
+
+@Composable
+fun getOverlayList(): OverlayListData {
+    val overlayList = remember {
+        SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+    }
+
+    val unsupportedOverlays = overlayList.filter { it.contains("---") }
+    val enabledOverlays = overlayList.filter { it.contains("[x]") }
+    val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+
+    return OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+}
+
+
+//var overlayList = SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
 
 @get:Composable
 val Colors.bordercol: Color
@@ -85,6 +106,9 @@ enum class CardFace(val angle: Float) {
 enum class RotationAxis {
     AxisX, AxisY,
 }
+
+
+
 
 @Stable
 
@@ -142,6 +166,7 @@ fun FlipCard(
     }
 }
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,9 +175,9 @@ class MainActivity : ComponentActivity() {
             ThemedManagerTheme {
                 SH.run("su")
                 if ("root" !in SH.run("whoami").stdout()) {
-                    Toast.makeText(LocalContext.current,
-                        getString(R.string.no_root_access), Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(
+                        LocalContext.current, getString(R.string.no_root_access), Toast.LENGTH_SHORT
+                    ).show()
                 }
                 if (BuildConfig.DEBUG) {
                     FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
@@ -160,8 +185,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 val context = LocalContext.current
-
-
 
 
                 val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
@@ -174,8 +197,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
 
 
 suspend fun downloadFile(url: String, destination: String) {
@@ -306,15 +327,10 @@ fun InfoCard() {
         backgroundColor = MaterialTheme.colors.cardcol
     ) {
         Text(
-            modifier = Modifier.padding(16.dp),
-            text = "",
-            fontSize = 14.sp
+            modifier = Modifier.padding(16.dp), text = "", fontSize = 14.sp
         )
     }
 }
-
-
-
 
 
 //@Preview()
