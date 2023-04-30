@@ -9,7 +9,6 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager"
         tools:targetApi="31">
@@ -31,7 +30,7 @@
             android:name=".DebugActivity"
             android:exported="false"
             android:label="@string/title_activity_debug"
-            android:theme="@style/Theme.ThemedManager"/>
+            android:theme="@style/Theme.ThemedManager" />
         <activity
             android:name=".FaqActivity"
             android:exported="false"

@@ -1,5 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
+    ExperimentalFoundationApi::class
 )
 
 package pro.themed.manager
@@ -11,7 +11,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,7 +53,6 @@ class AboutActivity : ComponentActivity() {
     }
 
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Preview
     @Composable
     fun AboutPage() {
@@ -63,19 +64,19 @@ class AboutActivity : ComponentActivity() {
                 var easteregg by remember { mutableStateOf(false) }
                 var tapcount by remember { mutableStateOf(0) }
                 TopAppBarAbout()
-                Surface(shape = CircleShape,
+                Surface(
+                    shape = CircleShape,
                     modifier = Modifier
                         .fillMaxWidth(0.5F)
                         .align(alignment = CenterHorizontally)
-                        .padding(12.dp),
-                    onClick = {
-                        if (tapcount >= 9) easteregg = true else tapcount += 1
-
-                    }) {
+                        .padding(12.dp)
+                ) {
                     Image(
                         contentDescription = null,
                         painter = painterResource(id = R.drawable.main_logo),
-                        modifier = Modifier,
+                        modifier = Modifier.combinedClickable(
+                            onClick = {},
+                            onLongClick = { easteregg = !easteregg }),
                         contentScale = ContentScale.FillWidth
                     )
                 }
@@ -91,36 +92,36 @@ class AboutActivity : ComponentActivity() {
                     onClick = {
 
 
-                                /*runOnUiThread {
-                                    Toast.makeText(
-                                        context,
-                                        getString(R.string.creating_folder),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }*/
-                                Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
-                                /*runOnUiThread {
+                        /*runOnUiThread {
+                            Toast.makeText(
+                                context,
+                                getString(R.string.creating_folder),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }*/
+                        Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
+                        /*runOnUiThread {
 
-                                }*/
-                                AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
+                        }*/
+                        AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
                         Toast.makeText(
                             context, getString(R.string.installing), Toast.LENGTH_SHORT
                         ).show()
 
-                                Shell.SU.run(
-                                    "while [ ! -f \"/sdcard/download/ThemedProject.zip\" ]\n" +
-                                            "do\n" +
-                                            "  sleep 1\n" +
-                                            "done" +
-                                            "; magisk --install-module /sdcard/Download/ThemedProject.zip"
-                                )
+                        Shell.SU.run(
+                            "while [ ! -f \"/sdcard/download/ThemedProject.zip\" ]\n" +
+                                    "do\n" +
+                                    "  sleep 1\n" +
+                                    "done" +
+                                    "; magisk --install-module /sdcard/Download/ThemedProject.zip"
+                        )
 
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        context, getString(R.string.done), Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                        runOnUiThread {
+                            Toast.makeText(
+                                context, getString(R.string.done), Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
 
                     },

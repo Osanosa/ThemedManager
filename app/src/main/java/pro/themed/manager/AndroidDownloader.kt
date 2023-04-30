@@ -7,7 +7,7 @@ import androidx.core.net.toUri
 
 class AndroidDownloader(
     private val context: Context
-): Downloader {
+) : Downloader {
 
     private val downloadManager = context.getSystemService(DownloadManager::class.java)
 

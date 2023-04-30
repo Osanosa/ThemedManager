@@ -70,7 +70,8 @@ class DebugActivity : ComponentActivity() {
                             Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/cmdoverlaylist.txt")
                             Shell.SU.run("cd /data/adb/modules ; ls | tee -a /sdcard/themeddebug/modules.txt")
 
-                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT)
+                                .show()
 
 
                         }, modifier = Modifier
@@ -92,7 +93,8 @@ class DebugActivity : ComponentActivity() {
                             Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/")
                             Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/")
 
-                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT)
+                                .show()
 
 
                         }, modifier = Modifier
@@ -107,7 +109,7 @@ class DebugActivity : ComponentActivity() {
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-Text(text = getOverlayList().overlayList.toString())
+                Text(text = getOverlayList().overlayList.toString())
             }
         }
 

@@ -64,7 +64,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 
@@ -633,7 +632,7 @@ class ToolboxActivity : ComponentActivity() {
 
     @Preview
     @Composable
-    fun DownscaleCard(context: Context) {
+    fun DownscaleCard(context: Context = LocalContext.current) {
         Card(
             border = BorderStroke(
                 width = 1.dp, color = MaterialTheme.colors.bordercol
@@ -660,7 +659,7 @@ class ToolboxActivity : ComponentActivity() {
                     )
                     IconButton(modifier = Modifier, onClick = {
 
-                                Shell.SU.run("wm size reset ; wm density reset")
+                        Shell.SU.run("wm size reset ; wm density reset")
 
 
                     }) {
@@ -684,15 +683,14 @@ class ToolboxActivity : ComponentActivity() {
                         text = { Text(stringResource(R.string.on_some_roms_such_as_miui_setting_resolution_to_smaller_then_480p_may_cause_issues_test_button_will_reset_size_after_10s)) },
                         buttons = {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                TextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp),
+                                TextField(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
                                     value = customres,
                                     singleLine = true,
                                     onValueChange = { customres = it },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                                )
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    label = { Text("Enter custom resolution") })
 
 
                                 Row(
@@ -704,9 +702,8 @@ class ToolboxActivity : ComponentActivity() {
                                         .weight(1f),
                                         onClick = {
 
-                                                    downscalebynumber(width = customres)
-                                                    Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
-
+                                            downscalebynumber(width = customres)
+                                            Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
 
 
                                         }) { Text(text = stringResource(R.string.test)) }
@@ -717,7 +714,7 @@ class ToolboxActivity : ComponentActivity() {
                                             .weight(1f),
                                         onClick = {
 
-                                                    downscalebynumber(width = customres)
+                                            downscalebynumber(width = customres)
 
 
                                         },
@@ -751,10 +748,10 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
 
-                                downscalebydivisor("2")
-                                if (switchState.value) {
-                                    Thread.sleep(10000)
-                                    Shell.SU.run(" wm size reset ; wm density reset")
+                            downscalebydivisor("2")
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
 
                             }
                         },
@@ -771,10 +768,10 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
 
-                                downscalebydivisor("3")
-                                if (switchState.value) {
-                                    Thread.sleep(10000)
-                                    Shell.SU.run(" wm size reset ; wm density reset")
+                            downscalebydivisor("3")
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
 
                             }
                         },
@@ -791,12 +788,12 @@ class ToolboxActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
 
-                                downscalebydivisor("4")
+                            downscalebydivisor("4")
 
-                                if (switchState.value) {
-                                    Thread.sleep(10000)
-                                    Shell.SU.run(" wm size reset ; wm density reset")
-                                }
+                            if (switchState.value) {
+                                Thread.sleep(10000)
+                                Shell.SU.run(" wm size reset ; wm density reset")
+                            }
 
                         },
                         modifier = Modifier.wrapContentWidth(),
@@ -832,8 +829,8 @@ class ToolboxActivity : ComponentActivity() {
 
     private fun downscalebydivisor(divisor: String) {
 
-            Shell.SU.run(
-                command = """
+        Shell.SU.run(
+            command = """
                 # Set the number of division
                 divisor=$divisor
                 
@@ -865,13 +862,13 @@ class ToolboxActivity : ComponentActivity() {
                 wm size ${'$'}width"x"${'$'}height
                 wm density ${'$'}density
                 """
-            )
+        )
 
     }
 
     private fun downscalebynumber(width: String) {
         Shell.SU.run(
-                    command = """
+            command = """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
                 
@@ -901,9 +898,8 @@ class ToolboxActivity : ComponentActivity() {
                 wm density ${'$'}(printf "%.0f" ${'$'}new_density)
                 
                 """
-                )
-            }
-
+        )
+    }
 
 
     @Composable

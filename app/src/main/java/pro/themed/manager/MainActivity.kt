@@ -25,10 +25,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -50,13 +50,10 @@ import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pro.themed.manager.comps.AppsTab
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
-import java.io.FileOutputStream
-import java.net.URL
 
 
 data class OverlayListData(
@@ -68,19 +65,25 @@ data class OverlayListData(
 
 @Composable
 fun getOverlayList(): OverlayListData {
-    val overlayList = remember {
-        SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+    var overlayList by remember { mutableStateOf<OverlayListData?>(null) }
+
+    LaunchedEffect(true) {
+        val result = withContext(Dispatchers.IO) {
+            val overlayList = SH.run("""su -c cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+            val unsupportedOverlays = overlayList.filter { it.contains("---") }
+            val enabledOverlays = overlayList.filter { it.contains("[x]") }
+            val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+
+            OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+        }
+        overlayList = result
     }
 
-    val unsupportedOverlays = overlayList.filter { it.contains("---") }
-    val enabledOverlays = overlayList.filter { it.contains("[x]") }
-    val disabledOverlays = overlayList.filter { it.contains("[ ]") }
-
-    return OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+    return overlayList ?: OverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
 }
 
 
-//var overlayList = SU.run("""cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+
 
 @get:Composable
 val Colors.bordercol: Color
@@ -106,8 +109,6 @@ enum class CardFace(val angle: Float) {
 enum class RotationAxis {
     AxisX, AxisY,
 }
-
-
 
 
 @Stable
@@ -173,11 +174,14 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             ThemedManagerTheme {
-                SH.run("su")
-                if ("root" !in SH.run("whoami").stdout()) {
+                var root by rememberSaveable {
+                    mutableStateOf(SH.run("su -c whoami").stdout())
+                }
+                if ("root" !in root) {
                     Toast.makeText(
                         LocalContext.current, getString(R.string.no_root_access), Toast.LENGTH_SHORT
                     ).show()
+                } else {
                 }
                 if (BuildConfig.DEBUG) {
                     FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
@@ -198,22 +202,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-suspend fun downloadFile(url: String, destination: String) {
-    withContext(Dispatchers.IO) {
-        val urlConnection = URL(url).openConnection()
-        urlConnection.connect()
-        val inputStream = urlConnection.getInputStream()
-        val outputStream = FileOutputStream(destination)
-        val buffer = ByteArray(1024)
-        var length: Int
-        while (inputStream.read(buffer).also { length = it } > 0) {
-            outputStream.write(buffer, 0, length)
-        }
-        outputStream.close()
-        inputStream.close()
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -248,7 +236,7 @@ fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         NavigationItems.ColorsTab,
         NavigationItems.IconsTab,
-        NavigationItems.FontsTab,
+      //  NavigationItems.FontsTab,
         NavigationItems.MiscTab
     )
     BottomNavigation(
@@ -302,9 +290,9 @@ fun Navigation(navController: NavHostController) {
         composable(NavigationItems.IconsTab.route) {
             IconsTab()
         }
-        composable(NavigationItems.FontsTab.route) {
+        /*composable(NavigationItems.FontsTab.route) {
             AppsTab()
-        }
+        }*/
         composable(NavigationItems.MiscTab.route) {
             MiscTab()
         }
@@ -372,10 +360,10 @@ fun overlayEnable(overlayname: String) {
     @Composable
 
     if (Build.VERSION.SDK_INT >= 28) {
-        SU.run("cmd overlay enable-exclusive --category themed.$overlayname")
+        SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
 
     } else {
-        SU.run("cmd overlay enable themed.$overlayname")
+        SU.run("su -c cmd overlay enable themed.$overlayname")
 
     }
 

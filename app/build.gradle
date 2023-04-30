@@ -33,9 +33,9 @@ android {
     defaultConfig {
         applicationId "pro.themed.manager"
         minSdk 26
-        targetSdk 33
-        versionCode 230324
-        versionName '23.03.24'
+        targetSdk 34
+        versionCode 230501
+        versionName '23.05.01'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -61,6 +61,14 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = [
+                "-Xopt-in=kotlin.RequiresOptIn",
+                "-Xopt-in=kotlin.Experimental",
+                "-Xopt-in=kotlin.ExperimentalFoundationApi",
+                "-Xopt-in=kotlin.time.ExperimentalTime",
+                "-Xopt-in=com.google.accompanist.flowlayout.ExperimentalFlowLayout",
+                // Add any other OptIn annotations you want to suppress warnings for
+        ]
     }
     buildFeatures {
         compose true
@@ -83,10 +91,10 @@ android {
 }
 
 dependencies {
-    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.20'))
+    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.21'))
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation 'androidx.activity:activity-compose:1.7.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation "androidx.compose.material:material:$compose_ui_version"
@@ -105,7 +113,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.1'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
-    implementation platform('androidx.compose:compose-bom:2023.04.00')
+    implementation platform('androidx.compose:compose-bom:2023.04.01')
     implementation "androidx.compose.ui:ui-graphics:$compose_ui_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -114,18 +122,18 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'androidx.navigation:navigation-compose:2.6.0-alpha09'
-    implementation platform('com.google.firebase:firebase-bom:31.4.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx:21.2.1'
+    implementation 'androidx.navigation:navigation-compose:2.6.0-beta01'
+    implementation platform('com.google.firebase:firebase-bom:31.5.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.2.2'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.0'
     implementation 'com.google.firebase:firebase-perf:20.3.1'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
     // Splash API
-    implementation 'androidx.core:core-splashscreen:1.0.0'
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.6.0-alpha09')
+    implementation('androidx.navigation:navigation-compose:2.6.0-beta01')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.30.0'
@@ -135,8 +143,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Dagger - Hilt
-    implementation 'com.google.dagger:hilt-android:2.45'
-    kapt 'com.google.dagger:hilt-android-compiler:2.45'
+    implementation 'com.google.dagger:hilt-android:2.46'
+    kapt 'com.google.dagger:hilt-android-compiler:2.46'
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
@@ -144,7 +152,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
-    implementation 'androidx.compose.material3:material3:1.1.0-beta02'
+    implementation 'androidx.compose.material3:material3:1.1.0-rc01'
 
     implementation "androidx.compose.ui:ui-util:$compose_ui_version"
 }

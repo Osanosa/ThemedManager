@@ -2,6 +2,7 @@ package pro.themed.manager.comps
 
 import android.widget.Toast
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +43,6 @@ import pro.themed.manager.R
 import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
-
 import kotlin.math.roundToInt
 
 
@@ -65,121 +65,124 @@ fun Slideritem(
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
     if (!getOverlayList().unsupportedOverlays.any { it.contains(overlayName) }) {
-    Surface {
+        Surface {
 
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                // horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
             ) {
-                Icon(
-                    painterResource(id = drawable),
-                    contentDescription = "",
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(24.dp)
-                )
-                Column {
-                    Text(
-                        text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp
+                Row(
+                    Modifier.fillMaxWidth(),
+                    // horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painterResource(id = drawable),
+                        contentDescription = "",
+                        Modifier
+                            .padding(horizontal = 16.dp)
+                            .size(24.dp)
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column {
+                        Text(
+                            text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        Text(text = "Value: $intvalue")
+                            Text(text = "Value: $intvalue")
 
+                        }
                     }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(modifier = Modifier, onClick = {
+                        intvalue = 0; sliderPosition = intvalue.toFloat()
+                        Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                    }) {
+                        Image(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .size(24.dp),
+                            painter = painterResource(R.drawable.reset),
+                            contentDescription = null,
+                        )
+                    }
+
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(modifier = Modifier, onClick = {
-                    intvalue = 0; sliderPosition = intvalue.toFloat()
-                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
-                }) {
+                Row(
+                    Modifier, verticalAlignment = Alignment.CenterVertically
+                ) {
+
                     Image(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
-                            .size(24.dp),
-                        painter = painterResource(R.drawable.reset),
+                            .clickable {
+                                intvalue -= sliderStepValue; sliderPosition = intvalue.toFloat()
+                                Toast
+                                    .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
+                                    .show()
+                                overlayEnable("$overlayName$intvalue")
+
+                            },
+                        painter = painterResource(R.drawable.remove_48px),
                         contentDescription = null,
                     )
+
+                    androidx.compose.material3.Slider(modifier = Modifier
+                        .height(16.dp)
+                        .weight(1f)
+                        .padding(0.dp),
+                        value = sliderPosition,
+                        onValueChange = { sliderPosition = it; intvalue = it.roundToInt() },
+                        valueRange = minSliderValue..maxSliderValue,
+                        onValueChangeFinished = {
+                            Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
+                            overlayEnable("$overlayName$intvalue")
+                        },
+                        steps = sliderSteps,
+                        thumb = {
+                            Image(
+                                painter = painterResource(R.drawable.fiber_manual_record_48px),
+                                contentDescription = null,
+                            )
+
+                        })
+
+                    Image(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .clickable {
+                                intvalue += sliderStepValue; sliderPosition = intvalue.toFloat()
+                                Toast
+                                    .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
+                                    .show()
+                                overlayEnable("$overlayName$intvalue")
+                            },
+                        painter = painterResource(R.drawable.add_48px),
+                        contentDescription = null,
+                    )
+
                 }
-
             }
-            Row(
-                Modifier, verticalAlignment = Alignment.CenterVertically
-            ) {
 
-                Image(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            intvalue -= sliderStepValue; sliderPosition = intvalue.toFloat()
-                            Toast
-                                .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                .show()
-                            overlayEnable("$overlayName$intvalue")
 
-                        },
-                    painter = painterResource(R.drawable.remove_48px),
-                    contentDescription = null,
-                )
-
-                androidx.compose.material3.Slider(modifier = Modifier
-                    .height(16.dp)
-                    .weight(1f)
-                    .padding(0.dp),
-                    value = sliderPosition,
-                    onValueChange = { sliderPosition = it; intvalue = it.roundToInt() },
-                    valueRange = minSliderValue..maxSliderValue,
-                    onValueChangeFinished = {
-                        Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
-                        overlayEnable("$overlayName$intvalue")
-                    },
-                    steps = sliderSteps,
-                    thumb = {
-                        Image(
-                            painter = painterResource(R.drawable.fiber_manual_record_48px),
-                            contentDescription = null,
-                        )
-
-                    })
-
-                Image(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            intvalue += sliderStepValue; sliderPosition = intvalue.toFloat()
-                            Toast
-                                .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                .show()
-                            overlayEnable("$overlayName$intvalue")
-                        },
-                    painter = painterResource(R.drawable.add_48px),
-                    contentDescription = null,
-                )
-
-            }
         }
-
+    } else {
+       Text(text = "$header is not supported")
 
     }
 }
-else {
-       null
 
-}}
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 fun HeaderRowWithSwitch(
     header: String = "Header",
-    subHeader: String = "SubHeader",
+    subHeader: String = "",
+    onCheckedChange: (Boolean) -> Unit = {},
     isChecked: Boolean = false
 ) {
     var showDescription by remember { mutableStateOf(false) }
@@ -187,9 +190,9 @@ fun HeaderRowWithSwitch(
 
     Surface {
         Column(
-            Modifier
-                .fillMaxWidth()
-                .clickable { showDescription = !showDescription }) {
+            Modifier.fillMaxWidth()
+            //.combinedClickable(onClick = {}, onLongClick = {showDescription = !showDescription})
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -197,31 +200,24 @@ fun HeaderRowWithSwitch(
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.subtitle1
                     )
-                    Text(
-                        text = subHeader, style = MaterialTheme.typography.body1
-                    )
+                    if (subHeader.isNotEmpty()) {
+                        Text(
+                            text = subHeader, style = MaterialTheme.typography.body1
+                        )
+                    }
                 }
                 val switchState = remember { mutableStateOf(isChecked) }
                 androidx.compose.material.Switch(
-                    checked = switchState.value,
-                    onCheckedChange = { switchState.value = it
-
-                        if (switchState.value) {
-                            // Code block to be executed if switch is on
-                            // ...
-                            // ...
-                        } else {
-                            // Code block to be executed if switch is off
-                            // ...
-                            // ...
-                        }
-                                      },
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    checked = switchState.value, onCheckedChange = {
+                        switchState.value = it
+                        onCheckedChange(it)
+                    }, modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
         }
     }
 }
+
 
 @ExperimentalMaterial3Api
 //@Preview
@@ -236,18 +232,7 @@ fun MiscTab() {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
 
-            if (!getOverlayList().overlayList.any { it.contains("roundedcorners") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "" )
 
-            } else {
-                if (getOverlayList().unsupportedOverlays.any { it.contains("roundedcorners") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
-                    )
-                } else {
                     Slideritem(
                         drawable = R.drawable.rounded_corner_48px,
                         header = stringResource(R.string.rounded_corners),
@@ -257,61 +242,48 @@ fun MiscTab() {
                         maxSliderValue = 36f,
                         overlayName = "roundedcorners"
                     )
-                }
-            }
 
 
             Divider()
 
 
-                    Slideritem(
-                        drawable = R.drawable.view_week_48px,
-                        header = stringResource(R.string.columns_portrait),
-                        sliderSteps = 8,
-                        sliderStepValue = 1,
-                        minSliderValue = 1f,
-                        maxSliderValue = 10f,
-                        overlayName = "columnsportrait"
-                    )
+            Slideritem(
+                drawable = R.drawable.view_week_48px,
+                header = stringResource(R.string.columns_portrait),
+                sliderSteps = 8,
+                sliderStepValue = 1,
+                minSliderValue = 1f,
+                maxSliderValue = 10f,
+                overlayName = "columnsportrait"
+            )
 
 
 
 
-                    Slideritem(
-                        drawable = R.drawable.table_rows_48px,
-                        header = stringResource(R.string.rows_portrait),
-                        sliderSteps = 8,
-                        sliderStepValue = 1,
-                        minSliderValue = 1f,
-                        maxSliderValue = 10f,
-                        overlayName = "rowsportrait"
-                    )
+            Slideritem(
+                drawable = R.drawable.table_rows_48px,
+                header = stringResource(R.string.rows_portrait),
+                sliderSteps = 8,
+                sliderStepValue = 1,
+                minSliderValue = 1f,
+                maxSliderValue = 10f,
+                overlayName = "rowsportrait"
+            )
 
 
 
-                    Slideritem(
-                        drawable = R.drawable.view_week_48px,
-                        header = stringResource(R.string.columns_landscape),
-                        sliderSteps = 8,
-                        sliderStepValue = 1,
-                        minSliderValue = 1f,
-                        maxSliderValue = 10f,
-                        overlayName = "columnslandscape"
-                    )
+            Slideritem(
+                drawable = R.drawable.view_week_48px,
+                header = stringResource(R.string.columns_landscape),
+                sliderSteps = 8,
+                sliderStepValue = 1,
+                minSliderValue = 1f,
+                maxSliderValue = 10f,
+                overlayName = "columnslandscape"
+            )
 
 
-            if (!getOverlayList().overlayList.any { it.contains("rowslandscape") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "")
 
-            } else {
-                if (getOverlayList().unsupportedOverlays.any { it.contains("rowslandscape") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
-                    )
-                } else {
                     Slideritem(
                         drawable = R.drawable.table_rows_48px,
                         header = stringResource(R.string.rows_landscape),
@@ -321,22 +293,10 @@ fun MiscTab() {
                         maxSliderValue = 10f,
                         overlayName = "rowslandscape"
                     )
-                }
-            }
+
             Divider()
 
-            if (!getOverlayList().overlayList.any { it.contains("qsquicktilesize") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text ="" )
 
-            } else {
-                if (getOverlayList().unsupportedOverlays.any { it.contains("qsquicktilesize") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
-                    )
-                } else {
                     Slideritem(
                         drawable = R.drawable.table_rows_48px,
                         header = stringResource(R.string.qsquicktilesize),
@@ -346,21 +306,9 @@ fun MiscTab() {
                         maxSliderValue = 80f,
                         overlayName = "qsquicktilesize"
                     )
-                }
-            }
 
-            if (!getOverlayList().overlayList.any { it.contains("qstileheight") }) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = "" )
 
-            } else {
-                if (getOverlayList().unsupportedOverlays.any { it.contains("qstileheight") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = ""
-                    )
-                } else {
+
                     Slideritem(
                         drawable = R.drawable.table_rows_48px,
                         header = stringResource(R.string.qstileheight),
@@ -370,9 +318,6 @@ fun MiscTab() {
                         maxSliderValue = 80f,
                         overlayName = "qstileheight"
                     )
-
-                }
-            }
 
 
         }

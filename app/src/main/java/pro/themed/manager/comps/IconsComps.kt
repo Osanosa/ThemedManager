@@ -5,6 +5,7 @@
     ExperimentalPagerApi::class,
     ExperimentalPagerApi::class
 )
+@file:Suppress("DEPRECATION")
 
 package pro.themed.manager.comps
 
