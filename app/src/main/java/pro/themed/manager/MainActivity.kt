@@ -9,7 +9,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -45,7 +44,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +67,8 @@ fun getOverlayList(): OverlayListData {
 
     LaunchedEffect(true) {
         val result = withContext(Dispatchers.IO) {
-            val overlayList = SH.run("""su -c cmd overlay list""").stdout().split("\n").filter { it.contains("themed") }
+            val overlayList = SH.run("""su -c cmd overlay list""").stdout().split("\n")
+                .filter { it.contains("themed") }.sorted()
             val unsupportedOverlays = overlayList.filter { it.contains("---") }
             val enabledOverlays = overlayList.filter { it.contains("[x]") }
             val disabledOverlays = overlayList.filter { it.contains("[ ]") }
@@ -81,8 +80,6 @@ fun getOverlayList(): OverlayListData {
 
     return overlayList ?: OverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
 }
-
-
 
 
 @get:Composable
@@ -183,11 +180,7 @@ class MainActivity : ComponentActivity() {
                     ).show()
                 } else {
                 }
-                if (BuildConfig.DEBUG) {
-                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-                        Log.d("FCM Token", "Token: $token")
-                    }
-                }
+
                 val context = LocalContext.current
 
 
@@ -236,7 +229,7 @@ fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         NavigationItems.ColorsTab,
         NavigationItems.IconsTab,
-      //  NavigationItems.FontsTab,
+        //  NavigationItems.FontsTab,
         NavigationItems.MiscTab
     )
     BottomNavigation(

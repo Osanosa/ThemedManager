@@ -1,10 +1,10 @@
 package pro.themed.manager.comps
 
 import android.widget.Toast
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +24,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -170,7 +171,7 @@ fun Slideritem(
 
         }
     } else {
-       Text(text = "$header is not supported")
+        Text(text = "$header is not supported")
 
     }
 }
@@ -183,16 +184,18 @@ fun HeaderRowWithSwitch(
     header: String = "Header",
     subHeader: String = "",
     onCheckedChange: (Boolean) -> Unit = {},
-    isChecked: Boolean = false
+    onLongClick: () -> Unit = {},
+    isChecked: Boolean = false,
 ) {
-    var showDescription by remember { mutableStateOf(false) }
-    val transition = updateTransition(targetState = showDescription, label = "")
+    var checkedState by remember { mutableStateOf(isChecked) }
 
-    Surface {
-        Column(
-            Modifier.fillMaxWidth()
-            //.combinedClickable(onClick = {}, onLongClick = {showDescription = !showDescription})
-        ) {
+    // Update the checkedState value when isChecked changes
+    LaunchedEffect(isChecked) {
+        checkedState = isChecked
+    }
+
+    Surface(modifier = Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick)) {
+        Column(Modifier.fillMaxWidth()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -202,21 +205,24 @@ fun HeaderRowWithSwitch(
                     )
                     if (subHeader.isNotEmpty()) {
                         Text(
-                            text = subHeader, style = MaterialTheme.typography.body1
+                            text = subHeader,
+                            style = MaterialTheme.typography.body1
                         )
                     }
                 }
-                val switchState = remember { mutableStateOf(isChecked) }
                 androidx.compose.material.Switch(
-                    checked = switchState.value, onCheckedChange = {
-                        switchState.value = it
+                    checked = checkedState,
+                    onCheckedChange = {
+                        checkedState = it
                         onCheckedChange(it)
-                    }, modifier = Modifier.align(Alignment.CenterVertically)
+                    },
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
         }
     }
 }
+
 
 
 @ExperimentalMaterial3Api
@@ -232,16 +238,15 @@ fun MiscTab() {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
 
-
-                    Slideritem(
-                        drawable = R.drawable.rounded_corner_48px,
-                        header = stringResource(R.string.rounded_corners),
-                        sliderSteps = 17,
-                        sliderStepValue = 2,
-                        minSliderValue = 0f,
-                        maxSliderValue = 36f,
-                        overlayName = "roundedcorners"
-                    )
+            Slideritem(
+                drawable = R.drawable.rounded_corner_48px,
+                header = stringResource(R.string.rounded_corners),
+                sliderSteps = 17,
+                sliderStepValue = 2,
+                minSliderValue = 0f,
+                maxSliderValue = 36f,
+                overlayName = "roundedcorners"
+            )
 
 
             Divider()
@@ -284,40 +289,40 @@ fun MiscTab() {
 
 
 
-                    Slideritem(
-                        drawable = R.drawable.table_rows_48px,
-                        header = stringResource(R.string.rows_landscape),
-                        sliderSteps = 8,
-                        sliderStepValue = 1,
-                        minSliderValue = 1f,
-                        maxSliderValue = 10f,
-                        overlayName = "rowslandscape"
-                    )
+            Slideritem(
+                drawable = R.drawable.table_rows_48px,
+                header = stringResource(R.string.rows_landscape),
+                sliderSteps = 8,
+                sliderStepValue = 1,
+                minSliderValue = 1f,
+                maxSliderValue = 10f,
+                overlayName = "rowslandscape"
+            )
 
             Divider()
 
 
-                    Slideritem(
-                        drawable = R.drawable.table_rows_48px,
-                        header = stringResource(R.string.qsquicktilesize),
-                        sliderSteps = 1,
-                        sliderStepValue = 20,
-                        minSliderValue = 60f,
-                        maxSliderValue = 80f,
-                        overlayName = "qsquicktilesize"
-                    )
+            Slideritem(
+                drawable = R.drawable.table_rows_48px,
+                header = stringResource(R.string.qsquicktilesize),
+                sliderSteps = 1,
+                sliderStepValue = 20,
+                minSliderValue = 60f,
+                maxSliderValue = 80f,
+                overlayName = "qsquicktilesize"
+            )
 
 
 
-                    Slideritem(
-                        drawable = R.drawable.table_rows_48px,
-                        header = stringResource(R.string.qstileheight),
-                        sliderSteps = 1,
-                        sliderStepValue = 20,
-                        minSliderValue = 60f,
-                        maxSliderValue = 80f,
-                        overlayName = "qstileheight"
-                    )
+            Slideritem(
+                drawable = R.drawable.table_rows_48px,
+                header = stringResource(R.string.qstileheight),
+                sliderSteps = 1,
+                sliderStepValue = 20,
+                minSliderValue = 60f,
+                maxSliderValue = 80f,
+                overlayName = "qstileheight"
+            )
 
 
         }

@@ -20,14 +20,36 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,14 +62,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.*
+import pro.themed.manager.CardFace
+import pro.themed.manager.FlipCard
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.*
+import pro.themed.manager.RotationAxis
+import pro.themed.manager.bordercol
+import pro.themed.manager.cardcol
+import pro.themed.manager.getOverlayList
+import pro.themed.manager.overlayEnable
 import kotlin.math.roundToInt
 
 
@@ -84,20 +110,14 @@ fun ColorTilesRow(name: String, colors: List<String>) {
         }
     }
 }*/
-@ExperimentalFoundationApi
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun MonetTest() {
 
-}
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FakeMonet(
 
 ) {
-  Card(
+    Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
         modifier = Modifier
             .wrapContentWidth()
@@ -143,7 +163,8 @@ fun FakeMonet(
 
             val brightnessValues =
                 listOf(0.99f, 0.95f, 0.90f, 0.80f, 0.70f, 0.60f, 0.496f, 0.40f, 0.30f, 0.20f, 0.10f)
-            val labels = listOf("10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900")
+            val labels =
+                listOf("10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900")
 
             Surface {
                 val context = LocalContext.current
@@ -262,7 +283,10 @@ fun FakeMonet(
                             Text(text = "A1")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        if (!getOverlayList().unsupportedOverlays.contains("a2") || !getOverlayList().unsupportedOverlays.contains("a3")) {
+                        if (!getOverlayList().unsupportedOverlays.contains("a2") || !getOverlayList().unsupportedOverlays.contains(
+                                "a3"
+                            )
+                        ) {
                             Button(modifier = Modifier.weight(1f), onClick = {
                                 overlayEnable("fakemonet.a2h${hue.toInt()}s${saturation.toInt()}$isDark")
                             }) {
@@ -277,26 +301,31 @@ fun FakeMonet(
                             }
                         }
                     }
-                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
-                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
-                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
-                    }) {
-                        Text(text = "Workaround to disable dynamic monet rro's")
+                    HeaderRowWithSwitch(
+                        header = "Disable Monet",
+                        subHeader = "Ye you need to enable this first, duh",
+                        isChecked =  getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
+                        onCheckedChange = {
+                            if (it) {
+                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
+                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
+                                overlayEnable("misc.flagmonet")
 
-                    }
-                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
-                        overlayEnable("misc.flagmonet")
-                    }) {
-                        Text(text = "Test overlay to disable monet")
+                            } else {
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                                Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
 
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                    )
 
                 }
             }
         }
     }
 }
+
 @Composable
 fun VerticalGrid(
     modifier: Modifier = Modifier, columns: Int = 2, content: @Composable () -> Unit
@@ -773,8 +802,9 @@ fun ColorsTab() {
             })
 
 
+            Spacer(modifier = Modifier.height(8.dp))
 
-           FakeMonet()
+            FakeMonet()
 
         }
 

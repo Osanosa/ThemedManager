@@ -74,10 +74,12 @@ class DebugActivity : ComponentActivity() {
                                 .show()
 
 
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
                         )
 
@@ -97,10 +99,12 @@ class DebugActivity : ComponentActivity() {
                                 .show()
 
 
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.cardcol,
                         )
 
@@ -109,10 +113,28 @@ class DebugActivity : ComponentActivity() {
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = getOverlayList().overlayList.toString())
-            }
-        }
+                Text(text = "Unsupported")
+                getOverlayList().unsupportedOverlays.forEach { overlay ->
+                    Text(
+                        text = overlay,
+                    )
+                }
 
+            Text(text = "Enabled")
+            getOverlayList().enabledOverlays.forEach { overlay ->
+                Text(
+                    text = overlay,
+                )
+            }
+            Text(text = "Disabled")
+            getOverlayList().disabledOverlays.forEach { overlay ->
+                Text(
+                    text = overlay,
+                )
+            }
+
+        }
+    }
     }
 
     @Composable
