@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ class SettingsActivity : ComponentActivity() {
                     Column {
 
                         TopAppBarSettings()
+Text(text = "Wow, such empty \n (I can't properly set up DataStoreRepository so no settings for now)")
 
 
                     }

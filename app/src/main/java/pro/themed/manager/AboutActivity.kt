@@ -62,7 +62,6 @@ class AboutActivity : ComponentActivity() {
                 horizontalAlignment = CenterHorizontally
             ) {
                 var easteregg by remember { mutableStateOf(false) }
-                var tapcount by remember { mutableStateOf(0) }
                 TopAppBarAbout()
                 Surface(
                     shape = CircleShape,
@@ -82,7 +81,6 @@ class AboutActivity : ComponentActivity() {
                 }
                 val context = LocalContext.current
                 val versionName = BuildConfig.VERSION_NAME
-                val versionCode = BuildConfig.VERSION_CODE
                 Text(text = stringResource(R.string.themed_project_by_osanosa))
                 Text(
                     text = stringResource(R.string.installed_manager_version_is, versionName),

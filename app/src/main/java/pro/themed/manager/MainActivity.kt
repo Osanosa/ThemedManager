@@ -174,12 +174,16 @@ class MainActivity : ComponentActivity() {
                 var root by rememberSaveable {
                     mutableStateOf(SH.run("su -c whoami").stdout())
                 }
+
                 if ("root" !in root) {
                     Toast.makeText(
                         LocalContext.current, getString(R.string.no_root_access), Toast.LENGTH_SHORT
                     ).show()
                 } else {
                 }
+
+
+
 
                 val context = LocalContext.current
 
@@ -194,6 +198,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@Composable
+fun getOverlay(): String {
+    val overlay = rememberSaveable {
+        mutableStateOf(SU.run("su -c cmd overlay").stdout())
+    }
+
+    return overlay.value
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -350,15 +364,16 @@ fun TopAppBar() {
 
 
 fun overlayEnable(overlayname: String) {
-    @Composable
 
-    if (Build.VERSION.SDK_INT >= 28) {
+    val overlay = SU.run("su -c cmd overlay").stdout()
+
+    if ("exclusive" in overlay) {
         SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
 
     } else {
-        SU.run("su -c cmd overlay enable themed.$overlayname")
-
+            SU.run("su -c cmd overlay enable themed.$overlayname")
     }
+
 
 
     Firebase.analytics.logEvent("Overlay_Selected") {

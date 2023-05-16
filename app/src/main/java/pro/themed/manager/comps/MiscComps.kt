@@ -186,7 +186,8 @@ fun HeaderRowWithSwitch(
     onCheckedChange: (Boolean) -> Unit = {},
     onLongClick: () -> Unit = {},
     isChecked: Boolean = false,
-) {
+
+    ) {
     var checkedState by remember { mutableStateOf(isChecked) }
 
     // Update the checkedState value when isChecked changes
@@ -195,7 +196,11 @@ fun HeaderRowWithSwitch(
     }
 
     Surface(modifier = Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick)) {
-        Column(Modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -205,24 +210,20 @@ fun HeaderRowWithSwitch(
                     )
                     if (subHeader.isNotEmpty()) {
                         Text(
-                            text = subHeader,
-                            style = MaterialTheme.typography.body1
+                            text = subHeader, style = MaterialTheme.typography.body1
                         )
                     }
                 }
                 androidx.compose.material.Switch(
-                    checked = checkedState,
-                    onCheckedChange = {
+                    checked = checkedState, onCheckedChange = {
                         checkedState = it
                         onCheckedChange(it)
-                    },
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    }, modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
         }
     }
 }
-
 
 
 @ExperimentalMaterial3Api
@@ -259,7 +260,7 @@ fun MiscTab() {
                 sliderStepValue = 1,
                 minSliderValue = 1f,
                 maxSliderValue = 10f,
-                overlayName = "columnsportrait"
+                overlayName = "qsgrid.columnsportrait"
             )
 
 
@@ -272,7 +273,7 @@ fun MiscTab() {
                 sliderStepValue = 1,
                 minSliderValue = 1f,
                 maxSliderValue = 10f,
-                overlayName = "rowsportrait"
+                overlayName = "qsgrid.rowsportrait"
             )
 
 
@@ -284,7 +285,7 @@ fun MiscTab() {
                 sliderStepValue = 1,
                 minSliderValue = 1f,
                 maxSliderValue = 10f,
-                overlayName = "columnslandscape"
+                overlayName = "qsgrid.columnslandscape"
             )
 
 
@@ -296,7 +297,7 @@ fun MiscTab() {
                 sliderStepValue = 1,
                 minSliderValue = 1f,
                 maxSliderValue = 10f,
-                overlayName = "rowslandscape"
+                overlayName = "qsgrid.rowslandscape"
             )
 
             Divider()
@@ -323,7 +324,30 @@ fun MiscTab() {
                 maxSliderValue = 80f,
                 overlayName = "qstileheight"
             )
-
+            HeaderRowWithSwitch(
+                header = "RoundIconMask",
+                subHeader = "Makes app icons masks a perfect circle",
+                onCheckedChange = {
+                    if (it) {
+                        Shell.SH.run("su -c cmd overlay enable themed.misc.roundiconmask")
+                    } else {
+                        Shell.SH.run("su -c cmd overlay disable themed.misc.roundiconmask")
+                    }
+                },
+                isChecked = getOverlayList().enabledOverlays.any { it.contains("roundiconmask") },
+            )
+            HeaderRowWithSwitch(
+                header = "Borderless",
+                subHeader = "Removes black line hiding display cutout",
+                onCheckedChange = {
+                    if (it) {
+                        Shell.SH.run("su -c cmd overlay enable themed.misc.borderless")
+                    } else {
+                        Shell.SH.run("su -c cmd overlay disable themed.misc.borderless")
+                    }
+                },
+                isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
+            )
 
         }
     }

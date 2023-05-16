@@ -1,0 +1,6 @@
+android {
+    ...
+    kapt {
+        jvmTarget = '1.8'
+    }
+}

@@ -115,7 +115,6 @@ fun ColorTilesRow(name: String, colors: List<String>) {
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FakeMonet(
-
 ) {
     Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),

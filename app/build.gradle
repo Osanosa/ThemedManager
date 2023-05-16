@@ -34,8 +34,8 @@ android {
         applicationId "pro.themed.manager"
         minSdk 26
         targetSdk 34
-        versionCode 230507
-        versionName '23.05.07'
+        versionCode 230517
+        versionName '23.05.17'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -109,7 +109,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.2'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
