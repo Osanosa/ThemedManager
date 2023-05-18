@@ -64,11 +64,12 @@ class DebugActivity : ComponentActivity() {
                     OutlinedButton(
                         onClick = {
 
-                            Shell.SU.run("rm /sdcard/themeddebug")
+                            Shell.SU.run("rm /sdcard/themeddebug/logs")
                             Shell.SU.run("mkdir /sdcard/themeddebug")
+                            Shell.SU.run("mkdir /sdcard/themeddebug/logs")
 
-                            Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/cmdoverlaylist.txt")
-                            Shell.SU.run("cd /data/adb/modules ; ls | tee -a /sdcard/themeddebug/modules.txt")
+                            Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt")
+                            Shell.SU.run("ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt")
 
                             Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT)
                                 .show()
@@ -89,11 +90,12 @@ class DebugActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = {
-                            Shell.SU.run("rm -r /sdcard/themeddebug")
-                            Shell.SU.run("mkdir /sdcard/themeddebug")
+                            Shell.SU.run("rm -r /sdcard/themeddebug/files")
+                            Shell.SU.run("mkdir /sdcard/themeddebug/")
+                            Shell.SU.run("mkdir /sdcard/themeddebug/files")
 
-                            Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/")
-                            Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/")
+                            Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files")
+                            Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files")
 
                             Toast.makeText(context, getString(R.string.done), Toast.LENGTH_SHORT)
                                 .show()

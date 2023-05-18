@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -102,7 +103,7 @@ fun QSTileCard() {
         IconButton(
             onClick = {
                 qstilestyle = overlayname
-                overlayEnable("qstile.$overlayname")
+                overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
             }, modifier = Modifier
                 .size(sizedp.dp)
                 .background(color = MaterialTheme.colors.cardcol)
@@ -155,8 +156,9 @@ fun QSTileCard() {
 
             Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
             val pagerState = rememberPagerState()
+            Spacer(modifier = Modifier.height(16.dp))
             HorizontalPager(
-                count = 3,
+                count = 2,
                 state = pagerState,
                 // Add 32.dp horizontal padding to 'center' the pages
                 contentPadding = PaddingValues(horizontal = 96.dp),
@@ -166,12 +168,8 @@ fun QSTileCard() {
                     Card(
                         Modifier
                             .graphicsLayer {
-                                // Calculate the absolute offset for the current page from the
-                                // scroll position. We use the absolute value which allows us to mirror
-                                // any effects for both directions
                                 val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
 
-                                // We animate the scaleX + scaleY, between 85% and 100%
                                 lerp(
                                     start = 0.85f,
                                     stop = 1f,
@@ -181,7 +179,6 @@ fun QSTileCard() {
                                     scaleY = scale
                                 }
 
-                                // We animate the alpha, between 50% and 100%
                                 alpha = lerp(
                                     start = 0.5f,
                                     stop = 1f,
@@ -191,8 +188,7 @@ fun QSTileCard() {
                             .fillMaxWidth()
                             .clickable {
                                 qspanelstyle = "default"
-                                overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
-                            }) {
+                            }, elevation = 2.dp) {
                         Text(text = "default", Modifier.padding(24.dp))
                     }
                 } else if (index == 1) {
@@ -225,8 +221,7 @@ fun QSTileCard() {
                             .fillMaxWidth()
                             .clickable {
                                 qspanelstyle = "clear"
-                                overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
-                            }) {
+                            }, elevation = 2.dp) {
                         Text(text = "clear", Modifier.padding(24.dp))
                     }
                 }
@@ -239,30 +234,8 @@ fun QSTileCard() {
                     .padding(16.dp),
             )
 
-            Text(text = qstilestyle)
 
-            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .padding(start = 8.dp),
-                    text = stringResource(R.string.qstiles),
-                    fontSize = 24.sp
-                )
-                IconButton(onClick = {
-                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qstile' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
-                }) {
-                    Image(
-                        painter = painterResource(R.drawable.reset), contentDescription = null
-                    )
-                }
-            }
 
             Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
 

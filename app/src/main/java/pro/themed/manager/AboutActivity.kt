@@ -90,17 +90,9 @@ class AboutActivity : ComponentActivity() {
                     onClick = {
 
 
-                        /*runOnUiThread {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.creating_folder),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }*/
-                        Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
-                        /*runOnUiThread {
 
-                        }*/
+                        Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
+
                         AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
                         Toast.makeText(
