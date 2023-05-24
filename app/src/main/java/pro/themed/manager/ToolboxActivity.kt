@@ -60,11 +60,13 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.jaredrummler.ktsh.Shell
+import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import pro.themed.manager.ui.theme.ThemedManagerTheme
+import java.text.DecimalFormat
 
 
 class ToolboxActivity : ComponentActivity() {
@@ -160,7 +162,7 @@ class ToolboxActivity : ComponentActivity() {
                                     Button(onClick = {
                                         MainScope().launch {
                                             async(Dispatchers.Default) {
-                                                Shell.SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                                SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
                                                 runOnUiThread {
                                                     Toast.makeText(
                                                         context,
@@ -215,9 +217,9 @@ class ToolboxActivity : ComponentActivity() {
                                     val myTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_overlay_reset_stock")
                                     myTrace.start()
-                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                    Shell.SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
                                     myTrace.stop()
 
                                     runOnUiThread {
@@ -260,7 +262,7 @@ class ToolboxActivity : ComponentActivity() {
                                     val myTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_overlay_reset_themed")
                                     myTrace.start()
-                                    Shell.SU.run(
+                                    SU.run(
                                         """for ol in $(cmd overlay list | grep -E '^.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done"""
                                     )
                                     myTrace.stop()
@@ -336,7 +338,7 @@ class ToolboxActivity : ComponentActivity() {
                                     val myTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_restart_systemui")
                                     myTrace.start()
-                                    Shell.SU.run("su -c killall com.android.systemui")
+                                    SU.run("su -c killall com.android.systemui")
 
                                     myTrace.stop()
                                 }
@@ -401,7 +403,7 @@ class ToolboxActivity : ComponentActivity() {
                         onClick = {
                             MainScope().launch {
                                 async(Dispatchers.Default) {
-                                    Shell.SU.run("cmd uimode night no")
+                                    SU.run("cmd uimode night no")
                                 }
                             }
                         },
@@ -423,7 +425,7 @@ class ToolboxActivity : ComponentActivity() {
                         onClick = {
                             MainScope().launch {
                                 async(Dispatchers.Default) {
-                                    Shell.SU.run("cmd uimode night yes")
+                                    SU.run("cmd uimode night yes")
                                 }
                             }
                         },
@@ -443,7 +445,7 @@ class ToolboxActivity : ComponentActivity() {
                         onClick = {
                             MainScope().launch {
                                 async(Dispatchers.Default) {
-                                    Shell.SU.run("cmd uimode night auto")
+                                    SU.run("cmd uimode night auto")
                                 }
                             }
                         },
@@ -508,12 +510,24 @@ class ToolboxActivity : ComponentActivity() {
                                     val myTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_cache_clear")
                                     myTrace.start()
-                                    Shell.SU.run("pm trim-caches 100g")
-                                    myTrace.stop()
 
+                                    val freebefore =
+                                        SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                            .replace(Regex("[^0-9]"), "").toLong()
+                                    SU.run("pm trim-caches 100000g")
+                                    val freeafter =
+                                        SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                            .replace(Regex("[^0-9]"), "").toLong()
+                                        myTrace.stop()
+                                    val difference: Float = freeafter.toFloat() - freebefore.toFloat()
+                                    val toast = when {
+                                        difference > 1024*1024 -> "${DecimalFormat("#.##").format (difference/1024)}Gb"
+                                        difference > 1024 -> "${DecimalFormat("#.##").format (difference/1024)}Mb"
+                                        else -> "${DecimalFormat("#").format (difference)}Kb"
+                                    }
                                     runOnUiThread {
                                         Toast.makeText(
-                                            context, getString(R.string.done), Toast.LENGTH_SHORT
+                                            context, "+$toast", Toast.LENGTH_SHORT
                                         ).show()
                                     }
 
@@ -589,8 +603,8 @@ class ToolboxActivity : ComponentActivity() {
                                     val SpeedTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_dex2oat_speed")
                                     SpeedTrace.start()
-                                    Shell.SU.run("cmd package compile -m speed-profile -a")
-                                    Shell.SU.run("cmd package compile -m speed-profile --secondary-dex -a")
+                                    SU.run("cmd package compile -m speed-profile -a")
+                                    SU.run("cmd package compile -m speed-profile --secondary-dex -a")
                                     SpeedTrace.stop()
                                     runOnUiThread {
                                         Toast.makeText(
@@ -602,7 +616,7 @@ class ToolboxActivity : ComponentActivity() {
                                     val LayoutsTrace: Trace = FirebasePerformance.getInstance()
                                         .newTrace("toolbox_dex2oat_layouts")
                                     LayoutsTrace.start()
-                                    Shell.SU.run("cmd package compile --compile-layouts -a")
+                                    SU.run("cmd package compile --compile-layouts -a")
                                     LayoutsTrace.stop()
                                     runOnUiThread {
                                         Toast.makeText(
@@ -659,7 +673,7 @@ class ToolboxActivity : ComponentActivity() {
                     )
                     IconButton(modifier = Modifier, onClick = {
 
-                        Shell.SU.run("wm size reset ; wm density reset")
+                        SU.run("wm size reset ; wm density reset")
 
 
                     }) {
@@ -697,13 +711,14 @@ class ToolboxActivity : ComponentActivity() {
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(8.dp)
                                 ) {
-                                    Button(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f),
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
                                         onClick = {
 
                                             downscalebynumber(width = customres)
-                                            Shell.SU.run("sleep 10 ; wm size reset ; wm density reset")
+                                            SU.run("sleep 10 ; wm size reset ; wm density reset")
 
 
                                         }) { Text(text = stringResource(R.string.test)) }
@@ -740,7 +755,8 @@ class ToolboxActivity : ComponentActivity() {
                         modifier = Modifier.padding(horizontal = 8.dp),
                         text = stringResource(R.string.reset_to_defaults_after_10_seconds)
                     )
-                    Switch(checked = switchState.value,
+                    Switch(
+                        checked = switchState.value,
                         onCheckedChange = { switchState.value = it })
                 }
 
@@ -751,7 +767,7 @@ class ToolboxActivity : ComponentActivity() {
                             downscalebydivisor("2")
                             if (switchState.value) {
                                 Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
+                                SU.run(" wm size reset ; wm density reset")
 
                             }
                         },
@@ -771,7 +787,7 @@ class ToolboxActivity : ComponentActivity() {
                             downscalebydivisor("3")
                             if (switchState.value) {
                                 Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
+                                SU.run(" wm size reset ; wm density reset")
 
                             }
                         },
@@ -792,7 +808,7 @@ class ToolboxActivity : ComponentActivity() {
 
                             if (switchState.value) {
                                 Thread.sleep(10000)
-                                Shell.SU.run(" wm size reset ; wm density reset")
+                                SU.run(" wm size reset ; wm density reset")
                             }
 
                         },
@@ -829,7 +845,7 @@ class ToolboxActivity : ComponentActivity() {
 
     private fun downscalebydivisor(divisor: String) {
 
-        Shell.SU.run(
+        SU.run(
             command = """
                 # Set the number of division
                 divisor=$divisor
@@ -867,7 +883,7 @@ class ToolboxActivity : ComponentActivity() {
     }
 
     private fun downscalebynumber(width: String) {
-        Shell.SU.run(
+        SU.run(
             command = """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
