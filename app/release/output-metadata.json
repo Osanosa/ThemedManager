@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 230525,
-      "versionName": "23.05.25",
-      "outputFile": "ThemedManager-v23.05.25-release.apk"
+      "versionCode": 230528,
+      "versionName": "23.05.28",
+      "outputFile": "ThemedManager-v23.05.28-release.apk"
     }
   ],
   "elementType": "File"

@@ -5,14 +5,16 @@
     ExperimentalMaterialApi::class,
     ExperimentalFoundationApi::class,
     ExperimentalFoundationApi::class
-)
+) @file:Suppress("LocalVariableName")
 
 package pro.themed.manager.comps
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -47,6 +49,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -62,8 +65,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.CardFace
@@ -72,6 +77,7 @@ import pro.themed.manager.R
 import pro.themed.manager.RotationAxis
 import pro.themed.manager.bordercol
 import pro.themed.manager.cardcol
+import pro.themed.manager.getOverlay
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import kotlin.math.roundToInt
@@ -98,26 +104,14 @@ fun ColorTile(name: String, color: String, modifier: Modifier = Modifier) {
 }
 
 
-/*@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ColorTilesRow(name: String, colors: List<String>) {
-    Row(   verticalAlignment = CenterVertically) {
-        colors.forEach { color ->
-                ColorTile(name, color,  modifier = Modifier
-                    .aspectRatio(1f)
-                    .weight(1f))
-
-        }
-    }
-}*/
-
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
+)
 @Composable
 fun FakeMonet(
 ) {
     Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.cardcol),
         modifier = Modifier
             .wrapContentWidth()
             .wrapContentHeight(),
@@ -150,8 +144,8 @@ fun FakeMonet(
             }
             val tilesize = ((LocalConfiguration.current.smallestScreenWidthDp - 16) / 11).dp
 
-            var hue by rememberSaveable { mutableStateOf(0f) }
-            var saturation by rememberSaveable { mutableStateOf(100f) }
+            var hue by rememberSaveable { mutableFloatStateOf(0f) }
+            var saturation by rememberSaveable { mutableFloatStateOf(100f) }
 
             if (hue == 360f) {
                 hue = 0f
@@ -167,6 +161,8 @@ fun FakeMonet(
 
             Surface {
                 val context = LocalContext.current
+
+
 
                 Column {
 
@@ -245,9 +241,7 @@ fun FakeMonet(
                             )
                         })
 
-                    var isDark by rememberSaveable { mutableStateOf("") }
-
-                    // Text(text = "fakemonet.n1h${hue.toInt()}s${saturation.toInt()}$isDark")
+                    // Text(text = "fakemonet.n1h${hue.toInt()}s${saturation.toInt()}")
 
                     /*HeaderRowWithSwitch(header = "Override dark theme", onCheckedChange = {
                         if (it) {
@@ -260,7 +254,7 @@ fun FakeMonet(
 
                     Row {
                         Button(modifier = Modifier.weight(1f), onClick = {
-                            overlayEnable("fakemonet.n1h${hue.toInt()}s${saturation.toInt()}$isDark")
+                            overlayEnable("fakemonet.n1h${hue.toInt()}s${saturation.toInt()}")
                         }) {
                             Text(text = "N1")
 
@@ -269,7 +263,7 @@ fun FakeMonet(
 
                         if (!getOverlayList().unsupportedOverlays.contains("n2")) {
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.n2h${hue.toInt()}s${saturation.toInt()}$isDark")
+                                overlayEnable("fakemonet.n2h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "N2")
                             }
@@ -277,7 +271,7 @@ fun FakeMonet(
                         }
 
                         Button(modifier = Modifier.weight(1f), onClick = {
-                            overlayEnable("fakemonet.a1h${hue.toInt()}s${saturation.toInt()}$isDark")
+                            overlayEnable("fakemonet.a1h${hue.toInt()}s${saturation.toInt()}")
                         }) {
                             Text(text = "A1")
                         }
@@ -287,37 +281,903 @@ fun FakeMonet(
                             )
                         ) {
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.a2h${hue.toInt()}s${saturation.toInt()}$isDark")
+                                overlayEnable("fakemonet.a2h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "A2")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.a3h${hue.toInt()}s${saturation.toInt()}$isDark")
+                                overlayEnable("fakemonet.a3h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "A3")
                             }
                         }
                     }
-                    HeaderRowWithSwitch(
-                        header = "Disable Monet",
-                        subHeader = "Ye you need to enable this first, duh",
-                        isChecked =  getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
-                        onCheckedChange = {
-                            if (it) {
-                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
-                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
-                                overlayEnable("misc.flagmonet")
 
-                            } else {
-                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
-                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
-                                Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
+                }
+            }
+        }
+    }
+}
 
-                            }
-                        }
+@RequiresApi(Build.VERSION_CODES.S)
+@Preview
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
+)
+@Composable
+fun FabricatedMonet(
+) {
+    val context = LocalContext.current
+
+    val SN1_10 = getColor(context, android.R.color.system_neutral1_10)
+    val SN1_50 = getColor(context, android.R.color.system_neutral1_50)
+    val SN1_100 = getColor(context, android.R.color.system_neutral1_100)
+    val SN1_200 = getColor(context, android.R.color.system_neutral1_200)
+    val SN1_300 = getColor(context, android.R.color.system_neutral1_300)
+    val SN1_400 = getColor(context, android.R.color.system_neutral1_400)
+    val SN1_500 = getColor(context, android.R.color.system_neutral1_500)
+    val SN1_600 = getColor(context, android.R.color.system_neutral1_600)
+    val SN1_700 = getColor(context, android.R.color.system_neutral1_700)
+    val SN1_800 = getColor(context, android.R.color.system_neutral1_800)
+    val SN1_900 = getColor(context, android.R.color.system_neutral1_900)
+
+    val SN2_10 = getColor(context, android.R.color.system_neutral2_10)
+    val SN2_50 = getColor(context, android.R.color.system_neutral2_50)
+    val SN2_100 = getColor(context, android.R.color.system_neutral2_100)
+    val SN2_200 = getColor(context, android.R.color.system_neutral2_200)
+    val SN2_300 = getColor(context, android.R.color.system_neutral2_300)
+    val SN2_400 = getColor(context, android.R.color.system_neutral2_400)
+    val SN2_500 = getColor(context, android.R.color.system_neutral2_500)
+    val SN2_600 = getColor(context, android.R.color.system_neutral2_600)
+    val SN2_700 = getColor(context, android.R.color.system_neutral2_700)
+    val SN2_800 = getColor(context, android.R.color.system_neutral2_800)
+    val SN2_900 = getColor(context, android.R.color.system_neutral2_900)
+
+    val SA2_10 = getColor(context, android.R.color.system_accent2_10)
+    val SA2_50 = getColor(context, android.R.color.system_accent2_50)
+    val SA2_100 = getColor(context, android.R.color.system_accent2_100)
+    val SA2_200 = getColor(context, android.R.color.system_accent2_200)
+    val SA2_300 = getColor(context, android.R.color.system_accent2_300)
+    val SA2_400 = getColor(context, android.R.color.system_accent2_400)
+    val SA2_500 = getColor(context, android.R.color.system_accent2_500)
+    val SA2_600 = getColor(context, android.R.color.system_accent2_600)
+    val SA2_700 = getColor(context, android.R.color.system_accent2_700)
+    val SA2_800 = getColor(context, android.R.color.system_accent2_800)
+    val SA2_900 = getColor(context, android.R.color.system_accent2_900)
+
+    val SA1_10 = getColor(context, android.R.color.system_accent1_10)
+    val SA1_50 = getColor(context, android.R.color.system_accent1_50)
+    val SA1_100 = getColor(context, android.R.color.system_accent1_100)
+    val SA1_200 = getColor(context, android.R.color.system_accent1_200)
+    val SA1_300 = getColor(context, android.R.color.system_accent1_300)
+    val SA1_400 = getColor(context, android.R.color.system_accent1_400)
+    val SA1_500 = getColor(context, android.R.color.system_accent1_500)
+    val SA1_600 = getColor(context, android.R.color.system_accent1_600)
+    val SA1_700 = getColor(context, android.R.color.system_accent1_700)
+    val SA1_800 = getColor(context, android.R.color.system_accent1_800)
+    val SA1_900 = getColor(context, android.R.color.system_accent1_900)
+
+    val SA3_10 = getColor(context, android.R.color.system_accent3_10)
+    val SA3_50 = getColor(context, android.R.color.system_accent3_50)
+    val SA3_100 = getColor(context, android.R.color.system_accent3_100)
+    val SA3_200 = getColor(context, android.R.color.system_accent3_200)
+    val SA3_300 = getColor(context, android.R.color.system_accent3_300)
+    val SA3_400 = getColor(context, android.R.color.system_accent3_400)
+    val SA3_500 = getColor(context, android.R.color.system_accent3_500)
+    val SA3_600 = getColor(context, android.R.color.system_accent3_600)
+    val SA3_700 = getColor(context, android.R.color.system_accent3_700)
+    val SA3_800 = getColor(context, android.R.color.system_accent3_800)
+    val SA3_900 = getColor(context, android.R.color.system_accent3_900)
+
+
+    var hue by rememberSaveable { mutableFloatStateOf(0f) }
+    var saturation by rememberSaveable { mutableFloatStateOf(100f) }
+    var lightness by rememberSaveable { mutableFloatStateOf(0f) }
+
+    if (hue == 360f) {
+        hue = 0f
+    }
+    if (saturation == 0f) {
+        hue = 0f
+    }
+
+
+    val C_10 = hsl(hue, saturation / 100, 0.99f + lightness / 100 / 10)
+    val C_50 = hsl(hue, saturation / 100, 0.95f + lightness / 100 / 2)
+    val C_100 = hsl(hue, saturation / 100, 0.90f + lightness / 100)
+    val C_200 = hsl(hue, saturation / 100, 0.80f + lightness / 100)
+    val C_300 = hsl(hue, saturation / 100, 0.70f + lightness / 100)
+    val C_400 = hsl(hue, saturation / 100, 0.60f + lightness / 100)
+    val C_500 = hsl(hue, saturation / 100, 0.496f + lightness / 100)
+    val C_600 = hsl(hue, saturation / 100, 0.40f + lightness / 100)
+    val C_700 = hsl(hue, saturation / 100, 0.30f + lightness / 100)
+    val C_800 = hsl(hue, saturation / 100, 0.20f + lightness / 100)
+    val C_900 = hsl(hue, saturation / 100, 0.10f + lightness / 100)
+
+
+    Card(
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.cardcol),
+        modifier = Modifier
+            .wrapContentWidth()
+            .wrapContentHeight(),
+        elevation = (0.dp),
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.cardcol
+    ) {
+        Column(modifier = Modifier) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .padding(start = 8.dp),
+                    text = "FabricatedMonet",
+                    fontSize = 24.sp
+                )
+
+                IconButton(modifier = Modifier, onClick = {
+                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonet' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.reset),
+                        contentDescription = null,
                     )
+                }
+            }
+            val tilesize = ((LocalConfiguration.current.smallestScreenWidthDp - 16) / 11).dp
+
+
+            listOf(
+                "10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900"
+            )
+
+            Surface {
+
+
+                Column {
+
+
+                    @Composable
+                    fun M3Tile(color: Int, colorName: String, themedColor: Color) {
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {
+                                    val fullName = colorName
+                                        .replace("SN", "system_neutral")
+                                        .replace("SA", "system_accent")
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonet$colorName color/$fullName 0x1c ${
+                                            "0x%08X".format(themedColor.toArgb())
+                                        }"
+                                    )
+                                    Shell.SH.run("su -c cmd overlay enable com.android.shell:ThemedMonet$colorName")
+
+                                }, onLongClick = {}), color = Color(color)
+                        ) {
+                            Text(
+                                text = colorName.substringAfter("_"),
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+
+
+                    Text(text = "system_neutral1")
+
+                    Row(Modifier.fillMaxWidth()) {
+                        M3Tile(color = SN1_10, colorName = "SN1_10", themedColor = C_10)
+                        M3Tile(color = SN1_50, colorName = "SN1_50", themedColor = C_50)
+                        M3Tile(color = SN1_100, colorName = "SN1_100", themedColor = C_100)
+                        M3Tile(color = SN1_200, colorName = "SN1_200", themedColor = C_200)
+                        M3Tile(color = SN1_300, colorName = "SN1_300", themedColor = C_300)
+                        M3Tile(color = SN1_400, colorName = "SN1_400", themedColor = C_400)
+                        M3Tile(color = SN1_500, colorName = "SN1_500", themedColor = C_500)
+                        M3Tile(color = SN1_600, colorName = "SN1_600", themedColor = C_600)
+                        M3Tile(color = SN1_700, colorName = "SN1_700", themedColor = C_700)
+                        M3Tile(color = SN1_800, colorName = "SN1_800", themedColor = C_800)
+                        M3Tile(color = SN1_900, colorName = "SN1_900", themedColor = C_900)
+
+                    }
+                    Text(text = "system_neutral2")
+
+                    Row(Modifier.fillMaxWidth()) {
+                        M3Tile(color = SN2_10, colorName = "SN2_10", themedColor = C_10)
+                        M3Tile(color = SN2_50, colorName = "SN2_50", themedColor = C_50)
+                        M3Tile(color = SN2_100, colorName = "SN2_100", themedColor = C_100)
+                        M3Tile(color = SN2_200, colorName = "SN2_200", themedColor = C_200)
+                        M3Tile(color = SN2_300, colorName = "SN2_300", themedColor = C_300)
+                        M3Tile(color = SN2_400, colorName = "SN2_400", themedColor = C_400)
+                        M3Tile(color = SN2_500, colorName = "SN2_500", themedColor = C_500)
+                        M3Tile(color = SN2_600, colorName = "SN2_600", themedColor = C_600)
+                        M3Tile(color = SN2_700, colorName = "SN2_700", themedColor = C_700)
+                        M3Tile(color = SN2_800, colorName = "SN2_800", themedColor = C_800)
+                        M3Tile(color = SN2_900, colorName = "SN2_900", themedColor = C_900)
+
+                    }
+                    Text(text = "system_accent1")
+
+                    Row(Modifier.fillMaxWidth()) {
+                        M3Tile(color = SA1_10, colorName = "SA1_10", themedColor = C_10)
+                        M3Tile(color = SA1_50, colorName = "SA1_50", themedColor = C_50)
+                        M3Tile(color = SA1_100, colorName = "SA1_100", themedColor = C_100)
+                        M3Tile(color = SA1_200, colorName = "SA1_200", themedColor = C_200)
+                        M3Tile(color = SA1_300, colorName = "SA1_300", themedColor = C_300)
+                        M3Tile(color = SA1_400, colorName = "SA1_400", themedColor = C_400)
+                        M3Tile(color = SA1_500, colorName = "SA1_500", themedColor = C_500)
+                        M3Tile(color = SA1_600, colorName = "SA1_600", themedColor = C_600)
+                        M3Tile(color = SA1_700, colorName = "SA1_700", themedColor = C_700)
+                        M3Tile(color = SA1_800, colorName = "SA1_800", themedColor = C_800)
+                        M3Tile(color = SA1_900, colorName = "SA1_900", themedColor = C_900)
+
+                    }
+                    Text(text = "system_accent2")
+
+                    Row(Modifier.fillMaxWidth()) {
+                        M3Tile(color = SA2_10, colorName = "SA2_10", themedColor = C_10)
+                        M3Tile(color = SA2_50, colorName = "SA2_50", themedColor = C_50)
+                        M3Tile(color = SA2_100, colorName = "SA2_100", themedColor = C_100)
+                        M3Tile(color = SA2_200, colorName = "SA2_200", themedColor = C_200)
+                        M3Tile(color = SA2_300, colorName = "SA2_300", themedColor = C_300)
+                        M3Tile(color = SA2_400, colorName = "SA2_400", themedColor = C_400)
+                        M3Tile(color = SA2_500, colorName = "SA2_500", themedColor = C_500)
+                        M3Tile(color = SA2_600, colorName = "SA2_600", themedColor = C_600)
+                        M3Tile(color = SA2_700, colorName = "SA2_700", themedColor = C_700)
+                        M3Tile(color = SA2_800, colorName = "SA2_800", themedColor = C_800)
+                        M3Tile(color = SA2_900, colorName = "SA2_900", themedColor = C_900)
+
+                    }
+                    Text(text = "system_accent3")
+
+                    Row(Modifier.fillMaxWidth()) {
+                        M3Tile(color = SA3_10, colorName = "SA3_10", themedColor = C_10)
+                        M3Tile(color = SA3_50, colorName = "SA3_50", themedColor = C_50)
+                        M3Tile(color = SA3_100, colorName = "SA3_100", themedColor = C_100)
+                        M3Tile(color = SA3_200, colorName = "SA3_200", themedColor = C_200)
+                        M3Tile(color = SA3_300, colorName = "SA3_300", themedColor = C_300)
+                        M3Tile(color = SA3_400, colorName = "SA3_400", themedColor = C_400)
+                        M3Tile(color = SA3_500, colorName = "SA3_500", themedColor = C_500)
+                        M3Tile(color = SA3_600, colorName = "SA3_600", themedColor = C_600)
+                        M3Tile(color = SA3_700, colorName = "SA3_700", themedColor = C_700)
+                        M3Tile(color = SA3_800, colorName = "SA3_800", themedColor = C_800)
+                        M3Tile(color = SA3_900, colorName = "SA3_900", themedColor = C_900)
+
+                    }
+
+
+                    Text(text = "Current color palette", fontWeight = FontWeight.Bold)
+                    Row(Modifier.fillMaxWidth()) {
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_10
+                        ) {
+                            Text(
+                                text = "10",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_50
+                        ) {
+                            Text(
+                                text = "50",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_100
+                        ) {
+                            Text(
+                                text = "100",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_200
+                        ) {
+                            Text(
+                                text = "200",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_300
+                        ) {
+                            Text(
+                                text = "300",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_400
+                        ) {
+                            Text(
+                                text = "400",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_500
+                        ) {
+                            Text(
+                                text = "500",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_600
+                        ) {
+                            Text(
+                                text = "600",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_700
+                        ) {
+                            Text(
+                                text = "700",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_800
+                        ) {
+                            Text(
+                                text = "800",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .height(tilesize)
+                                .aspectRatio(1f)
+                                .combinedClickable(onClick = {}), color = C_900
+                        ) {
+                            Text(
+                                text = "900",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.align(CenterVertically)
+                            )
+                        }
+
+                    }
+
+
+                    Text(text = "hue is ${hue.toInt()}°")
+                    androidx.compose.material3.Slider(modifier = Modifier
+                        .height(16.dp)
+                        .padding(0.dp),
+                        value = hue,
+                        onValueChange = {
+                            hue = it.roundToInt().toFloat()
+                        },
+                        valueRange = 0f..360f,
+                        onValueChangeFinished = {},
+                        steps = 0,
+                        thumb = {
+                            Image(
+                                painter = painterResource(R.drawable.fiber_manual_record_48px),
+                                contentDescription = null,
+                            )
+
+                        })
+                    Text(text = "saturation is ${saturation.toInt()}%")
+                    androidx.compose.material3.Slider(modifier = Modifier
+                        .height(16.dp)
+                        .padding(0.dp),
+                        value = saturation,
+                        onValueChange = {
+                            saturation = it.roundToInt().toFloat()
+                        },
+                        valueRange = 0f..100f,
+                        onValueChangeFinished = {},
+                        steps = 0,
+                        thumb = {
+                            Image(
+                                painter = painterResource(R.drawable.fiber_manual_record_48px),
+                                contentDescription = null,
+                            )
+                        })
+                    Text(text = "Lightness is $lightness")
+                    androidx.compose.material3.Slider(modifier = Modifier
+                        .height(16.dp)
+                        .padding(0.dp),
+                        value = lightness,
+                        onValueChange = {
+                            lightness = it.roundToInt().toFloat()
+                        },
+                        valueRange = -10f..+10f,
+                        onValueChangeFinished = {},
+                        steps = 19,
+                        thumb = {
+                            Image(
+                                painter = painterResource(R.drawable.fiber_manual_record_48px),
+                                contentDescription = null,
+                            )
+                        })
+
+
+                    Text(text = "Apply to")
+
+                    Row {
+                        Button(modifier = Modifier.weight(1f), onClick = {
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_10 color/system_neutral1_10 0x1c ${
+                                    "0x%08X".format(C_10.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_50 color/system_neutral1_50 0x1c ${
+                                    "0x%08X".format(C_50.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_100 color/system_neutral1_100 0x1c ${
+                                    "0x%08X".format(C_100.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_200 color/system_neutral1_200 0x1c ${
+                                    "0x%08X".format(C_200.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_300 color/system_neutral1_300 0x1c ${
+                                    "0x%08X".format(C_300.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_400 color/system_neutral1_400 0x1c ${
+                                    "0x%08X".format(C_400.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_500 color/system_neutral1_500 0x1c ${
+                                    "0x%08X".format(C_500.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_600 color/system_neutral1_600 0x1c ${
+                                    "0x%08X".format(C_600.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_700 color/system_neutral1_700 0x1c ${
+                                    "0x%08X".format(C_700.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_800 color/system_neutral1_800 0x1c ${
+                                    "0x%08X".format(C_800.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSN1_900 color/system_neutral1_900 0x1c ${
+                                    "0x%08X".format(C_900.toArgb())
+                                }"
+                            )
+
+
+
+                            Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSN1'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+
+                        }) {
+                            Text(text = "N1")
+
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        if (!getOverlayList().unsupportedOverlays.contains("n2")) {
+                            Button(modifier = Modifier.weight(1f), onClick = {
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_10 color/system_neutral2_10 0x1c ${
+                                        "0x%08X".format(C_10.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_50 color/system_neutral2_50 0x1c ${
+                                        "0x%08X".format(C_50.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_100 color/system_neutral2_100 0x1c ${
+                                        "0x%08X".format(C_100.toArgb())
+                                    }"
+                                )
+
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_200 color/system_neutral2_200 0x1c ${
+                                        "0x%08X".format(C_200.toArgb())
+                                    }"
+                                )
+
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_300 color/system_neutral2_300 0x1c ${
+                                        "0x%08X".format(C_300.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_400 color/system_neutral2_400 0x1c ${
+                                        "0x%08X".format(C_400.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_500 color/system_neutral2_500 0x1c ${
+                                        "0x%08X".format(C_500.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_600 color/system_neutral2_600 0x1c ${
+                                        "0x%08X".format(C_600.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_700 color/system_neutral2_700 0x1c ${
+                                        "0x%08X".format(C_700.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_800 color/system_neutral2_800 0x1c ${
+                                        "0x%08X".format(C_800.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSN2_900 color/system_neutral2_900 0x1c ${
+                                        "0x%08X".format(C_900.toArgb())
+                                    }"
+                                )
+
+
+
+                                Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSN2'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+
+                            }) {
+                                Text(text = "N2")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
+                        Button(modifier = Modifier.weight(1f), onClick = {
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_10 color/system_accent1_10 0x1c ${
+                                    "0x%08X".format(C_10.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_50 color/system_accent1_50 0x1c ${
+                                    "0x%08X".format(C_50.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_100 color/system_accent1_100 0x1c ${
+                                    "0x%08X".format(C_100.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_200 color/system_accent1_200 0x1c ${
+                                    "0x%08X".format(C_200.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_300 color/system_accent1_300 0x1c ${
+                                    "0x%08X".format(C_300.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_400 color/system_accent1_400 0x1c ${
+                                    "0x%08X".format(C_400.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_500 color/system_accent1_500 0x1c ${
+                                    "0x%08X".format(C_500.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_600 color/system_accent1_600 0x1c ${
+                                    "0x%08X".format(C_600.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_700 color/system_accent1_700 0x1c ${
+                                    "0x%08X".format(C_700.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_800 color/system_accent1_800 0x1c ${
+                                    "0x%08X".format(C_800.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA1_900 color/system_accent1_900 0x1c ${
+                                    "0x%08X".format(C_900.toArgb())
+                                }"
+                            )
+
+
+
+                            Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA1'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+                        }) {
+                            Text(text = "A1")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                       
+                            Button(modifier = Modifier.weight(1f), onClick = {
+                                
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_10 color/system_accent2_10 0x1c ${
+                                            "0x%08X".format(C_10.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_50 color/system_accent2_50 0x1c ${
+                                            "0x%08X".format(C_50.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_100 color/system_accent2_100 0x1c ${
+                                            "0x%08X".format(C_100.toArgb())
+                                        }"
+                                    )
+
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_200 color/system_accent2_200 0x1c ${
+                                            "0x%08X".format(C_200.toArgb())
+                                        }"
+                                    )
+
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_300 color/system_accent2_300 0x1c ${
+                                            "0x%08X".format(C_300.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_400 color/system_accent2_400 0x1c ${
+                                            "0x%08X".format(C_400.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_500 color/system_accent2_500 0x1c ${
+                                            "0x%08X".format(C_500.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_600 color/system_accent2_600 0x1c ${
+                                            "0x%08X".format(C_600.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_700 color/system_accent2_700 0x1c ${
+                                            "0x%08X".format(C_700.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_800 color/system_accent2_800 0x1c ${
+                                            "0x%08X".format(C_800.toArgb())
+                                        }"
+                                    )
+
+                                    Shell.SH.run(
+                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_900 color/system_accent2_900 0x1c ${
+                                            "0x%08X".format(C_900.toArgb())
+                                        }"
+                                    )
+
+
+
+                                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA2'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+                                
+                            }) {
+                                Text(text = "A2")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Button(modifier = Modifier.weight(1f), onClick = {
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_10 color/system_accent3_10 0x1c ${
+                                        "0x%08X".format(C_10.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_50 color/system_accent3_50 0x1c ${
+                                        "0x%08X".format(C_50.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_100 color/system_accent3_100 0x1c ${
+                                        "0x%08X".format(C_100.toArgb())
+                                    }"
+                                )
+
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_200 color/system_accent3_200 0x1c ${
+                                        "0x%08X".format(C_200.toArgb())
+                                    }"
+                                )
+
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_300 color/system_accent3_300 0x1c ${
+                                        "0x%08X".format(C_300.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_400 color/system_accent3_400 0x1c ${
+                                        "0x%08X".format(C_400.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_500 color/system_accent3_500 0x1c ${
+                                        "0x%08X".format(C_500.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_600 color/system_accent3_600 0x1c ${
+                                        "0x%08X".format(C_600.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_700 color/system_accent3_700 0x1c ${
+                                        "0x%08X".format(C_700.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_800 color/system_accent3_800 0x1c ${
+                                        "0x%08X".format(C_800.toArgb())
+                                    }"
+                                )
+
+                                Shell.SH.run(
+                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_900 color/system_accent3_900 0x1c ${
+                                        "0x%08X".format(C_900.toArgb())
+                                    }"
+                                )
+
+
+
+                                Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA3'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+                            }) {
+                                Text(text = "A3")
+                            }
+                        
+                    }
 
                 }
             }
@@ -800,10 +1660,38 @@ fun ColorsTab() {
 
             })
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            FakeMonet()
+            Spacer(modifier = Modifier.height(8.dp))
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            FakeMonet()
+
+            if (getOverlay().contains("fabricate")){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    FabricatedMonet()
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            HeaderRowWithSwitch(header = "Disable Monet",
+                subHeader = "Ye you need to enable this first, duh",
+                isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
+                onCheckedChange = {
+                    if (it) {
+                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
+                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
+                        overlayEnable("misc.flagmonet")
+
+                    } else {
+                        Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
+                        Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                        Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
+
+                    }
+                })
+
 
         }
 

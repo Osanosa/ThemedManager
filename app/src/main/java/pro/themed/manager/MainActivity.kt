@@ -63,22 +63,22 @@ data class OverlayListData(
 
 @Composable
 fun getOverlayList(): OverlayListData {
-    var overlayList by remember { mutableStateOf<OverlayListData?>(null) }
+    val overlayList by remember { mutableStateOf(fetchOverlayList()) }
 
-    LaunchedEffect(true) {
-        val result = withContext(Dispatchers.IO) {
-            val overlayList = SH.run("""su -c cmd overlay list""").stdout().split("\n")
-                .filter { it.contains("themed") }.sorted()
-            val unsupportedOverlays = overlayList.filter { it.contains("---") }
-            val enabledOverlays = overlayList.filter { it.contains("[x]") }
-            val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+    return overlayList
+}
 
-            OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
-        }
-        overlayList = result
-    }
+private fun fetchOverlayList(): OverlayListData {
+    val result = SU.run("cmd overlay list").stdout()
+    val overlayList = result.lines()
+        .filter { it.contains("themed") }
+        .sorted()
 
-    return overlayList ?: OverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
+    val unsupportedOverlays = overlayList.filter { it.contains("---") }
+    val enabledOverlays = overlayList.filter { it.contains("[x]") }
+    val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+
+    return OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
 }
 
 

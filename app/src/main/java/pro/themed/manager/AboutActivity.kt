@@ -53,6 +53,9 @@ class AboutActivity : ComponentActivity() {
     }
 
 
+
+
+
     @Preview
     @Composable
     fun AboutPage() {
