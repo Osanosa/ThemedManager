@@ -188,7 +188,8 @@ fun QSTileCard() {
                             .fillMaxWidth()
                             .clickable {
                                 qspanelstyle = "default"
-                            }, elevation = 2.dp) {
+                            }, elevation = 2.dp
+                    ) {
                         Text(text = "default", Modifier.padding(24.dp))
                     }
                 } else if (index == 1) {
@@ -221,7 +222,8 @@ fun QSTileCard() {
                             .fillMaxWidth()
                             .clickable {
                                 qspanelstyle = "clear"
-                            }, elevation = 2.dp) {
+                            }, elevation = 2.dp
+                    ) {
                         Text(text = "clear", Modifier.padding(24.dp))
                     }
                 }

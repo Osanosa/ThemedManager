@@ -1,7 +1,10 @@
 package pro.themed.manager
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -15,11 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import pro.themed.manager.comps.HeaderRowWithSwitch
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 class SettingsActivity : ComponentActivity() {
@@ -34,13 +37,30 @@ class SettingsActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
+                    val sharedPreferences: SharedPreferences =
+                        context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                    val editor: SharedPreferences.Editor = sharedPreferences.edit()
+
 
 
                     Column {
-
+                        val context = LocalContext.current
                         TopAppBarSettings()
-Text(text = "Wow, such empty \n (I can't properly set up DataStoreRepository so no settings for now)")
+                        HeaderRowWithSwitch(header = "Automatically restart SystemUI",
+                            subHeader = "Enabling this will automatically restart system interface after applying overlays",
+                            isChecked = sharedPreferences.getBoolean("restart_system_ui", false),
+                            onCheckedChange = {
+                                if (it) {
+                                    editor.putBoolean("restart_system_ui", true)
+                                    editor.apply()
+                                    Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    editor.putBoolean("restart_system_ui", false)
+                                    editor.apply()
+                                    Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
 
+                                }
+                            })
 
                     }
                 }
@@ -67,8 +87,7 @@ Text(text = "Wow, such empty \n (I can't properly set up DataStoreRepository so 
                 IconButton(onClick = {
                     context.startActivity(
                         Intent(
-                            context,
-                            DebugActivity::class.java
+                            context, DebugActivity::class.java
                         )
                     )
 
@@ -82,8 +101,7 @@ Text(text = "Wow, such empty \n (I can't properly set up DataStoreRepository so 
                 IconButton(onClick = {
                     context.startActivity(
                         Intent(
-                            context,
-                            FaqActivity::class.java
+                            context, FaqActivity::class.java
                         )
                     )
                 }) {

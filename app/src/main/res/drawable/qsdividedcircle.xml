@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="42.0dip" android:height="42.0dip" android:viewportWidth="42.0" android:viewportHeight="42.0">
-    <path android:pathData="M39.873 26.493c0.523-1.771 0.815-3.642 0.815-5.583 0-10.863-8.806-19.668-19.668-19.668-1.94 0-3.811 0.292-5.582 0.815M3.01 13.021c-1.061 2.416-1.658 5.081-1.658 7.889 0 10.863 8.806 19.668 19.668 19.668 2.808 0 5.473-0.598 7.889-1.658" android:strokeWidth="1.25" android:strokeColor="@color/DrawableColor" android:strokeLineCap="round" android:strokeMiterLimit="10.0"/>
-    <path android:fillColor="@color/DrawableColor" android:pathData="M5.136 10.01a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm2.057-2.502a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zM9.86 5.175a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm2.943-1.926a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm26.53 26.154a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm-1.685 2.829a0.575 0.575 0 0 1-1.15 0 0.575 0.575 0 0 1 1.15 0zm-2.288 2.721a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm-2.751 2.249a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="42.0dip"
+    android:height="42.0dip"
+    android:viewportWidth="42.0"
+    android:viewportHeight="42.0">
+    <path
+        android:pathData="M39.873 26.493c0.523-1.771 0.815-3.642 0.815-5.583 0-10.863-8.806-19.668-19.668-19.668-1.94 0-3.811 0.292-5.582 0.815M3.01 13.021c-1.061 2.416-1.658 5.081-1.658 7.889 0 10.863 8.806 19.668 19.668 19.668 2.808 0 5.473-0.598 7.889-1.658"
+        android:strokeWidth="1.25"
+        android:strokeColor="@color/DrawableColor"
+        android:strokeLineCap="round"
+        android:strokeMiterLimit="10.0" />
+    <path
+        android:fillColor="@color/DrawableColor"
+        android:pathData="M5.136 10.01a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm2.057-2.502a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zM9.86 5.175a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm2.943-1.926a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm26.53 26.154a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm-1.685 2.829a0.575 0.575 0 0 1-1.15 0 0.575 0.575 0 0 1 1.15 0zm-2.288 2.721a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0zm-2.751 2.249a0.576 0.576 0 0 1-1.152 0 0.576 0.576 0 0 1 1.152 0z" />
 </vector>

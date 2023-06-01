@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 import java.text.SimpleDateFormat
-import java.util.Date
 
 def computeVersionCode() {
     def format = new SimpleDateFormat("yyMMdd")
@@ -11,8 +11,9 @@ def computeVersionCode() {
 def computeVersionName() {
     def format = new SimpleDateFormat("yy.MM.dd")
     def currentDate = format.format(new Date())
-    return  currentDate
+    return currentDate
 }
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -105,7 +106,7 @@ android {
 
 dependencies {
     implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.21'))
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.11.0-beta01'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
@@ -138,7 +139,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-compose:2.7.0-alpha01'
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.2.2'
-    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.0'
+    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.1'
     implementation 'com.google.firebase:firebase-perf:20.3.2'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
@@ -149,8 +150,8 @@ dependencies {
     implementation('androidx.navigation:navigation-compose:2.7.0-alpha01')
 
     // Pager and Indicators - Accompanist
-    implementation 'com.google.accompanist:accompanist-pager:0.30.0'
-    implementation 'com.google.accompanist:accompanist-pager-indicators:0.30.0'
+    implementation 'com.google.accompanist:accompanist-pager:0.30.1'
+    implementation 'com.google.accompanist:accompanist-pager-indicators:0.30.1'
 
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")

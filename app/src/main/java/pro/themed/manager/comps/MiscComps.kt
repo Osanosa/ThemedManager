@@ -67,7 +67,11 @@ fun Slideritem(
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
-    if (getOverlayList().overlayList.any { it.contains(overlayName) }&&!getOverlayList().unsupportedOverlays.any { it.contains(overlayName) }) {
+    if (getOverlayList().overlayList.any { it.contains(overlayName) } && !getOverlayList().unsupportedOverlays.any {
+            it.contains(
+                overlayName
+            )
+        }) {
         Surface {
 
 
@@ -240,10 +244,10 @@ fun MiscTab() {
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
-Row(Modifier.padding(8.dp)) {
-    Icon(Icons.Default.Info, contentDescription = "")
-    Text(text = "Only supported options are being shown")
-}
+            Row(Modifier.padding(8.dp)) {
+                Icon(Icons.Default.Info, contentDescription = "")
+                Text(text = "Only supported options are being shown")
+            }
             Slideritem(
                 drawable = R.drawable.rounded_corner_48px,
                 header = stringResource(R.string.rounded_corners),
@@ -353,18 +357,18 @@ Row(Modifier.padding(8.dp)) {
                 },
                 isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
             )
-           /* HeaderRowWithSwitch(
-                header = "DokeOS support package",
-                subHeader = "Remaps accents",
-                onCheckedChange = {
-                    if (it) {
-                        Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
-                    } else {
-                        Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
-                    }
-                },
-                isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
-            )*/
+            /* HeaderRowWithSwitch(
+                 header = "DokeOS support package",
+                 subHeader = "Remaps accents",
+                 onCheckedChange = {
+                     if (it) {
+                         Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
+                     } else {
+                         Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
+                     }
+                 },
+                 isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
+             )*/
 
         }
     }

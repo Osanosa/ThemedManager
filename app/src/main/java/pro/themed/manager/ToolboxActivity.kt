@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
-import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -518,12 +517,23 @@ class ToolboxActivity : ComponentActivity() {
                                     val freeafter =
                                         SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
                                             .replace(Regex("[^0-9]"), "").toLong()
-                                        myTrace.stop()
-                                    val difference: Float = freeafter.toFloat() - freebefore.toFloat()
+                                    myTrace.stop()
+                                    val difference: Float =
+                                        freeafter.toFloat() - freebefore.toFloat()
                                     val toast = when {
-                                        difference > 1024*1024 -> "${DecimalFormat("#.##").format (difference/1024)}Gb"
-                                        difference > 1024 -> "${DecimalFormat("#.##").format (difference/1024)}Mb"
-                                        else -> "${DecimalFormat("#").format (difference)}Kb"
+                                        difference > 1024 * 1024 -> "${
+                                            DecimalFormat("#.##").format(
+                                                difference / 1024
+                                            )
+                                        }Gb"
+
+                                        difference > 1024 -> "${
+                                            DecimalFormat("#.##").format(
+                                                difference / 1024
+                                            )
+                                        }Mb"
+
+                                        else -> "${DecimalFormat("#").format(difference)}Kb"
                                     }
                                     runOnUiThread {
                                         Toast.makeText(

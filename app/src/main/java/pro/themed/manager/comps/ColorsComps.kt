@@ -1020,163 +1020,163 @@ fun FabricatedMonet(
                             Text(text = "A1")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                       
-                            Button(modifier = Modifier.weight(1f), onClick = {
-                                
 
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_10 color/system_accent2_10 0x1c ${
-                                            "0x%08X".format(C_10.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_50 color/system_accent2_50 0x1c ${
-                                            "0x%08X".format(C_50.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_100 color/system_accent2_100 0x1c ${
-                                            "0x%08X".format(C_100.toArgb())
-                                        }"
-                                    )
+                        Button(modifier = Modifier.weight(1f), onClick = {
 
 
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_200 color/system_accent2_200 0x1c ${
-                                            "0x%08X".format(C_200.toArgb())
-                                        }"
-                                    )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_10 color/system_accent2_10 0x1c ${
+                                    "0x%08X".format(C_10.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_50 color/system_accent2_50 0x1c ${
+                                    "0x%08X".format(C_50.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_100 color/system_accent2_100 0x1c ${
+                                    "0x%08X".format(C_100.toArgb())
+                                }"
+                            )
 
 
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_300 color/system_accent2_300 0x1c ${
-                                            "0x%08X".format(C_300.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_400 color/system_accent2_400 0x1c ${
-                                            "0x%08X".format(C_400.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_500 color/system_accent2_500 0x1c ${
-                                            "0x%08X".format(C_500.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_600 color/system_accent2_600 0x1c ${
-                                            "0x%08X".format(C_600.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_700 color/system_accent2_700 0x1c ${
-                                            "0x%08X".format(C_700.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_800 color/system_accent2_800 0x1c ${
-                                            "0x%08X".format(C_800.toArgb())
-                                        }"
-                                    )
-
-                                    Shell.SH.run(
-                                        "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_900 color/system_accent2_900 0x1c ${
-                                            "0x%08X".format(C_900.toArgb())
-                                        }"
-                                    )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_200 color/system_accent2_200 0x1c ${
+                                    "0x%08X".format(C_200.toArgb())
+                                }"
+                            )
 
 
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_300 color/system_accent2_300 0x1c ${
+                                    "0x%08X".format(C_300.toArgb())
+                                }"
+                            )
 
-                                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA2'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
-                                
-                            }) {
-                                Text(text = "A2")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_400 color/system_accent2_400 0x1c ${
+                                    "0x%08X".format(C_400.toArgb())
+                                }"
+                            )
 
-                            Button(modifier = Modifier.weight(1f), onClick = {
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_10 color/system_accent3_10 0x1c ${
-                                        "0x%08X".format(C_10.toArgb())
-                                    }"
-                                )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_500 color/system_accent2_500 0x1c ${
+                                    "0x%08X".format(C_500.toArgb())
+                                }"
+                            )
 
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_50 color/system_accent3_50 0x1c ${
-                                        "0x%08X".format(C_50.toArgb())
-                                    }"
-                                )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_600 color/system_accent2_600 0x1c ${
+                                    "0x%08X".format(C_600.toArgb())
+                                }"
+                            )
 
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_100 color/system_accent3_100 0x1c ${
-                                        "0x%08X".format(C_100.toArgb())
-                                    }"
-                                )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_700 color/system_accent2_700 0x1c ${
+                                    "0x%08X".format(C_700.toArgb())
+                                }"
+                            )
 
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_800 color/system_accent2_800 0x1c ${
+                                    "0x%08X".format(C_800.toArgb())
+                                }"
+                            )
 
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_200 color/system_accent3_200 0x1c ${
-                                        "0x%08X".format(C_200.toArgb())
-                                    }"
-                                )
-
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_300 color/system_accent3_300 0x1c ${
-                                        "0x%08X".format(C_300.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_400 color/system_accent3_400 0x1c ${
-                                        "0x%08X".format(C_400.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_500 color/system_accent3_500 0x1c ${
-                                        "0x%08X".format(C_500.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_600 color/system_accent3_600 0x1c ${
-                                        "0x%08X".format(C_600.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_700 color/system_accent3_700 0x1c ${
-                                        "0x%08X".format(C_700.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_800 color/system_accent3_800 0x1c ${
-                                        "0x%08X".format(C_800.toArgb())
-                                    }"
-                                )
-
-                                Shell.SH.run(
-                                    "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_900 color/system_accent3_900 0x1c ${
-                                        "0x%08X".format(C_900.toArgb())
-                                    }"
-                                )
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA2_900 color/system_accent2_900 0x1c ${
+                                    "0x%08X".format(C_900.toArgb())
+                                }"
+                            )
 
 
 
-                                Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA3'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
-                            }) {
-                                Text(text = "A3")
-                            }
-                        
+                            Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA2'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+
+                        }) {
+                            Text(text = "A2")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Button(modifier = Modifier.weight(1f), onClick = {
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_10 color/system_accent3_10 0x1c ${
+                                    "0x%08X".format(C_10.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_50 color/system_accent3_50 0x1c ${
+                                    "0x%08X".format(C_50.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_100 color/system_accent3_100 0x1c ${
+                                    "0x%08X".format(C_100.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_200 color/system_accent3_200 0x1c ${
+                                    "0x%08X".format(C_200.toArgb())
+                                }"
+                            )
+
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_300 color/system_accent3_300 0x1c ${
+                                    "0x%08X".format(C_300.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_400 color/system_accent3_400 0x1c ${
+                                    "0x%08X".format(C_400.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_500 color/system_accent3_500 0x1c ${
+                                    "0x%08X".format(C_500.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_600 color/system_accent3_600 0x1c ${
+                                    "0x%08X".format(C_600.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_700 color/system_accent3_700 0x1c ${
+                                    "0x%08X".format(C_700.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_800 color/system_accent3_800 0x1c ${
+                                    "0x%08X".format(C_800.toArgb())
+                                }"
+                            )
+
+                            Shell.SH.run(
+                                "su -c cmd overlay fabricate --target android --name ThemedMonetSA3_900 color/system_accent3_900 0x1c ${
+                                    "0x%08X".format(C_900.toArgb())
+                                }"
+                            )
+
+
+
+                            Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'ThemedMonetSA3'  | sed -E 's/^....//'); do cmd overlay enable \"\$ol\"; done")
+                        }) {
+                            Text(text = "A3")
+                        }
+
                     }
 
                 }
@@ -1669,7 +1669,7 @@ fun ColorsTab() {
             Spacer(modifier = Modifier.height(8.dp))
 
 
-            if (getOverlay().contains("fabricate")){
+            if (getOverlay().contains("fabricate")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     FabricatedMonet()
                 }

@@ -122,21 +122,21 @@ class DebugActivity : ComponentActivity() {
                     )
                 }
 
-            Text(text = "Enabled")
-            getOverlayList().enabledOverlays.forEach { overlay ->
-                Text(
-                    text = overlay,
-                )
-            }
-            Text(text = "Disabled")
-            getOverlayList().disabledOverlays.forEach { overlay ->
-                Text(
-                    text = overlay,
-                )
-            }
+                Text(text = "Enabled")
+                getOverlayList().enabledOverlays.forEach { overlay ->
+                    Text(
+                        text = overlay,
+                    )
+                }
+                Text(text = "Disabled")
+                getOverlayList().disabledOverlays.forEach { overlay ->
+                    Text(
+                        text = overlay,
+                    )
+                }
 
+            }
         }
-    }
     }
 
     @Composable

@@ -6,8 +6,9 @@
 package pro.themed.manager
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -28,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,8 +46,6 @@ import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
@@ -70,9 +68,7 @@ fun getOverlayList(): OverlayListData {
 
 private fun fetchOverlayList(): OverlayListData {
     val result = SU.run("cmd overlay list").stdout()
-    val overlayList = result.lines()
-        .filter { it.contains("themed") }
-        .sorted()
+    val overlayList = result.lines().filter { it.contains("themed") }.sorted()
 
     val unsupportedOverlays = overlayList.filter { it.contains("---") }
     val enabledOverlays = overlayList.filter { it.contains("[x]") }
@@ -164,6 +160,17 @@ fun FlipCard(
     }
 }
 
+object SharedPreferencesManager {
+    private lateinit var sharedPreferences: SharedPreferences
+
+    fun initialize(context: Context) {
+        sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+    }
+
+    fun getSharedPreferences(): SharedPreferences {
+        return sharedPreferences
+    }
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,7 +178,10 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             ThemedManagerTheme {
-                var root by rememberSaveable {
+
+                SharedPreferencesManager.initialize(applicationContext)
+
+                val root by rememberSaveable {
                     mutableStateOf(SH.run("su -c whoami").stdout())
                 }
 
@@ -183,12 +193,6 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-
-
-                val context = LocalContext.current
-
-
-                val screenwidth = (LocalConfiguration.current.screenWidthDp - 16) / 8
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
                 ) {
@@ -207,7 +211,6 @@ fun getOverlay(): String {
 
     return overlay.value
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -241,8 +244,7 @@ private operator fun Navigation.invoke() {
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        NavigationItems.ColorsTab,
-        NavigationItems.IconsTab,
+        NavigationItems.ColorsTab, NavigationItems.IconsTab,
         //  NavigationItems.FontsTab,
         NavigationItems.MiscTab
     )
@@ -296,8 +298,7 @@ fun Navigation(navController: NavHostController) {
         }
         composable(NavigationItems.IconsTab.route) {
             IconsTab()
-        }
-        /*composable(NavigationItems.FontsTab.route) {
+        }/*composable(NavigationItems.FontsTab.route) {
             AppsTab()
         }*/
         composable(NavigationItems.MiscTab.route) {
@@ -371,10 +372,16 @@ fun overlayEnable(overlayname: String) {
         SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
 
     } else {
-            SU.run("su -c cmd overlay enable themed.$overlayname")
+        SU.run("su -c cmd overlay enable themed.$overlayname")
     }
 
 
+    val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
+    val restart_system_ui: Boolean = sharedPreferences.getBoolean("restart_system_ui", false)
+
+    if (restart_system_ui) {
+        SU.run("su -c killall com.android.systemui")
+    }
 
     Firebase.analytics.logEvent("Overlay_Selected") {
         param("Overlay_Name", overlayname)
