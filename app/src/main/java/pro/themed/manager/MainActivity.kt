@@ -18,6 +18,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -26,14 +28,18 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigation
@@ -41,11 +47,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
@@ -173,36 +183,160 @@ object SharedPreferencesManager {
 }
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
         setContent {
 
             ThemedManagerTheme {
 
                 SharedPreferencesManager.initialize(applicationContext)
+                val context = LocalContext.current
+
+                val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
+                val onBoardingCompleted: Boolean =
+                    sharedPreferences.getBoolean("onBoardingCompleted", false)
+
+                if (onBoardingCompleted) {
+                    splashScreen.setKeepOnScreenCondition { true }
+
 
                 val root by rememberSaveable {
                     mutableStateOf(SH.run("su -c whoami").stdout())
                 }
 
-                if ("root" !in root) {
-                    Toast.makeText(
-                        LocalContext.current, getString(R.string.no_root_access), Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                }
-
-
-                Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
-                ) {
+                    if ("root" !in root) {
+                        Toast.makeText(
+                            LocalContext.current,
+                            getString(R.string.no_root_access),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    getOverlayList()
+                    getOverlay()
                     Main()
+                    LaunchedEffect(Unit) {
+                        //  delay(1000)
+                        splashScreen.setKeepOnScreenCondition { false }
+                    }
                 }
+                else {
+                    splashScreen.setKeepOnScreenCondition { false }
+
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        val pageCount = 4
+                        val pagerState = rememberPagerState {
+                            pageCount
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+                        HorizontalPager(state = pagerState, userScrollEnabled = false) {
+
+                                index ->
+
+                            if (index == 0) {
+                                onBoarding(
+                                    image = R.drawable.main_logo_circle_mask00000,
+                                    text = "This app uses RROs (resource runtime overlays) to overlay colors, icons, booleans, etc. Full compatibility with OEM ROMs cannot be guaranteed as new resources cannot be added"
+                                )
+
+                            } else if (index == 1) {
+                                onBoarding(
+                                    image = R.drawable.magisk_logo,
+                                    text = "This app requires Root access in order to apply overlays"
+                                )
+
+                            } else if (index == 2) {
+                                onBoarding(
+                                    image = R.drawable.dead_android,
+                                    text = "\n" + "If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled"
+                                )
+
+                            } else if (index == 3) {
+                                onBoarding(
+                                    image = R.drawable.telegram_logo,
+                                    text = "You can get support and request compatibility fixes in the Telegram group"
+                                )
+
+                            }
+                        }
+                        val coroutineScope = rememberCoroutineScope()
+                        HorizontalPagerIndicator(
+                            pagerState = pagerState,
+                            pageCount = pageCount,
+                            activeColor = MaterialTheme.colors.textcol,
+                            inactiveColor = MaterialTheme.colors.textcol.copy(0.4f)
+                        )
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                if (pagerState.currentPage == 1) {
+
+                                    val root = Shell.SH.run("su -c whoami").stdout()
+
+
+                                    if ("root" !in root) {
+                                        Toast.makeText(
+                                            context,
+                                            getString(R.string.no_root_access),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                }
+                                if (pagerState.currentPage == pageCount - 1) {
+                                    sharedPreferences.edit().putBoolean("onBoardingCompleted", true)
+                                        .apply()
+                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }) {
+                            androidx.compose.material3.Text(text = "Next")
+                        }
+                    }
+                }
+
             }
         }
     }
 }
 
+@Composable
+fun onBoarding(image: Int, text: String) {
+
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        //verticalArrangement = Arrangement.SpaceEvenly,
+
+    ) {
+        Spacer(modifier = Modifier.height(60.dp))
+        Image(
+            painter = painterResource(id = image),
+            contentDescription = null,
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 80.dp),
+            contentScale = ContentScale.FillWidth
+        )
+        Spacer(modifier = Modifier.height(60.dp))
+
+        androidx.compose.material3.Text(
+            text = text, Modifier.padding(horizontal = 30.dp), textAlign = TextAlign.Center,
+            // fontWeight = FontWeight.Bold,
+            fontSize = 16.sp, color = MaterialTheme.colors.textcol
+        )
+
+    }
+
+}
 @Composable
 fun getOverlay(): String {
     val overlay = rememberSaveable {

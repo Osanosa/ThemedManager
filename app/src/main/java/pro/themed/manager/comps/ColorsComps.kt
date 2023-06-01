@@ -1672,25 +1672,25 @@ fun ColorsTab() {
             if (getOverlay().contains("fabricate")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     FabricatedMonet()
+                    HeaderRowWithSwitch(header = "Disable Monet",
+                        subHeader = "Ye you need to enable this first, duh",
+                        isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
+                        onCheckedChange = {
+                            if (it) {
+                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
+                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
+                                overlayEnable("misc.flagmonet")
+
+                            } else {
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                                Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
+
+                            }
+                        })
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            HeaderRowWithSwitch(header = "Disable Monet",
-                subHeader = "Ye you need to enable this first, duh",
-                isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
-                onCheckedChange = {
-                    if (it) {
-                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
-                        Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
-                        overlayEnable("misc.flagmonet")
-
-                    } else {
-                        Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
-                        Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
-                        Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
-
-                    }
-                })
 
 
         }
