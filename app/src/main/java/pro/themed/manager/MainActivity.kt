@@ -47,14 +47,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
-import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
@@ -203,9 +200,9 @@ class MainActivity : ComponentActivity() {
                     splashScreen.setKeepOnScreenCondition { true }
 
 
-                val root by rememberSaveable {
-                    mutableStateOf(SH.run("su -c whoami").stdout())
-                }
+                    val root by rememberSaveable {
+                        mutableStateOf(SH.run("su -c whoami").stdout())
+                    }
 
                     if ("root" !in root) {
                         Toast.makeText(
@@ -221,21 +218,23 @@ class MainActivity : ComponentActivity() {
                         //  delay(1000)
                         splashScreen.setKeepOnScreenCondition { false }
                     }
-                }
-                else {
+                } else {
                     splashScreen.setKeepOnScreenCondition { false }
 
                     Column(
                         Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceBetween,
+//                        verticalArrangement = Arrangement.SpaceBetween,
                     ) {
                         val pageCount = 4
                         val pagerState = rememberPagerState {
                             pageCount
                         }
-                        Spacer(modifier = Modifier.height(30.dp))
-                        HorizontalPager(state = pagerState, userScrollEnabled = false) {
+                        HorizontalPager(
+                            state = pagerState,
+                            Modifier.fillMaxHeight(0.8f),
+                            userScrollEnabled = false
+                        ) {
 
                                 index ->
 
@@ -265,40 +264,56 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
-                        val coroutineScope = rememberCoroutineScope()
-                        HorizontalPagerIndicator(
-                            pagerState = pagerState,
-                            pageCount = pageCount,
-                            activeColor = MaterialTheme.colors.textcol,
-                            inactiveColor = MaterialTheme.colors.textcol.copy(0.4f)
-                        )
-                        Button(onClick = {
-                            coroutineScope.launch {
-                                if (pagerState.currentPage == 1) {
+                        val coroutineScope = rememberCoroutineScope()/* HorizontalPagerIndicator(
+                             pagerState = pagerState,
+                             pageCount = pageCount,
+                             activeColor = MaterialTheme.colors.textcol,
+                             inactiveColor = MaterialTheme.colors.textcol.copy(0.4f)
+                         )*/
+                        Row(Modifier.fillMaxHeight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
-                                    val root = Shell.SH.run("su -c whoami").stdout()
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        if (pagerState.currentPage == 1) {
+
+                                            val root = SH.run("su -c whoami").stdout()
 
 
-                                    if ("root" !in root) {
-                                        Toast.makeText(
-                                            context,
-                                            getString(R.string.no_root_access),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                            if ("root" !in root) {
+                                                Toast.makeText(
+                                                    context,
+                                                    getString(R.string.no_root_access),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+
+                                        }
+                                        if (pagerState.currentPage == pageCount - 1) {
+                                            sharedPreferences.edit()
+                                                .putBoolean("onBoardingCompleted", true).apply()
+                                            val intent =
+                                                Intent(this@MainActivity, MainActivity::class.java)
+                                            finish()
+                                            startActivity(intent)
+                                        }
+                                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
                                     }
-
                                 }
+                            ) {
                                 if (pagerState.currentPage == pageCount - 1) {
-                                    sharedPreferences.edit().putBoolean("onBoardingCompleted", true)
-                                        .apply()
-                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
+                                    androidx.compose.material3.Text(text = "Get started")
+
+                                } else if (pagerState.currentPage == 1) {
+                                    androidx.compose.material3.Text(text = "Grant access")
+
+                                } else {
+                                    androidx.compose.material3.Text(text = "Next")
                                 }
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
-                        }) {
-                            androidx.compose.material3.Text(text = "Next")
+
                         }
                     }
                 }
@@ -314,10 +329,9 @@ fun onBoarding(image: Int, text: String) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        //verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Bottom,
 
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
         Image(
             painter = painterResource(id = image),
             contentDescription = null,
@@ -337,6 +351,7 @@ fun onBoarding(image: Int, text: String) {
     }
 
 }
+
 @Composable
 fun getOverlay(): String {
     val overlay = rememberSaveable {

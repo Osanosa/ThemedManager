@@ -523,7 +523,7 @@ class ToolboxActivity : ComponentActivity() {
                                     val toast = when {
                                         difference > 1024 * 1024 -> "${
                                             DecimalFormat("#.##").format(
-                                                difference / 1024
+                                                difference / 1024 / 1024
                                             )
                                         }Gb"
 

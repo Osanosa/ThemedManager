@@ -2,13 +2,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import java.text.SimpleDateFormat
 
-def computeVersionCode() {
+static def computeVersionCode() {
     def format = new SimpleDateFormat("yyMMdd")
     def currentDate = format.format(new Date())
     return Integer.parseInt(currentDate)
 }
 
-def computeVersionName() {
+static def computeVersionName() {
     def format = new SimpleDateFormat("yy.MM.dd")
     def currentDate = format.format(new Date())
     return currentDate
@@ -42,7 +42,7 @@ android {
         }
     }
     namespace 'pro.themed.manager'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "pro.themed.manager"
@@ -105,8 +105,8 @@ android {
 }
 
 dependencies {
-    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.21'))
-    implementation 'androidx.core:core-ktx:1.11.0-beta01'
+    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.22'))
+    implementation 'androidx.core:core-ktx:1.12.0-alpha05'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
@@ -118,7 +118,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
 */
 
-    implementation 'com.google.firebase:firebase-perf-ktx:20.3.2'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.3.3'
     implementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -127,29 +127,29 @@ dependencies {
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.2'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
-    implementation platform('androidx.compose:compose-bom:2023.05.01')
+    implementation platform('androidx.compose:compose-bom:2023.06.00')
     implementation "androidx.compose.ui:ui-graphics:$compose_ui_version"
-    implementation platform('androidx.compose:compose-bom:2023.03.00')
+    implementation platform('androidx.compose:compose-bom:2023.06.00')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
-    androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
+    androidTestImplementation platform('androidx.compose:compose-bom:2023.06.00')
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'androidx.navigation:navigation-compose:2.7.0-alpha01'
-    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'androidx.navigation:navigation-compose:2.7.0-beta01'
+    implementation platform('com.google.firebase:firebase-bom:32.1.1')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.1'
-    implementation 'com.google.firebase:firebase-perf:20.3.2'
+    implementation 'com.google.firebase:firebase-perf:20.3.3'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
     // Splash API
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.7.0-alpha01')
+    implementation('androidx.navigation:navigation-compose:2.7.0-beta01')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.30.1'
