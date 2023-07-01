@@ -142,7 +142,7 @@ fun QSTileCard() {
                     modifier = Modifier
                         .padding(8.dp)
                         .padding(start = 8.dp),
-                    text = stringResource(R.string.qspanels),
+                    text = stringResource(R.string.qspanels_header),
                     fontSize = 24.sp
                 )
                 IconButton(onClick = {

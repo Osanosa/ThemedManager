@@ -2,14 +2,12 @@ package pro.themed.manager
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,22 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
@@ -43,30 +34,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.perf.FirebasePerformance
-import com.google.firebase.perf.metrics.Trace
 import com.jaredrummler.ktsh.Shell.Companion.SU
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import pro.themed.manager.comps.HeaderRow
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import java.text.DecimalFormat
-
 
 class ToolboxActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +61,7 @@ class ToolboxActivity : ComponentActivity() {
         }
     }
 
-
+    @Preview
     @Composable
     fun ToolboxPage() {
         val context = LocalContext.current
@@ -89,769 +70,217 @@ class ToolboxActivity : ComponentActivity() {
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 TopAppToolbox()
+                SharedPreferencesManager.initialize(applicationContext)
+                val sharedPreferences: SharedPreferences =
+                    context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+
 
                 Column(Modifier.padding(horizontal = 8.dp)) {
-
-                    DisableOverlaysCard(context)
-
-                    Spacer(Modifier.height(8.dp))
-                    SystemUIRestart()
-                    Spacer(Modifier.height(8.dp))
-
-                    SystemThemeCard()
-                    Spacer(Modifier.height(8.dp))
-
-                    ClearAppCacheCard(context)
-                    Spacer(Modifier.height(8.dp))
-
-                    Dex2OatCard(context)
-                    Spacer(Modifier.height(8.dp))
-                    DownscaleCard(context = context)
-                }
-            }
-        }
-
-    }
-
-
-    @Composable
-    fun DisableOverlaysCard(context: Context) {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 4.dp
-                        ),
-                        text = stringResource(R.string.disable_overlays),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                    HeaderRow(stringResource(R.string.disable_overlays),
+                        stringResource(R.string.disable_overlays_header),
+                        button1text = stringResource(R.string.all),
+                        button1onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
+                        button2text = stringResource(R.string.stock),
+                        button2onClick = {
+                            SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                            SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                            SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                        },
+                        button3text = stringResource(R.string.themed),
+                        button3onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '^.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
+                    HeaderRow(
+                        stringResource(R.string.restart_systemui),
+                        stringResource(R.string.systemui_restart_header),
+                        button1text = stringResource(R.string.restart_now),
+                        button1onClick = { SU.run("su -c killall com.android.systemui") },
                     )
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.disable_all_overlays_stock_android_themes_or_only_themed_project_s),
-                    fontSize = 18.sp
-                )
+                    HeaderRow(stringResource(R.string.change_system_theme),
+                        stringResource(R.string.change_a_theme_of_your_device),
+                        button1text = stringResource(R.string.light),
+                        button1onClick = {
+                            SU.run("cmd uimode night no")
+                        },
+                        button2text = stringResource(R.string.dark),
+                        button2onClick = {
+                            SU.run("cmd uimode night yes")
+                        },
+                        button3text = stringResource(R.string.auto),
+                        button3onClick = {
+                            SU.run("cmd uimode night auto")
+                        })
+                    HeaderRow(
+                        stringResource(R.string.clear_app_caches),
+                        stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
+                        button1text = stringResource(R.string.clear_all),
+                        button1onClick = {
+                            val freebefore =
+                                SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    .replace(Regex("[^0-9]"), "").toLong()
+                            SU.run("pm trim-caches 100000g")
+                            val freeafter =
+                                SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    .replace(Regex("[^0-9]"), "").toLong()
+                            val difference: Float = freeafter.toFloat() - freebefore.toFloat()
+                            val toast = when {
+                                difference > 1024 * 1024 -> "${
+                                    DecimalFormat("#.##").format(
+                                        difference / 1024 / 1024
+                                    )
+                                }Gb"
 
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    var isDialogShown by remember { mutableStateOf(false) }
-                    if (isDialogShown) {
+                                difference > 1024 -> "${
+                                    DecimalFormat("#.##").format(
+                                        difference / 1024
+                                    )
+                                }Mb"
+
+                                else -> "${DecimalFormat("#").format(difference)}Kb"
+                            }
+                            Toast.makeText(
+                                context, "+$toast", Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                    )
+                    val forcedex2oat =
+                        if (sharedPreferences.getBoolean("force_dex2oat", false)) " -f" else ""
+                    HeaderRow(
+                        stringResource(R.string.dex2oat),
+                        stringResource(R.string.dex2oat_subheader),
+                        button1weight = 1.2f,
+                        button1text = "Everything",
+                        button1onClick = {
+                            SU.run("cmd package compile -m everything -a$forcedex2oat")
+                            SU.run("cmd package compile -m everything --secondary-dex -a$forcedex2oat")
+                        },
+                        button2text = "Layouts",
+                        button2onClick = {
+                            SU.run("cmd package compile --compile-layouts -a$forcedex2oat")
+                        },
+                        button3text = "Reset",
+                        button3onClick = {
+                            SU.run("cmd package compile --reset -a")
+                        },
+                        showSwitch = true,
+                        switchDescription = "Force recompile even if not needed",
+                        isChecked = sharedPreferences.getBoolean("force_dex2oat", false),
+                        onCheckedChange = {
+                            if (it) {
+                                editor.putBoolean("force_dex2oat", true)
+                                editor.apply()
+                                Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
+                            } else {
+                                editor.putBoolean("force_dex2oat", false)
+                                editor.apply()
+                                Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
+
+                            }
+                        },
+                    )
+                    var customresShown by remember { mutableStateOf(false) }
+                    var customres by remember { mutableStateOf("") }
+                    if (customresShown) {
                         AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                            title = { Text(stringResource(R.string.disabling_all_overlays_may_cause_some_system_settings_to_reset)) },
-                            text = { Text(stringResource(R.string.are_you_sure_you_want_to_proceed)) },
+                            title = { Text(stringResource(R.string.enter_your_custom_resolution)) },
+                            text = { Text(stringResource(R.string.downscale_warning)) },
                             buttons = {
-                                Row {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    TextField(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                        value = customres,
+                                        singleLine = true,
+                                        onValueChange = { customres = it },
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        label = { Text("Enter custom resolution") })
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(8.dp)
+                                    ) {
+                                        Button(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(1f),
+                                            onClick = {
 
+                                                downscalebynumber(width = customres)
+                                                SU.run("sleep 10 ; wm size reset ; wm density reset")
+                                            }) { Text(text = stringResource(R.string.test)) }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(1f),
+                                            onClick = {
 
-                                    Button(onClick = {
-                                        MainScope().launch {
-                                            async(Dispatchers.Default) {
-                                                SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                                runOnUiThread {
-                                                    Toast.makeText(
-                                                        context,
-                                                        getString(R.string.done),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                            }
-                                        }
-                                    }) { Text(text = stringResource(R.string.yes)) }
-                                    Button(
-                                        onClick = {
-                                            isDialogShown = false
-                                        },
-                                    ) { Text(text = stringResource(R.string.no)) }
+                                                downscalebynumber(width = customres)
+                                            },
+                                        ) { Text(text = stringResource(R.string.apply)) }
+                                    }
+                                    Text(text = stringResource(R.string.close),
+                                        modifier = Modifier.clickable { customresShown = false })
+                                    Spacer(modifier = Modifier.height(8.dp))
+
                                 }
                             })
                     }
-
-                    OutlinedButton(
-                        onClick = {
-
-
-                            isDialogShown = true
-
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol, contentColor = Color.Red
-                        )
-                    ) {
-                        Text(text = stringResource(R.string.all))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context,
-                                            getString(R.string.process_started_now_wait),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-
-                                    }
-                                    val myTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_overlay_reset_stock")
-                                    myTrace.start()
-                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                    SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                    myTrace.stop()
-
-                                    runOnUiThread {
-
-                                        Toast.makeText(
-                                            context, getString(R.string.done), Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-
-                            }
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.stock))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context,
-                                            getString(R.string.process_started_now_wait),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-                                    val myTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_overlay_reset_themed")
-                                    myTrace.start()
-                                    SU.run(
-                                        """for ol in $(cmd overlay list | grep -E '^.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done"""
-                                    )
-                                    myTrace.stop()
-
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context, getString(R.string.done), Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-                                }
-                            }
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.themed))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun SystemUIRestart() {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column(Modifier.padding(vertical = 2.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        ),
-                        text = stringResource(R.string.restart_systemui),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.restarts_systemui_in_case_if_your_rom_doesn_t_refreshes_it_automatically),
-                    fontSize = 18.sp
-                )
-
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    val myTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_restart_systemui")
-                                    myTrace.start()
-                                    SU.run("su -c killall com.android.systemui")
-
-                                    myTrace.stop()
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.restart_now))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                }
-
-            }
-        }
-    }
-
-    @Composable
-    fun SystemThemeCard() {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column(Modifier.padding(vertical = 2.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        ),
-                        text = stringResource(R.string.change_system_theme),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.change_a_theme_of_your_device),
-                    fontSize = 18.sp
-                )
-
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    SU.run("cmd uimode night no")
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-                    ) {
-                        Row {
-                            Text(text = stringResource(R.string.light))
-
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    SU.run("cmd uimode night yes")
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.dark))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    SU.run("cmd uimode night auto")
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.auto))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun ClearAppCacheCard(context: Context) {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column(Modifier.padding(vertical = 2.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        ),
-                        text = stringResource(R.string.clear_app_caches),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
-                    fontSize = 18.sp
-                )
-
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    val myTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_cache_clear")
-                                    myTrace.start()
-
-                                    val freebefore =
-                                        SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                            .replace(Regex("[^0-9]"), "").toLong()
-                                    SU.run("pm trim-caches 100000g")
-                                    val freeafter =
-                                        SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                            .replace(Regex("[^0-9]"), "").toLong()
-                                    myTrace.stop()
-                                    val difference: Float =
-                                        freeafter.toFloat() - freebefore.toFloat()
-                                    val toast = when {
-                                        difference > 1024 * 1024 -> "${
-                                            DecimalFormat("#.##").format(
-                                                difference / 1024 / 1024
-                                            )
-                                        }Gb"
-
-                                        difference > 1024 -> "${
-                                            DecimalFormat("#.##").format(
-                                                difference / 1024
-                                            )
-                                        }Mb"
-
-                                        else -> "${DecimalFormat("#").format(difference)}Kb"
-                                    }
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context, "+$toast", Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-                                }
-                            }
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.clear_all))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun Dex2OatCard(context: Context) {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column(Modifier.padding(vertical = 2.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        ),
-                        text = stringResource(R.string.dex2oat),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.pre_compiles_code_of_all_installed_apps_aswell_as_it_s_layouts_to_reduce_lag_ans_stutter),
-                    fontSize = 18.sp
-                )
-
-                Row(modifier = Modifier) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-
-                            MainScope().launch {
-                                async(Dispatchers.Default) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context,
-                                            getString(R.string.precompiling_dex_files),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    val SpeedTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_dex2oat_speed")
-                                    SpeedTrace.start()
-                                    SU.run("cmd package compile -m speed-profile -a")
-                                    SU.run("cmd package compile -m speed-profile --secondary-dex -a")
-                                    SpeedTrace.stop()
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context,
-                                            getString(R.string.precompiling_layouts),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    val LayoutsTrace: Trace = FirebasePerformance.getInstance()
-                                        .newTrace("toolbox_dex2oat_layouts")
-                                    LayoutsTrace.start()
-                                    SU.run("cmd package compile --compile-layouts -a")
-                                    LayoutsTrace.stop()
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            context, getString(R.string.done), Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string.optimize))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                }
-            }
-        }
-    }
-
-    @Preview
-    @Composable
-    fun DownscaleCard(context: Context = LocalContext.current) {
-        Card(
-            border = BorderStroke(
-                width = 1.dp, color = MaterialTheme.colors.bordercol
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            elevation = (0.dp),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        ),
-                        text = stringResource(R.string.downscale),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    IconButton(modifier = Modifier, onClick = {
-
-                        SU.run("wm size reset ; wm density reset")
-
-
-                    }) {
-                        Image(
-                            painter = painterResource(R.drawable.reset),
-                            contentDescription = null,
-                        )
-                    }
-
-                }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.changes_resolution_and_density_please_click_custom_first),
-                    fontSize = 18.sp
-                )
-                var customresShown by remember { mutableStateOf(false) }
-                var customres by remember { mutableStateOf("") }
-                if (customresShown) {
-                    AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                        title = { Text(stringResource(R.string.enter_your_custom_resolution)) },
-                        text = { Text(stringResource(R.string.on_some_roms_such_as_miui_setting_resolution_to_smaller_then_480p_may_cause_issues_test_button_will_reset_size_after_10s)) },
-                        buttons = {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                TextField(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp),
-                                    value = customres,
-                                    singleLine = true,
-                                    onValueChange = { customres = it },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    label = { Text("Enter custom resolution") })
-
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(8.dp)
-                                ) {
-                                    Button(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f),
-                                        onClick = {
-
-                                            downscalebynumber(width = customres)
-                                            SU.run("sleep 10 ; wm size reset ; wm density reset")
-
-
-                                        }) { Text(text = stringResource(R.string.test)) }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f),
-                                        onClick = {
-
-                                            downscalebynumber(width = customres)
-
-
-                                        },
-                                    ) { Text(text = stringResource(R.string.apply)) }
-                                }
-                                Text(text = stringResource(R.string.close),
-                                    modifier = Modifier.clickable { customresShown = false })
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                            }
-                        })
-                }
-                val switchState = rememberSaveable { mutableStateOf(true) }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        text = stringResource(R.string.reset_to_defaults_after_10_seconds)
-                    )
-                    Switch(
-                        checked = switchState.value,
-                        onCheckedChange = { switchState.value = it })
-                }
-
-                Row(modifier = Modifier.padding(horizontal = 8.dp)) {
-                    OutlinedButton(
-                        onClick = {
-
+                    HeaderRow(
+                        stringResource(R.string.downscale),
+                        stringResource(R.string.downscale_subheader),
+                        button1text = "1/2",
+                        button1onClick = {
                             downscalebydivisor("2")
-                            if (switchState.value) {
+                            if (sharedPreferences.getBoolean("resetwm", false)) {
                                 Thread.sleep(10000)
-                                SU.run(" wm size reset ; wm density reset")
-
+                                SU.run("wm size reset ; wm density reset")
                             }
+
                         },
-                        modifier = Modifier.wrapContentWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string._0_5x))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-
+                        button2text = "1/3",
+                        button2onClick = {
                             downscalebydivisor("3")
-                            if (switchState.value) {
+                            if (sharedPreferences.getBoolean("resetwm", false)) {
                                 Thread.sleep(10000)
-                                SU.run(" wm size reset ; wm density reset")
-
-                            }
-                        },
-                        modifier = Modifier.wrapContentWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
-
-                    ) {
-                        Text(text = stringResource(R.string._0_33x))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
-
-                            downscalebydivisor("4")
-
-                            if (switchState.value) {
-                                Thread.sleep(10000)
-                                SU.run(" wm size reset ; wm density reset")
+                                SU.run("wm size reset ; wm density reset")
                             }
 
                         },
-                        modifier = Modifier.wrapContentWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
+                        button3text = "Set",
+                        button3onClick = {
 
-                    ) {
-                        Text(text = stringResource(R.string._0_25x))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = {
                             customresShown = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.cardcol,
-                        )
 
-                    ) {
-                        Text(text = stringResource(R.string.custom))
-                    }
+
+                        },
+                        button4text = "Reset",
+                        button4onClick = {
+                            SU.run("wm size reset ; wm density reset")
+
+                        },
+                        showSwitch = true,
+                        switchDescription = stringResource(R.string.reset_to_defaults_after_10_seconds),
+                        isChecked = sharedPreferences.getBoolean("resetwm", false),
+                        onCheckedChange = {
+                            if (it) {
+                                editor.putBoolean("resetwm", true)
+                                editor.apply()
+                                Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
+                            } else {
+                                editor.putBoolean("resetwm", false)
+                                editor.apply()
+                                Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
+
+                            }
+                        },
+                    )
+
 
                 }
             }
         }
+
     }
+
 
     private fun downscalebydivisor(divisor: String) {
 
@@ -927,7 +356,6 @@ class ToolboxActivity : ComponentActivity() {
         )
     }
 
-
     @Composable
     fun TopAppToolbox() {
         val context = LocalContext.current
@@ -965,5 +393,3 @@ class ToolboxActivity : ComponentActivity() {
             })
     }
 }
-
-

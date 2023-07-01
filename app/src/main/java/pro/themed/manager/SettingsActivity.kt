@@ -17,12 +17,15 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import pro.themed.manager.comps.HeaderRowWithSwitch
+import com.jaredrummler.ktsh.Shell
+import pro.themed.manager.comps.HeaderRow
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 
 class SettingsActivity : ComponentActivity() {
@@ -46,7 +49,7 @@ class SettingsActivity : ComponentActivity() {
                     Column {
                         val context = LocalContext.current
                         TopAppBarSettings()
-                        HeaderRowWithSwitch(header = "Automatically restart SystemUI",
+                        HeaderRow(header = "Automatically restart SystemUI",
                             subHeader = "Enabling this will automatically restart system interface after applying overlays",
                             isChecked = sharedPreferences.getBoolean("restart_system_ui", false),
                             onCheckedChange = {
@@ -60,8 +63,23 @@ class SettingsActivity : ComponentActivity() {
                                     Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
 
                                 }
-                            })
+                            }, showSwitch = true)
+                        val scope = rememberCoroutineScope()
 
+                        HeaderRow(header = stringResource(R.string.uninstall_unused_overlays_header),
+                            subHeader = stringResource(R.string.uninstall_unused_overlays_subheader),
+                            button1onClick = {
+                                Toast.makeText(
+                                    context, R.string.process_started_now_wait, Toast.LENGTH_SHORT
+                                ).show()
+                                Shell.SU.run("""cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
+                                             path=${'$'}(cmd package path "${'$'}ol" | awk -F':' '{print ${'$'}2}')
+                                             rm_path="/data/adb/modules/ThemedProject/system${'$'}(echo "${'$'}path" | sed 's/^package://')"
+                                             rm "${'$'}rm_path" done""")
+                                Toast.makeText(
+                                    context, R.string.done, Toast.LENGTH_SHORT
+                                ).show()
+                            }, button1text = "Uninstall")
                     }
                 }
             }

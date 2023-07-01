@@ -1,10 +1,8 @@
 package pro.themed.manager.comps
 
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,13 +12,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -30,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,12 +46,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import kotlin.math.roundToInt
-
 
 @ExperimentalMaterial3Api
 @Composable
@@ -183,51 +187,147 @@ fun Slideritem(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun HeaderRowWithSwitch(
-    header: String = "Header",
+fun HeaderRow(
+    header: String = "",
     subHeader: String = "",
+    button1text: String = "",
+    button1onClick: () -> Unit = {},
+    button1weight: Float = 1f,
+    button2text: String = "",
+    button2onClick: () -> Unit = {},
+    button2weight: Float = 1f,
+    button3text: String = "",
+    button3onClick: () -> Unit = {},
+    button3weight: Float = 1f,
+    button4text: String = "",
+    button4onClick: () -> Unit = {},
+    button4weight: Float = 1f,
+    switchDescription: String = "",
     onCheckedChange: (Boolean) -> Unit = {},
-    onLongClick: () -> Unit = {},
     isChecked: Boolean = false,
-
-    ) {
+    showSwitch: Boolean = false,
+) {
+    val scope = rememberCoroutineScope()
     var checkedState by remember { mutableStateOf(isChecked) }
 
-    // Update the checkedState value when isChecked changes
     LaunchedEffect(isChecked) {
         checkedState = isChecked
     }
-
-    Surface(modifier = Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick)) {
+    val context = LocalContext.current
+    Surface {
         Column(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+           // verticalAlignment = Alignment.CenterVertically,
+           // horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
+            if (showSwitch && switchDescription.isEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = header,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                        Text(
+                            text = subHeader,
+                            style = MaterialTheme.typography.body1,
+                        )
+
+                    }
+
+                    Switch(
+                        checked = checkedState, onCheckedChange = {
+                            checkedState = it
+                            onCheckedChange(it)
+                        }, modifier = Modifier
+                    )
+                }
+            } else if (showSwitch && switchDescription.isNotEmpty()) {
+                Column(Modifier) {
                     Text(
                         text = header,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.subtitle1
                     )
-                    if (subHeader.isNotEmpty()) {
+                    Text(
+                        text = subHeader,
+                        style = MaterialTheme.typography.body1,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = subHeader, style = MaterialTheme.typography.body1
+                            text = switchDescription,
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Switch(
+                            checked = checkedState, onCheckedChange = {
+                                checkedState = it
+                                onCheckedChange(it)
+                            }, modifier = Modifier
                         )
                     }
                 }
-                androidx.compose.material.Switch(
-                    checked = checkedState, onCheckedChange = {
-                        checkedState = it
-                        onCheckedChange(it)
-                    }, modifier = Modifier.align(Alignment.CenterVertically)
-                )
+            } else { Text(
+                text = header,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.subtitle1
+            )
+                Text(
+                    text = subHeader,
+                    style = MaterialTheme.typography.body1,
+                )}
+
+
+            Row {
+                if (button1text.isNotEmpty()) {
+                    OutlinedButton(
+                        onClick = { scope.launch { button1onClick() } },
+                        modifier = Modifier.weight(button1weight),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                    ) { Text(text = button1text) }
+                }
+
+                if (button2text.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = { scope.launch { button2onClick() } },
+                        modifier = Modifier.weight(button2weight),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                    ) { Text(text = button2text) }
+                }
+                if (button3text.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = { scope.launch { button3onClick() } },
+                        modifier = Modifier.weight(button3weight),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                    ) { Text(text = button3text) }
+                }
+                if (button4text.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = { scope.launch { button4onClick() } },
+                        modifier = Modifier.weight(button4weight),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                    ) { Text(text = button4text) }
+                }
             }
         }
+
     }
 }
 
@@ -250,7 +350,7 @@ fun MiscTab() {
             }
             Slideritem(
                 drawable = R.drawable.rounded_corner_48px,
-                header = stringResource(R.string.rounded_corners),
+                header = stringResource(R.string.rounded_corners_header),
                 sliderSteps = 17,
                 sliderStepValue = 2,
                 minSliderValue = 0f,
@@ -333,9 +433,10 @@ fun MiscTab() {
                 maxSliderValue = 80f,
                 overlayName = "qstileheight"
             )
-            HeaderRowWithSwitch(
+            HeaderRow(
                 header = "RoundIconMask",
                 subHeader = "Makes app icons masks a perfect circle",
+                showSwitch = true,
                 onCheckedChange = {
                     if (it) {
                         Shell.SH.run("su -c cmd overlay enable themed.misc.roundiconmask")
@@ -345,9 +446,10 @@ fun MiscTab() {
                 },
                 isChecked = getOverlayList().enabledOverlays.any { it.contains("roundiconmask") },
             )
-            HeaderRowWithSwitch(
+            HeaderRow(
                 header = "Borderless",
                 subHeader = "Removes black line hiding display cutout",
+                showSwitch = true,
                 onCheckedChange = {
                     if (it) {
                         Shell.SH.run("su -c cmd overlay enable themed.misc.borderless")
@@ -357,18 +459,21 @@ fun MiscTab() {
                 },
                 isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
             )
-            /* HeaderRowWithSwitch(
-                 header = "DokeOS support package",
-                 subHeader = "Remaps accents",
-                 onCheckedChange = {
-                     if (it) {
-                         Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
-                     } else {
-                         Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
-                     }
-                 },
-                 isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
-             )*/
+/*
+            HeaderRow(
+                header = "DokeOS support package",
+                subHeader = "Remaps accents",
+                showSwitch = true,
+                onCheckedChange = {
+                    if (it) {
+                        Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
+                    } else {
+                        Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
+                    }
+                },
+                isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
+            )
+*/
 
         }
     }

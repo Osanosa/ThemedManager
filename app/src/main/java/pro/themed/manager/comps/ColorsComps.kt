@@ -1652,7 +1652,7 @@ fun ColorsTab() {
                         )
                     } else {
                         AccentsNewTemp(
-                            "accents", stringResource(R.string.accents)
+                            "accents", stringResource(R.string.accents_card_header)
                         )
 
                     }
@@ -1672,7 +1672,7 @@ fun ColorsTab() {
             if (getOverlay().contains("fabricate")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     FabricatedMonet()
-                    HeaderRowWithSwitch(header = "Disable Monet",
+                    HeaderRow(header = "Disable Monet",
                         subHeader = "Ye you need to enable this first, duh",
                         isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
                         onCheckedChange = {
@@ -1687,7 +1687,7 @@ fun ColorsTab() {
                                 Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
 
                             }
-                        })
+                        }, showSwitch = true)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

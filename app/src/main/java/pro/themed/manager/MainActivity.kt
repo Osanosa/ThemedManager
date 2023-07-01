@@ -221,9 +221,9 @@ class MainActivity : ComponentActivity() {
                 } else {
                     splashScreen.setKeepOnScreenCondition { false }
 
-                    Column(
+                    Box(
                         Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                       contentAlignment = Alignment.Center
 //                        verticalArrangement = Arrangement.SpaceBetween,
                     ) {
                         val pageCount = 4
@@ -238,42 +238,72 @@ class MainActivity : ComponentActivity() {
 
                                 index ->
 
-                            if (index == 0) {
-                                onBoarding(
-                                    image = R.drawable.main_logo_circle_mask00000,
-                                    text = "This app uses RROs (resource runtime overlays) to overlay colors, icons, booleans, etc. Full compatibility with OEM ROMs cannot be guaranteed as new resources cannot be added"
-                                )
+                            when (index) {
+                                0 -> {
+                                    onBoarding(
+                                        image = R.drawable.main_logo_circle_mask00000,
+                                        text = "This app uses RROs (resource runtime overlays) to overlay colors, icons, booleans, etc. Full compatibility with OEM ROMs cannot be guaranteed as new resources cannot be added"
+                                    )
 
-                            } else if (index == 1) {
-                                onBoarding(
-                                    image = R.drawable.magisk_logo,
-                                    text = "This app requires Root access in order to apply overlays"
-                                )
+                                }
+                                1 -> {
+                                    onBoarding(
+                                        image = R.drawable.magisk_logo,
+                                        text = "This app requires Root access in order to apply overlays"
+                                    )
 
-                            } else if (index == 2) {
-                                onBoarding(
-                                    image = R.drawable.dead_android,
-                                    text = "\n" + "If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled"
-                                )
+                                }
+                                2 -> {
+                                    onBoarding(
+                                        image = R.drawable.dead_android,
+                                        text = "\n" + "If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled"
+                                    )
 
-                            } else if (index == 3) {
-                                onBoarding(
-                                    image = R.drawable.telegram_logo,
-                                    text = "You can get support and request compatibility fixes in the Telegram group"
-                                )
+                                }
+                                3 -> {
+                                    onBoarding(
+                                        image = R.drawable.telegram_logo,
+                                        text = "You can get support and request compatibility fixes in the Telegram group"
+                                    )
 
+                                }
                             }
                         }
-                        val coroutineScope = rememberCoroutineScope()/* HorizontalPagerIndicator(
-                             pagerState = pagerState,
-                             pageCount = pageCount,
-                             activeColor = MaterialTheme.colors.textcol,
-                             inactiveColor = MaterialTheme.colors.textcol.copy(0.4f)
-                         )*/
-                        Row(Modifier.fillMaxHeight(1f),
-                            verticalAlignment = Alignment.CenterVertically
+                        val coroutineScope = rememberCoroutineScope()
+
+                         Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding( 32.dp),
+                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+
+                                        if (pagerState.currentPage == 0) {
+                                            sharedPreferences.edit()
+                                                .putBoolean("onBoardingCompleted", true).apply()
+                                            val intent =
+                                                Intent(this@MainActivity, MainActivity::class.java)
+                                            finish()
+                                            startActivity(intent)
+                                        } else {
+                                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                                        }
+                                    }
+                                }
+                            ) {
+                                when (pagerState.currentPage) {
+                                    0 -> {
+                                        androidx.compose.material3.Text(text = "Skip")
+
+                                    }
+
+                                    else -> {
+                                        androidx.compose.material3.Text(text = "Back")
+                                    }
+                                }
+                            }
+                           // Spacer(modifier = Modifier.fillMaxWidth())
                             Button(
                                 onClick = {
                                     coroutineScope.launch {
@@ -303,14 +333,18 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             ) {
-                                if (pagerState.currentPage == pageCount - 1) {
-                                    androidx.compose.material3.Text(text = "Get started")
+                                when (pagerState.currentPage) {
+                                    pageCount - 1 -> {
+                                        androidx.compose.material3.Text(text = "Get started")
 
-                                } else if (pagerState.currentPage == 1) {
-                                    androidx.compose.material3.Text(text = "Grant access")
+                                    }
+                                    1 -> {
+                                        androidx.compose.material3.Text(text = "Grant access")
 
-                                } else {
-                                    androidx.compose.material3.Text(text = "Next")
+                                    }
+                                    else -> {
+                                        androidx.compose.material3.Text(text = "Next")
+                                    }
                                 }
                             }
 

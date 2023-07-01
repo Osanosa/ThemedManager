@@ -7,6 +7,7 @@ package pro.themed.manager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -81,40 +82,37 @@ class AboutActivity : ComponentActivity() {
                         .align(alignment = CenterHorizontally)
                         .padding(12.dp)
                 ) {
-                    Image(
-                        contentDescription = null,
+                    Image(contentDescription = null,
                         painter = painterResource(id = R.drawable.main_logo),
-                        modifier = Modifier.combinedClickable(
-                            onClick = {},
+                        modifier = Modifier.combinedClickable(onClick = {},
                             onLongClick = { easteregg = !easteregg }),
                         contentScale = ContentScale.FillWidth
                     )
                 }
                 val context = LocalContext.current
                 val versionName = BuildConfig.VERSION_NAME
-                Text(text = stringResource(R.string.themed_project_by_osanosa))
+                Text(text = stringResource(R.string.about_description))
                 Text(
-                    text = stringResource(R.string.installed_manager_version_is, versionName),
+                    text = stringResource(R.string.app_version, versionName),
                     textAlign = TextAlign.Center
                 )
                 OutlinedButton(
                     onClick = {
 
+                        val path = Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS
+                        Toast.makeText(
+                            context, path, Toast.LENGTH_SHORT
+                        ).show()
 
-                        Shell.SU.run("rm /sdcard/Download/ThemedProject.zip")
+                        Shell.SU.run("rm $path/ThemedProject.zip ; sleep 1")
 
                         AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
                         Toast.makeText(
                             context, getString(R.string.installing), Toast.LENGTH_SHORT
                         ).show()
-
                         Shell.SU.run(
-                            "while [ ! -f \"/sdcard/download/ThemedProject.zip\" ]\n" +
-                                    "do\n" +
-                                    "  sleep 1\n" +
-                                    "done" +
-                                    "; magisk --install-module /sdcard/Download/ThemedProject.zip"
+                            """while [ ! -f "$path/ThemedProject.zip" ] do sleep 1 done; magisk --install-module $path/ThemedProject.zip"""
                         )
 
                         runOnUiThread {
@@ -147,7 +145,7 @@ class AboutActivity : ComponentActivity() {
                             contentScale = ContentScale.FillWidth
 
                         )
-                        Text(text = stringResource(R.string.thank_you_for_using_the_app_please_report_testing_it_is_very_important))
+                        Text(text = stringResource(R.string.feedback_thank_you))
                     }
                 }
 
