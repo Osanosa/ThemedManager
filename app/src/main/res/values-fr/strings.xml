@@ -67,4 +67,5 @@
     <string name="toolbox">Boîte à outils</string>
     <string name="uninstall_unused_overlays_header">Désinstaller les superpositions inutilisées (désactivées) Themed</string>
     <string name="uninstall_unused_overlays_subheader">Si vous avez choisi votre thème et que vous n\'avez pas l\'intention de le changer, vous pouvez désinstaller les superpositions inutilisées</string>
+
 </resources>

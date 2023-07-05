@@ -12,6 +12,7 @@ package pro.themed.manager.comps
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -71,10 +72,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.CardFace
-import pro.themed.manager.FlipCard
+import pro.themed.manager.AdmobBanner
+import pro.themed.manager.GlobalVariables
 import pro.themed.manager.R
-import pro.themed.manager.RotationAxis
 import pro.themed.manager.bordercol
 import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlay
@@ -87,10 +87,11 @@ import kotlin.math.roundToInt
 @Composable
 fun ColorTile(name: String, color: String, modifier: Modifier = Modifier) {
 
+    val context = LocalContext.current
 
     Surface(modifier = modifier,
         color = Color(color.toColorInt()),
-        onClick = { overlayEnable("$name.${color.removePrefix("#")}") }) {
+        onClick = { overlayEnable( "$name.${color.removePrefix("#")}") }) {
 
         if (getOverlayList().enabledOverlays.any { it.contains(name + "." + color.removePrefix("#")) }) {
 
@@ -263,7 +264,7 @@ fun FakeMonet(
 
                         if (!getOverlayList().unsupportedOverlays.contains("n2")) {
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.n2h${hue.toInt()}s${saturation.toInt()}")
+                                overlayEnable( "fakemonet.n2h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "N2")
                             }
@@ -271,7 +272,7 @@ fun FakeMonet(
                         }
 
                         Button(modifier = Modifier.weight(1f), onClick = {
-                            overlayEnable("fakemonet.a1h${hue.toInt()}s${saturation.toInt()}")
+                            overlayEnable( "fakemonet.a1h${hue.toInt()}s${saturation.toInt()}")
                         }) {
                             Text(text = "A1")
                         }
@@ -281,14 +282,14 @@ fun FakeMonet(
                             )
                         ) {
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.a2h${hue.toInt()}s${saturation.toInt()}")
+                                overlayEnable( "fakemonet.a2h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "A2")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Button(modifier = Modifier.weight(1f), onClick = {
-                                overlayEnable("fakemonet.a3h${hue.toInt()}s${saturation.toInt()}")
+                                overlayEnable( "fakemonet.a3h${hue.toInt()}s${saturation.toInt()}")
                             }) {
                                 Text(text = "A3")
                             }
@@ -1613,52 +1614,32 @@ fun ColorsTab() {
                 .verticalScroll(rememberScrollState())
                 .padding(8.dp)
         ) {
+            val context = LocalContext.current
+            AdmobBanner()
+Text(text = "${GlobalVariables.myBoolean}")
+            val sharedPreferences: SharedPreferences =
+                context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
 
-            var state by rememberSaveable { mutableStateOf(CardFace.Front) }
-            FlipCard(cardFace = state, onClick = {
-                state = it.next
-            }, axis = RotationAxis.AxisY, back = {
-                if (!getOverlayList().overlayList.any { it.contains("accents.dark") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp), text = ""
-                    )
-
-                } else {
-                    if (getOverlayList().unsupportedOverlays.any { it.contains("accents.dark") }) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp), text = ""
-                        )
+            AccentsNewTemp(
+                if (sharedPreferences.getBoolean("acccents_dark", false)) "accents.dark" else  "accents", stringResource(R.string.accents_card_header)
+            )
+            HeaderRow(
+                header = "Override dark theme for accents",
+                showSwitch = true,
+                isChecked = sharedPreferences.getBoolean("acccents_dark", false),
+                onCheckedChange = {
+                    if (it) {
+                        editor.putBoolean("acccents_dark", true)
+                        editor.apply()
                     } else {
-                        AccentsNewTemp(
-                            "accents.dark", stringResource(R.string.accents_dark)
-                        )
+                        editor.putBoolean("acccents_dark", false)
+                        editor.apply()
 
                     }
-                }
-
-
-            }, front = {
-
-                if (!getOverlayList().overlayList.any { it.contains("accents.F") }) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp), text = ""
-                    )
-
-                } else {
-                    if (getOverlayList().unsupportedOverlays.any { it.contains("accents.F") }) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp), text = ""
-                        )
-                    } else {
-                        AccentsNewTemp(
-                            "accents", stringResource(R.string.accents_card_header)
-                        )
-
-                    }
-                }
-
-            })
+                },
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -1666,20 +1647,20 @@ fun ColorsTab() {
             FakeMonet()
             Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
 
 
             if (getOverlay().contains("fabricate")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     FabricatedMonet()
-                    HeaderRow(header = "Disable Monet",
+                    HeaderRow(
+                        header = "Disable Monet",
                         subHeader = "Ye you need to enable this first, duh",
                         isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
                         onCheckedChange = {
                             if (it) {
                                 Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
                                 Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
-                                overlayEnable("misc.flagmonet")
+                                overlayEnable( "misc.flagmonet")
 
                             } else {
                                 Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
@@ -1687,7 +1668,9 @@ fun ColorsTab() {
                                 Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
 
                             }
-                        }, showSwitch = true)
+                        },
+                        showSwitch = true
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

@@ -13,14 +13,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -31,7 +27,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -39,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -47,6 +43,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
@@ -65,7 +64,26 @@ data class OverlayListData(
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
-
+@Composable
+fun AdmobBanner(modifier: Modifier = Modifier) {
+    AndroidView(
+        modifier = Modifier.fillMaxWidth(),
+        factory = { context ->
+            // on below line specifying ad view.
+            AdView(context).apply {
+                // on below line specifying ad size
+                //adSize = AdSize.BANNER
+                // on below line specifying ad unit id
+                // currently added a test ad unit id.
+                setAdSize(AdSize.LARGE_BANNER)
+                adUnitId = "ca-app-pub-5920419856758740/9976311451"
+                // calling load ad to load our ad.
+                loadAd(AdRequest.Builder().build())
+            }
+        }
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+}
 @Composable
 fun getOverlayList(): OverlayListData {
     val overlayList by remember { mutableStateOf(fetchOverlayList()) }
@@ -93,79 +111,9 @@ val Colors.cardcol: Color
 val Colors.textcol: Color
     get() = if (isLight) backgroundDark else backgroundLight
 
-enum class CardFace(val angle: Float) {
-    Front(0f) {
-        override val next: CardFace
-            get() = Back
-    },
-    Back(180f) {
-        override val next: CardFace
-            get() = Front
-    };
-
-    abstract val next: CardFace
-}
-
-enum class RotationAxis {
-    AxisX, AxisY,
-}
 
 
-@Stable
 
-@ExperimentalMaterialApi
-@Composable
-fun FlipCard(
-    cardFace: CardFace,
-    onClick: (CardFace) -> Unit,
-    modifier: Modifier = Modifier,
-    axis: RotationAxis = RotationAxis.AxisY,
-    back: @Composable () -> Unit = {},
-    front: @Composable () -> Unit = {},
-) {
-    val rotation = animateFloatAsState(
-        targetValue = cardFace.angle, animationSpec = tween(
-            durationMillis = 400,
-            easing = FastOutSlowInEasing,
-        ), label = ""
-    )
-    Card(
-        elevation = 0.dp,
-        onClick = { onClick(cardFace) },
-        modifier = modifier
-            .wrapContentSize()
-            .graphicsLayer {
-                if (axis == RotationAxis.AxisX) {
-                    rotationX = rotation.value
-                } else {
-                    rotationY = rotation.value
-                }
-                cameraDistance = 12f * density
-            },
-    ) {
-        if (rotation.value <= 90f) {
-            Box(
-                Modifier.wrapContentSize()
-            ) {
-                front()
-            }
-        } else {
-            Box(
-                Modifier
-                    .wrapContentSize()
-                    .graphicsLayer {
-                        if (axis == RotationAxis.AxisX) {
-                            rotationX = 180f
-                        } else {
-                            rotationY = 180f
-                        }
-                    },
-            ) {
-                back()
-            }
-        }
-    }
-}
 
 object SharedPreferencesManager {
     private lateinit var sharedPreferences: SharedPreferences
@@ -179,19 +127,34 @@ object SharedPreferencesManager {
     }
 }
 
+object GlobalVariables {
+    var myBoolean by mutableStateOf(false)
+}
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        loadInterstitial(this)
 
         setContent {
 
             ThemedManagerTheme {
 
+
+
+
+
+
                 SharedPreferencesManager.initialize(applicationContext)
                 val context = LocalContext.current
+                if (GlobalVariables.myBoolean) {
+                    showInterstitial(context) {
 
+                    }
+                    GlobalVariables.myBoolean = false
+
+                }
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
                 val onBoardingCompleted: Boolean =
                     sharedPreferences.getBoolean("onBoardingCompleted", false)
@@ -201,7 +164,7 @@ class MainActivity : ComponentActivity() {
 
 
                     val root by rememberSaveable {
-                        mutableStateOf(SH.run("su -c whoami").stdout())
+                        mutableStateOf(SU.run(" whoami").stdout())
                     }
 
                     if ("root" !in root) {
@@ -221,133 +184,159 @@ class MainActivity : ComponentActivity() {
                 } else {
                     splashScreen.setKeepOnScreenCondition { false }
 
-                    Box(
-                        Modifier.fillMaxSize(),
-                       contentAlignment = Alignment.Center
-//                        verticalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        val pageCount = 4
-                        val pagerState = rememberPagerState {
-                            pageCount
-                        }
-                        HorizontalPager(
-                            state = pagerState,
-                            Modifier.fillMaxHeight(0.8f),
-                            userScrollEnabled = false
-                        ) {
+                    OnBoardingPage(sharedPreferences, context)
+                }
 
-                                index ->
+            }
+        }
+    }
 
-                            when (index) {
-                                0 -> {
-                                    onBoarding(
-                                        image = R.drawable.main_logo_circle_mask00000,
-                                        text = "This app uses RROs (resource runtime overlays) to overlay colors, icons, booleans, etc. Full compatibility with OEM ROMs cannot be guaranteed as new resources cannot be added"
-                                    )
+    @Composable
+    @OptIn(ExperimentalFoundationApi::class)
+    private fun OnBoardingPage(
+        sharedPreferences: SharedPreferences,
+        context: Context
+    ) {
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+    //                        verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            val pageCount = 5
+            val pagerState = rememberPagerState {
+                pageCount
+            }
+            HorizontalPager(
+                state = pagerState,
+                Modifier.fillMaxHeight(0.8f),
+                userScrollEnabled = false
+            ) {
 
-                                }
-                                1 -> {
-                                    onBoarding(
-                                        image = R.drawable.magisk_logo,
-                                        text = "This app requires Root access in order to apply overlays"
-                                    )
+                    index ->
 
-                                }
-                                2 -> {
-                                    onBoarding(
-                                        image = R.drawable.dead_android,
-                                        text = "\n" + "If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled"
-                                    )
+                when (index) {
+                    0 -> {
+                        OnBoarding(
+                            image = R.drawable.main_logo_circle_mask00000,
+                            text = stringResource(R.string.onboarding0)
+                        )
 
-                                }
-                                3 -> {
-                                    onBoarding(
-                                        image = R.drawable.telegram_logo,
-                                        text = "You can get support and request compatibility fixes in the Telegram group"
-                                    )
+                    }
 
-                                }
+                    1 -> {
+                        OnBoarding(
+                            image = R.drawable.magisk_logo,
+                            text = stringResource(R.string.onboarding1)
+                        )
+
+                    }
+
+                    2 -> {
+                        OnBoarding(
+                            image = R.drawable.dead_android,
+                            text = stringResource(R.string.onboarding2)
+                        )
+
+                    }
+
+                    3 -> {
+                        OnBoarding(
+                            image = R.drawable.telegram_logo,
+                            text = stringResource(R.string.onboarding3)
+                        )
+
+                    }
+                    4 -> {
+                        OnBoarding(
+                            image = R.drawable.localazy_logo,
+                            text = stringResource(R.string.onboarding4)
+                        )
+
+                    }
+                }
+            }
+            val coroutineScope = rememberCoroutineScope()
+
+            Row(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+
+                            if (pagerState.currentPage == 0) {
+                                sharedPreferences.edit()
+                                    .putBoolean("onBoardingCompleted", true).apply()
+                                val intent =
+                                    Intent(this@MainActivity, MainActivity::class.java)
+                                finish()
+                                startActivity(intent)
+                            } else {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
                             }
                         }
-                        val coroutineScope = rememberCoroutineScope()
+                    }
+                ) {
+                    when (pagerState.currentPage) {
+                        0 -> {
+                            androidx.compose.material3.Text(text = "Skip")
 
-                         Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding( 32.dp),
-                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                        }
 
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
+                        else -> {
+                            androidx.compose.material3.Text(text = "Back")
+                        }
+                    }
+                }
+                // Spacer(modifier = Modifier.fillMaxWidth())
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage == 1) {
 
-                                        if (pagerState.currentPage == 0) {
-                                            sharedPreferences.edit()
-                                                .putBoolean("onBoardingCompleted", true).apply()
-                                            val intent =
-                                                Intent(this@MainActivity, MainActivity::class.java)
-                                            finish()
-                                            startActivity(intent)
-                                        } else {
-                                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                                        }
-                                    }
+                                val root = SH.run("su -c whoami").stdout()
+
+
+                                if ("root" !in root) {
+                                    Toast.makeText(
+                                        context,
+                                        getString(R.string.no_root_access),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                            ) {
-                                when (pagerState.currentPage) {
-                                    0 -> {
-                                        androidx.compose.material3.Text(text = "Skip")
 
-                                    }
-
-                                    else -> {
-                                        androidx.compose.material3.Text(text = "Back")
-                                    }
-                                }
                             }
-                           // Spacer(modifier = Modifier.fillMaxWidth())
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        if (pagerState.currentPage == 1) {
-
-                                            val root = SH.run("su -c whoami").stdout()
-
-
-                                            if ("root" !in root) {
-                                                Toast.makeText(
-                                                    context,
-                                                    getString(R.string.no_root_access),
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-
-                                        }
-                                        if (pagerState.currentPage == pageCount - 1) {
-                                            sharedPreferences.edit()
-                                                .putBoolean("onBoardingCompleted", true).apply()
-                                            val intent =
-                                                Intent(this@MainActivity, MainActivity::class.java)
-                                            finish()
-                                            startActivity(intent)
-                                        }
-                                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                    }
-                                }
-                            ) {
-                                when (pagerState.currentPage) {
-                                    pageCount - 1 -> {
-                                        androidx.compose.material3.Text(text = "Get started")
-
-                                    }
-                                    1 -> {
-                                        androidx.compose.material3.Text(text = "Grant access")
-
-                                    }
-                                    else -> {
-                                        androidx.compose.material3.Text(text = "Next")
-                                    }
-                                }
+                            if (pagerState.currentPage == pageCount - 1) {
+                                sharedPreferences.edit()
+                                    .putBoolean("onBoardingCompleted", true).apply()
+                                val intent =
+                                    Intent(this@MainActivity, MainActivity::class.java)
+                                finish()
+                                startActivity(intent)
                             }
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    }
+                ) {
+                    when (pagerState.currentPage) {
+                        pageCount - 1 -> {
+                            androidx.compose.material3.Text(text = "Get started")
 
+                        }
+
+                        1 -> {
+                            androidx.compose.material3.Text(text = "Grant access")
+
+                        }
+
+                        else -> {
+                            androidx.compose.material3.Text(text = "Next")
                         }
                     }
                 }
@@ -355,10 +344,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onDestroy() {
+        removeInterstitial()
+        super.onDestroy()
+    }
 }
 
 @Composable
-fun onBoarding(image: Int, text: String) {
+fun OnBoarding(image: Int, text: String) {
 
 
     Column(
@@ -404,13 +398,13 @@ fun getOverlay(): String {
 fun Main() {
     Column {
 
-
         val navController = rememberNavController()
 
         Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
             topBar = { TopAppBar() },
             bottomBar = { BottomNavigationBar(navController) }) {
             Box {
+
                 PaddingValues(bottom = 200.dp)
                 Navigation(navController)
             }
@@ -491,25 +485,6 @@ fun Navigation(navController: NavHostController) {
 
 }
 
-//@Preview
-@Composable
-fun InfoCard() {
-    Card(
-        border = BorderStroke(
-            width = 1.dp, color = MaterialTheme.colors.bordercol
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(8.dp),
-        elevation = (0.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
-    ) {
-        Text(
-            modifier = Modifier.padding(16.dp), text = "", fontSize = 14.sp
-        )
-    }
-}
 
 
 //@Preview()
@@ -571,6 +546,7 @@ fun overlayEnable(overlayname: String) {
     }
 
 
+    GlobalVariables.myBoolean = true
 }
 
 

@@ -4,10 +4,13 @@
 
 package pro.themed.manager
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -65,6 +68,7 @@ class AboutActivity : ComponentActivity() {
     }
 
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Preview
     @Composable
     fun AboutPage() {
@@ -96,30 +100,44 @@ class AboutActivity : ComponentActivity() {
                     text = stringResource(R.string.app_version, versionName),
                     textAlign = TextAlign.Center
                 )
+                var path =
+                    Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS + "/ThemedProject.zip"
+
+
+                fun showBigTextMessage(context: Context, message: String) {
+                    val dialog = AlertDialog.Builder(context)
+                        .setMessage(message)
+                        .setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .create()
+
+                    dialog.setOnShowListener {
+                        val textView = dialog.findViewById<TextView>(android.R.id.message)
+                        textView?.setTextIsSelectable(true)
+                    }
+
+                    dialog.show()
+                }
                 OutlinedButton(
                     onClick = {
 
-                        val path = Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS
                         Toast.makeText(
-                            context, path, Toast.LENGTH_SHORT
+                            context, getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
                         ).show()
 
-                        Shell.SU.run("rm $path/ThemedProject.zip ; sleep 1")
+                        Shell.SU.run("rm $path")
 
                         AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
                         Toast.makeText(
                             context, getString(R.string.installing), Toast.LENGTH_SHORT
                         ).show()
-                        Shell.SU.run(
-                            """while [ ! -f "$path/ThemedProject.zip" ] do sleep 1 done; magisk --install-module $path/ThemedProject.zip"""
+                        val test = Shell.SU.run(
+                            """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
                         )
 
-                        runOnUiThread {
-                            Toast.makeText(
-                                context, getString(R.string.done), Toast.LENGTH_SHORT
-                            ).show()
-                        }
+
 
 
                     },

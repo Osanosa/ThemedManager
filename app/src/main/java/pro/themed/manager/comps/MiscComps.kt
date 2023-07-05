@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.launch
+import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
 import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlayList
@@ -134,7 +135,7 @@ fun Slideritem(
                                 Toast
                                     .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
                                     .show()
-                                overlayEnable("$overlayName$intvalue")
+                                overlayEnable( "$overlayName$intvalue")
 
                             },
                         painter = painterResource(R.drawable.remove_48px),
@@ -150,7 +151,7 @@ fun Slideritem(
                         valueRange = minSliderValue..maxSliderValue,
                         onValueChangeFinished = {
                             Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
-                            overlayEnable("$overlayName$intvalue")
+                            overlayEnable( "$overlayName$intvalue")
                         },
                         steps = sliderSteps,
                         thumb = {
@@ -235,11 +236,12 @@ fun HeaderRow(
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.subtitle1
                         )
-                        Text(
-                            text = subHeader,
-                            style = MaterialTheme.typography.body1,
-                        )
-
+                       if (subHeader.isNotEmpty()) {
+                           Text(
+                               text = subHeader,
+                               style = MaterialTheme.typography.body1,
+                           )
+                       }
                     }
 
                     Switch(
@@ -343,6 +345,7 @@ fun MiscTab() {
         color = MaterialTheme.colors.cardcol
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AdmobBanner()
 
             Row(Modifier.padding(8.dp)) {
                 Icon(Icons.Default.Info, contentDescription = "")

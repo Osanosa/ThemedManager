@@ -67,4 +67,9 @@
     <string name="toolbox">Набор инструментов</string>
     <string name="uninstall_unused_overlays_header">Удалить неиспользуемые (отключенные) оверлеи Themed</string>
     <string name="uninstall_unused_overlays_subheader">Если вы выбрали свою тему и не планируете ее менять, вы можете удалить неиспользуемые оверлеи</string>
+    <string name="onboarding0">Это приложение использует оверлеи для изменения цветов, иконок, прочего. Полная совместимость с сторонними оболочками требует доработок.</string>
+    <string name="onboarding1">Приложению нужен рут доступ для применения тем.</string>
+    <string name="onboarding2">Если система в бутлупе после применения оверлея нажмите громкость+ во время бутанимации для отключения оверлеев Themed</string>
+    <string name="onboarding3">Вы пожете получить поддержку и запросить исправления для вашей прошивки в группе в телеграме</string>
+    <string name="onboarding4">Вы можете вставить свои 5 копеек если перевод недостаточно хорош для вас на Localazy</string>
 </resources>

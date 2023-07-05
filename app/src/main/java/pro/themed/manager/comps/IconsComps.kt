@@ -3,9 +3,9 @@
     ExperimentalPagerApi::class,
     ExperimentalPagerApi::class,
     ExperimentalPagerApi::class,
-    ExperimentalPagerApi::class
-)
-@file:Suppress("DEPRECATION")
+    ExperimentalPagerApi::class,
+    ExperimentalLayoutApi::class
+) @file:Suppress("DEPRECATION")
 
 package pro.themed.manager.comps
 
@@ -16,6 +16,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,10 +59,11 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.InfoCard
+import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
 import pro.themed.manager.bordercol
 import pro.themed.manager.cardcol
+import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import kotlin.math.absoluteValue
 
@@ -72,11 +76,11 @@ fun IconsTab() {
         color = MaterialTheme.colors.cardcol
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AdmobBanner()
 
             QSTileCard()
             NavbarCard()
             IconPackCard()
-            InfoCard()
 
         }
     }
@@ -84,15 +88,13 @@ fun IconsTab() {
 }
 
 
-@Composable
-fun QsPanel() {
 
-}
 
 @OptIn(ExperimentalPagerApi::class)
 @Preview
 @Composable
 fun QSTileCard() {
+    val context = LocalContext.current
 
     var qspanelstyle by remember { mutableStateOf("default") }
     var qstilestyle by remember { mutableStateOf("default") }
@@ -100,23 +102,26 @@ fun QSTileCard() {
 
     @Composable
     fun MyIconButton(overlayname: String, sizedp: Int, contentdescription: String, iconname: Int) {
-        IconButton(
-            onClick = {
-                qstilestyle = overlayname
-                overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
-            }, modifier = Modifier
-                .size(sizedp.dp)
-                .background(color = MaterialTheme.colors.cardcol)
-        ) {
-            Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                painter = painterResource(iconname),
-                contentDescription = contentdescription,
-            )
-        }
 
+        if (getOverlayList().overlayList.any { it.contains(overlayname) }) {
+            IconButton(
+                onClick = {
+                    qstilestyle = overlayname
+                    overlayEnable( "qspanel.$qspanelstyle.$qstilestyle")
+                },
+                modifier = Modifier
+                    .size(sizedp.dp)
+                    .background(color = MaterialTheme.colors.cardcol)
+            ) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    painter = painterResource(iconname),
+                    contentDescription = contentdescription,
+                )
+            }
+        }
     }
 
 
@@ -165,64 +170,61 @@ fun QSTileCard() {
                 modifier = Modifier.fillMaxWidth()
             ) { index ->
                 if (index == 0) {
-                    Card(
-                        Modifier
-                            .graphicsLayer {
-                                val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
+                    Card(Modifier
+                        .graphicsLayer {
+                            val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
 
-                                lerp(
-                                    start = 0.85f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                ).also { scale ->
-                                    scaleX = scale
-                                    scaleY = scale
-                                }
-
-                                alpha = lerp(
-                                    start = 0.5f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                )
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
                             }
-                            .fillMaxWidth()
-                            .clickable {
-                                qspanelstyle = "default"
-                            }, elevation = 2.dp
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            )
+                        }
+                        .fillMaxWidth()
+                        .clickable {
+                            qspanelstyle = "default"
+                        }, elevation = 2.dp
                     ) {
                         Text(text = "default", Modifier.padding(24.dp))
                     }
                 } else if (index == 1) {
-                    Card(
-                        Modifier
-                            .graphicsLayer {
-                                // Calculate the absolute offset for the current page from the
-                                // scroll position. We use the absolute value which allows us to mirror
-                                // any effects for both directions
-                                val pageOffset =
-                                    calculateCurrentOffsetForPage(page = 1).absoluteValue
+                    Card(Modifier
+                        .graphicsLayer {
+                            // Calculate the absolute offset for the current page from the
+                            // scroll position. We use the absolute value which allows us to mirror
+                            // any effects for both directions
+                            val pageOffset = calculateCurrentOffsetForPage(page = 1).absoluteValue
 
-                                // We animate the scaleX + scaleY, between 85% and 100%
-                                lerp(
-                                    start = 0.85f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                ).also { scale ->
-                                    scaleX = scale
-                                    scaleY = scale
-                                }
-
-                                // We animate the alpha, between 50% and 100%
-                                alpha = lerp(
-                                    start = 0.5f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                )
+                            // We animate the scaleX + scaleY, between 85% and 100%
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
                             }
-                            .fillMaxWidth()
-                            .clickable {
-                                qspanelstyle = "clear"
-                            }, elevation = 2.dp
+
+                            // We animate the alpha, between 50% and 100%
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            )
+                        }
+                        .fillMaxWidth()
+                        .clickable {
+                            qspanelstyle = "clear"
+                        }, elevation = 2.dp
                     ) {
                         Text(text = "clear", Modifier.padding(24.dp))
                     }
@@ -243,7 +245,7 @@ fun QSTileCard() {
 
             Surface {
                 Column {
-                    Row {
+                    FlowRow {
                         MyIconButton(
                             overlayname = "dualtonecircle",
                             sizedp = testdp,
@@ -281,9 +283,6 @@ fun QSTileCard() {
                             contentdescription = "Default",
                             iconname = R.drawable.qsdefault
                         )
-
-                    }
-                    Row {
                         MyIconButton(
                             overlayname = "dividedcircle",
                             sizedp = testdp,
@@ -320,10 +319,6 @@ fun QSTileCard() {
                             contentdescription = "Just Icons",
                             iconname = R.drawable.qsjusticons
                         )
-
-
-                    }
-                    Row {
                         MyIconButton(
                             overlayname = "mountain",
                             sizedp = testdp,
@@ -360,9 +355,6 @@ fun QSTileCard() {
                             contentdescription = "Pokesign",
                             iconname = R.drawable.qspokesign
                         )
-
-                    }
-                    Row {
                         MyIconButton(
                             overlayname = "squaremedo",
                             sizedp = testdp,
@@ -400,8 +392,8 @@ fun QSTileCard() {
                             iconname = R.drawable.qswavey
                         )
 
-
                     }
+
                 }
             }
 
@@ -452,214 +444,71 @@ fun NavbarCard() {
             AnimatedVisibility(expanded) {
                 Surface {
                     Column {
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.android")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_android_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_android_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_android_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.asus")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_asus_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_asus_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_asus_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.dora")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_dora_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_dora_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_dora_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_android_back,
+                            home = R.drawable.navbar_android_home,
+                            R.drawable.navbar_android_recent,
+                            "android"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_asus_back,
+                            home = R.drawable.navbar_asus_home,
+                            R.drawable.navbar_asus_recent,
+                            "asus"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_dora_back,
+                            home = R.drawable.navbar_dora_home,
+                            R.drawable.navbar_dora_recent,
+                            "dora"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_moto_back,
+                            home = R.drawable.navbar_moto_home,
+                            R.drawable.navbar_moto_recent,
+                            "moto"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_nexus_back,
+                            home = R.drawable.navbar_nexus_home,
+                            R.drawable.navbar_nexus_recent,
+                            "nexus"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_old_back,
+                            home = R.drawable.navbar_old_home,
+                            R.drawable.navbar_old_recent,
+                            "old"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_oneplus_back,
+                            home = R.drawable.navbar_oneplus_home,
+                            R.drawable.navbar_oneplus_recent,
+                            "oneplus"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_sammy_back,
+                            home = R.drawable.navbar_sammy_home,
+                            R.drawable.navbar_sammy_recent,
+                            "sammy"
+                        )
+                        Navbar(
+                            testdp,
+                            back = R.drawable.navbar_tecnocamon_back,
+                            home = R.drawable.navbar_tecnocamon_home,
+                            R.drawable.navbar_tecnocamon_recent,
+                            "tecno"
+                        )
 
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.moto")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_moto_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_moto_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_moto_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.nexus")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_nexus_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_nexus_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_nexus_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.old")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_old_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_old_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_old_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.oneplus")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_oneplus_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_oneplus_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_oneplus_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.sammy")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_sammy_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_sammy_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_sammy_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colors.cardcol,
-                            onClick = {
-                                overlayEnable("navbar.tecno")
-                            }) {
-                            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_tecnocamon_back),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_tecnocamon_home),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    painter = painterResource(R.drawable.navbar_tecnocamon_recent),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
+
                     }
                 }
             }
@@ -667,9 +516,33 @@ fun NavbarCard() {
     }
 }
 
+@Composable
+private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String) {
+    val context = LocalContext.current
+
+    if (getOverlayList().overlayList.any { it.contains(name) }) {
+        Row(Modifier.clickable {
+            overlayEnable( "navbar.$name")
+        }.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Image(
+                painter = painterResource(back), contentDescription = null, Modifier.size(testdp.dp)
+            )
+            Image(
+                painter = painterResource(home), contentDescription = null, Modifier.size(testdp.dp)
+            )
+            Image(
+                painter = painterResource(recent),
+                contentDescription = null,
+                Modifier.size(testdp.dp)
+            )
+        }
+    }
+}
+
 //@Preview
 @Composable
 fun IconPackCard() {
+    val context = LocalContext.current
 
     Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
@@ -715,8 +588,8 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.acherus.android")
-                            overlayEnable("iconpack.acherus.systemui")
+                            overlayEnable( "iconpack.acherus.android")
+                            overlayEnable( "iconpack.acherus.systemui")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -760,11 +633,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.circular.android")
-                            overlayEnable("iconpack.circular.launcher")
-                            overlayEnable("iconpack.circular.settings")
-                            overlayEnable("iconpack.circular.systemui")
-                            overlayEnable("iconpack.circular.themepicker")
+                            overlayEnable( "iconpack.circular.android")
+                            overlayEnable( "iconpack.circular.launcher")
+                            overlayEnable( "iconpack.circular.settings")
+                            overlayEnable( "iconpack.circular.systemui")
+                            overlayEnable( "iconpack.circular.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -808,11 +681,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.filled.android")
-                            overlayEnable("iconpack.filled.launcher")
-                            overlayEnable("iconpack.filled.settings")
-                            overlayEnable("iconpack.filled.systemui")
-                            overlayEnable("iconpack.filled.themepicker")
+                            overlayEnable( "iconpack.filled.android")
+                            overlayEnable( "iconpack.filled.launcher")
+                            overlayEnable( "iconpack.filled.settings")
+                            overlayEnable( "iconpack.filled.systemui")
+                            overlayEnable( "iconpack.filled.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -855,11 +728,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.kai.android")
-                            overlayEnable("iconpack.kai.launcher")
-                            overlayEnable("iconpack.kai.settings")
-                            overlayEnable("iconpack.kai.systemui")
-                            overlayEnable("iconpack.kai.themepicker")
+                            overlayEnable( "iconpack.kai.android")
+                            overlayEnable( "iconpack.kai.launcher")
+                            overlayEnable( "iconpack.kai.settings")
+                            overlayEnable( "iconpack.kai.systemui")
+                            overlayEnable( "iconpack.kai.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -902,11 +775,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.outline.android")
-                            overlayEnable("iconpack.outline.launcher")
-                            overlayEnable("iconpack.outline.settings")
-                            overlayEnable("iconpack.outline.systemui")
-                            overlayEnable("iconpack.outline.themepicker")
+                            overlayEnable( "iconpack.outline.android")
+                            overlayEnable( "iconpack.outline.launcher")
+                            overlayEnable( "iconpack.outline.settings")
+                            overlayEnable( "iconpack.outline.systemui")
+                            overlayEnable( "iconpack.outline.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -949,11 +822,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.oos.android")
-                            overlayEnable("iconpack.oos.launcher")
-                            overlayEnable("iconpack.oos.settings")
-                            overlayEnable("iconpack.oos.systemui")
-                            overlayEnable("iconpack.oos.themepicker")
+                            overlayEnable( "iconpack.oos.android")
+                            overlayEnable( "iconpack.oos.launcher")
+                            overlayEnable( "iconpack.oos.settings")
+                            overlayEnable( "iconpack.oos.systemui")
+                            overlayEnable( "iconpack.oos.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -996,11 +869,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.pui.android")
-                            overlayEnable("iconpack.pui.launcher")
-                            overlayEnable("iconpack.pui.settings")
-                            overlayEnable("iconpack.pui.systemui")
-                            overlayEnable("iconpack.pui.themepicker")
+                            overlayEnable( "iconpack.pui.android")
+                            overlayEnable( "iconpack.pui.launcher")
+                            overlayEnable( "iconpack.pui.settings")
+                            overlayEnable( "iconpack.pui.systemui")
+                            overlayEnable( "iconpack.pui.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -1045,11 +918,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.rounded.android")
-                            overlayEnable("iconpack.rounded.launcher")
-                            overlayEnable("iconpack.rounded.settings")
-                            overlayEnable("iconpack.rounded.systemui")
-                            overlayEnable("iconpack.rounded.themepicker")
+                            overlayEnable( "iconpack.rounded.android")
+                            overlayEnable( "iconpack.rounded.launcher")
+                            overlayEnable( "iconpack.rounded.settings")
+                            overlayEnable( "iconpack.rounded.systemui")
+                            overlayEnable( "iconpack.rounded.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -1094,11 +967,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.sam.android")
-                            overlayEnable("iconpack.sam.launcher")
-                            overlayEnable("iconpack.sam.settings")
-                            overlayEnable("iconpack.sam.systemui")
-                            overlayEnable("iconpack.sam.themepicker")
+                            overlayEnable( "iconpack.sam.android")
+                            overlayEnable( "iconpack.sam.launcher")
+                            overlayEnable( "iconpack.sam.settings")
+                            overlayEnable( "iconpack.sam.systemui")
+                            overlayEnable( "iconpack.sam.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -1141,11 +1014,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable("iconpack.victor.android")
-                            overlayEnable("iconpack.victor.launcher")
-                            overlayEnable("iconpack.victor.settings")
-                            overlayEnable("iconpack.victor.systemui")
-                            overlayEnable("iconpack.victor.themepicker")
+                            overlayEnable( "iconpack.victor.android")
+                            overlayEnable( "iconpack.victor.launcher")
+                            overlayEnable( "iconpack.victor.settings")
+                            overlayEnable( "iconpack.victor.systemui")
+                            overlayEnable( "iconpack.victor.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
