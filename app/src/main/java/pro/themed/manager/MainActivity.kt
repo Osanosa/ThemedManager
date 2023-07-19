@@ -26,7 +26,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -64,6 +63,7 @@ data class OverlayListData(
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
+
 @Composable
 fun AdmobBanner(modifier: Modifier = Modifier) {
     AndroidView(
@@ -84,6 +84,7 @@ fun AdmobBanner(modifier: Modifier = Modifier) {
     )
     Spacer(modifier = Modifier.height(8.dp))
 }
+
 @Composable
 fun getOverlayList(): OverlayListData {
     val overlayList by remember { mutableStateOf(fetchOverlayList()) }
@@ -92,6 +93,7 @@ fun getOverlayList(): OverlayListData {
 }
 
 private fun fetchOverlayList(): OverlayListData {
+
     val result = SU.run("cmd overlay list").stdout()
     val overlayList = result.lines().filter { it.contains("themed") }.sorted()
 
@@ -101,16 +103,6 @@ private fun fetchOverlayList(): OverlayListData {
 
     return OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
 }
-
-
-@get:Composable
-val Colors.bordercol: Color
-    get() = if (isLight) borderLight else borderDark
-val Colors.cardcol: Color
-    get() = if (isLight) backgroundLight else backgroundDark
-val Colors.textcol: Color
-    get() = if (isLight) backgroundDark else backgroundLight
-
 
 
 
@@ -127,9 +119,6 @@ object SharedPreferencesManager {
     }
 }
 
-object GlobalVariables {
-    var myBoolean by mutableStateOf(false)
-}
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,17 +131,12 @@ class MainActivity : ComponentActivity() {
             ThemedManagerTheme {
 
 
-
-
-
-
                 SharedPreferencesManager.initialize(applicationContext)
                 val context = LocalContext.current
                 if (GlobalVariables.myBoolean) {
-                    showInterstitial(context) {
-
-                    }
+                    showInterstitial(context, onAdDismissed = { finish() })
                     GlobalVariables.myBoolean = false
+                    removeInterstitial()
 
                 }
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
@@ -200,7 +184,7 @@ class MainActivity : ComponentActivity() {
         Box(
             Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
-    //                        verticalArrangement = Arrangement.SpaceBetween,
+            //                        verticalArrangement = Arrangement.SpaceBetween,
         ) {
             val pageCount = 5
             val pagerState = rememberPagerState {
@@ -246,6 +230,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                     }
+
                     4 -> {
                         OnBoarding(
                             image = R.drawable.localazy_logo,
@@ -359,7 +344,7 @@ fun OnBoarding(image: Int, text: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
 
-    ) {
+        ) {
         Image(
             painter = painterResource(id = image),
             contentDescription = null,
@@ -484,7 +469,6 @@ fun Navigation(navController: NavHostController) {
     }
 
 }
-
 
 
 //@Preview()

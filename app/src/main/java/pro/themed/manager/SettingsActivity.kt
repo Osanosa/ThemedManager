@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.comps.HeaderRow
 import pro.themed.manager.ui.theme.ThemedManagerTheme
+import pro.themed.manager.ui.theme.cardcol
 
 class SettingsActivity : ComponentActivity() {
 

@@ -1,5 +1,7 @@
 package pro.themed.manager.ui.theme
 
+import androidx.compose.material.Colors
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 
@@ -15,3 +17,10 @@ val borderDark = Color(0xFF2C2E33)
 val uibgAmoled = Color(0xFF000000)
 val uibgCharcoal = Color(0xFF151618)
 
+@get:Composable
+val Colors.bordercol: Color
+    get() = if (isLight) borderLight else borderDark
+val Colors.cardcol: Color
+    get() = if (isLight) backgroundLight else backgroundDark
+val Colors.textcol: Color
+    get() = if (isLight) backgroundDark else backgroundLight

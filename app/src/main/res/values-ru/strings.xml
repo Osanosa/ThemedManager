@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="title_activity_about">О приложении</string>
     <string name="title_activity_debug">Отладка</string>
@@ -18,7 +17,7 @@
     <string name="app_version">Установленная версия менеджера: %1$s</string>
     <string name="installing">Установка модуля</string>
     <string name="done">Готово</string>
-    <string name="download_latest_module">Загрузить новейшую версию</string>
+    <string name="install_latest_module">Установить последнюю версию</string>
     <string name="feedback_thank_you">Спасибо за использование приложения. Пожалуйста, сообщайте об ошибках, это очень важно!</string>
     <string name="about">О приложении</string>
     <string name="collect_logs">Собрать логи</string>
@@ -35,7 +34,6 @@
     <string name="all">Все</string>
     <string name="process_started_now_wait">Процесс начат, ожидайте</string>
     <string name="stock">Системные</string>
-    <string name="themed">Themed</string>
     <string name="restart_systemui">Перезапустить SystemUI</string>
     <string name="systemui_restart_header">Перезапустить SystemUI, если ваша прошивка не обновляет его автоматически</string>
     <string name="restart_now">Перезапустить сейчас</string>
@@ -72,4 +70,5 @@
     <string name="onboarding2">Если система в бутлупе после применения оверлея нажмите громкость+ во время бутанимации для отключения оверлеев Themed</string>
     <string name="onboarding3">Вы пожете получить поддержку и запросить исправления для вашей прошивки в группе в телеграме</string>
     <string name="onboarding4">Вы можете вставить свои 5 копеек если перевод недостаточно хорош для вас на Localazy</string>
+    <string name="FakeMonetUpdate">↑ Нажмите на плитку сверху что бы изменить один цвет из палитры или на кнопку что бы применить ко всей палитре. Когда вы выберете цвета нажмите ↓ кнопку что бы собрать и обновить оверлей.</string>
 </resources>

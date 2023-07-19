@@ -46,7 +46,6 @@ fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
             }
         }
         mInterstitialAd?.show(activity)
-        GlobalVariables.myBoolean = false
 
     }
 }

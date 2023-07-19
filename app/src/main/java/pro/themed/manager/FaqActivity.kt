@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import pro.themed.manager.ui.theme.ThemedManagerTheme
+import pro.themed.manager.ui.theme.cardcol
 
 class FaqActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

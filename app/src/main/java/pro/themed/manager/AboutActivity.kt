@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
+import pro.themed.manager.ui.theme.cardcol
 
 class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -148,7 +149,7 @@ class AboutActivity : ComponentActivity() {
                     )
                 ) {
                     Row {
-                        Text(text = stringResource(R.string.download_latest_module))
+                        Text(text = stringResource(R.string.install_latest_module))
                     }
                 }
 

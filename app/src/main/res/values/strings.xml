@@ -18,7 +18,7 @@
     <string name="app_version">Installed manager version is %1$s</string>
     <string name="installing">Installing module</string>
     <string name="done">Done</string>
-    <string name="download_latest_module">Download latest module</string>
+    <string name="install_latest_module">Install latest module</string>
     <string name="feedback_thank_you">Thank you for using the app. Please report testing, it is very important!</string>
     <string name="about">About</string>
     <string name="collect_logs">Collect logs</string>
@@ -72,4 +72,5 @@
     <string name="onboarding2">If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled</string>
     <string name="onboarding3">You can get support and request compatibility fixes in the Telegram group</string>
     <string name="onboarding4">You\'re free to contribute on Localazy if translations aren\'t up to your standarts</string>
+    <string name="FakeMonetUpdate">↑ Click color tile to change one color from palette or button to change whole palette.  Once you pick your colors click ↓ button to build and update overlay.</string>
 </resources>

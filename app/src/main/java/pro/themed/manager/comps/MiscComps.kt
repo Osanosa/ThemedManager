@@ -49,9 +49,9 @@ import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.launch
 import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
-import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
+import pro.themed.manager.ui.theme.cardcol
 import kotlin.math.roundToInt
 
 @ExperimentalMaterial3Api

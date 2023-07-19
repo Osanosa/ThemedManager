@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import pro.themed.manager.cardcol
+import pro.themed.manager.ui.theme.cardcol
 
 @Preview
 @Composable

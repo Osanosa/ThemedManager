@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Налаштування</string>
     <string name="title_activity_about">Про Додаток</string>
     <string name="title_activity_debug">Налагодження</string>
@@ -18,7 +17,7 @@
     <string name="app_version">Встановлена версія Менеджера: %1$s</string>
     <string name="installing">Встановлення модуля</string>
     <string name="done">Готово</string>
-    <string name="download_latest_module">Завантажити останню версію</string>
+    <string name="install_latest_module">Встановити останню версію</string>
     <string name="feedback_thank_you">Дякуємо за використання додатку. Будь ласка, повідомляйте про помилки, це дуже важливо!</string>
     <string name="about">Про Додаток</string>
     <string name="collect_logs">Зібрати журнали</string>
@@ -35,7 +34,6 @@
     <string name="all">Всі</string>
     <string name="process_started_now_wait">Процес розпочато, зачекайте</string>
     <string name="stock">Системні</string>
-    <string name="themed">Themed</string>
     <string name="restart_systemui">Перезапустити SystemUI</string>
     <string name="systemui_restart_header">Перезапустити SystemUI, якщо ваша прошивка не оновлює його автоматично</string>
     <string name="restart_now">Перезавантажити зараз</string>

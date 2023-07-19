@@ -60,11 +60,12 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.AdmobBanner
+import pro.themed.manager.GlobalVariables
 import pro.themed.manager.R
-import pro.themed.manager.bordercol
-import pro.themed.manager.cardcol
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
+import pro.themed.manager.ui.theme.bordercol
+import pro.themed.manager.ui.theme.cardcol
 import kotlin.math.absoluteValue
 
 @Composable
@@ -77,6 +78,7 @@ fun IconsTab() {
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AdmobBanner()
+            Text(text = "${GlobalVariables.myBoolean}")
 
             QSTileCard()
             NavbarCard()
@@ -86,8 +88,6 @@ fun IconsTab() {
     }
 
 }
-
-
 
 
 @OptIn(ExperimentalPagerApi::class)
@@ -107,7 +107,7 @@ fun QSTileCard() {
             IconButton(
                 onClick = {
                     qstilestyle = overlayname
-                    overlayEnable( "qspanel.$qspanelstyle.$qstilestyle")
+                    overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
                 },
                 modifier = Modifier
                     .size(sizedp.dp)
@@ -521,9 +521,12 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
     val context = LocalContext.current
 
     if (getOverlayList().overlayList.any { it.contains(name) }) {
-        Row(Modifier.clickable {
-            overlayEnable( "navbar.$name")
-        }.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Row(
+            Modifier
+                .clickable {
+                    overlayEnable("navbar.$name")
+                }
+                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Image(
                 painter = painterResource(back), contentDescription = null, Modifier.size(testdp.dp)
             )
@@ -588,8 +591,8 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.acherus.android")
-                            overlayEnable( "iconpack.acherus.systemui")
+                            overlayEnable("iconpack.acherus.android")
+                            overlayEnable("iconpack.acherus.systemui")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -633,11 +636,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.circular.android")
-                            overlayEnable( "iconpack.circular.launcher")
-                            overlayEnable( "iconpack.circular.settings")
-                            overlayEnable( "iconpack.circular.systemui")
-                            overlayEnable( "iconpack.circular.themepicker")
+                            overlayEnable("iconpack.circular.android")
+                            overlayEnable("iconpack.circular.launcher")
+                            overlayEnable("iconpack.circular.settings")
+                            overlayEnable("iconpack.circular.systemui")
+                            overlayEnable("iconpack.circular.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -681,11 +684,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.filled.android")
-                            overlayEnable( "iconpack.filled.launcher")
-                            overlayEnable( "iconpack.filled.settings")
-                            overlayEnable( "iconpack.filled.systemui")
-                            overlayEnable( "iconpack.filled.themepicker")
+                            overlayEnable("iconpack.filled.android")
+                            overlayEnable("iconpack.filled.launcher")
+                            overlayEnable("iconpack.filled.settings")
+                            overlayEnable("iconpack.filled.systemui")
+                            overlayEnable("iconpack.filled.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -728,11 +731,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.kai.android")
-                            overlayEnable( "iconpack.kai.launcher")
-                            overlayEnable( "iconpack.kai.settings")
-                            overlayEnable( "iconpack.kai.systemui")
-                            overlayEnable( "iconpack.kai.themepicker")
+                            overlayEnable("iconpack.kai.android")
+                            overlayEnable("iconpack.kai.launcher")
+                            overlayEnable("iconpack.kai.settings")
+                            overlayEnable("iconpack.kai.systemui")
+                            overlayEnable("iconpack.kai.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -775,11 +778,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.outline.android")
-                            overlayEnable( "iconpack.outline.launcher")
-                            overlayEnable( "iconpack.outline.settings")
-                            overlayEnable( "iconpack.outline.systemui")
-                            overlayEnable( "iconpack.outline.themepicker")
+                            overlayEnable("iconpack.outline.android")
+                            overlayEnable("iconpack.outline.launcher")
+                            overlayEnable("iconpack.outline.settings")
+                            overlayEnable("iconpack.outline.systemui")
+                            overlayEnable("iconpack.outline.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -822,11 +825,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.oos.android")
-                            overlayEnable( "iconpack.oos.launcher")
-                            overlayEnable( "iconpack.oos.settings")
-                            overlayEnable( "iconpack.oos.systemui")
-                            overlayEnable( "iconpack.oos.themepicker")
+                            overlayEnable("iconpack.oos.android")
+                            overlayEnable("iconpack.oos.launcher")
+                            overlayEnable("iconpack.oos.settings")
+                            overlayEnable("iconpack.oos.systemui")
+                            overlayEnable("iconpack.oos.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -869,11 +872,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.pui.android")
-                            overlayEnable( "iconpack.pui.launcher")
-                            overlayEnable( "iconpack.pui.settings")
-                            overlayEnable( "iconpack.pui.systemui")
-                            overlayEnable( "iconpack.pui.themepicker")
+                            overlayEnable("iconpack.pui.android")
+                            overlayEnable("iconpack.pui.launcher")
+                            overlayEnable("iconpack.pui.settings")
+                            overlayEnable("iconpack.pui.systemui")
+                            overlayEnable("iconpack.pui.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -918,11 +921,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.rounded.android")
-                            overlayEnable( "iconpack.rounded.launcher")
-                            overlayEnable( "iconpack.rounded.settings")
-                            overlayEnable( "iconpack.rounded.systemui")
-                            overlayEnable( "iconpack.rounded.themepicker")
+                            overlayEnable("iconpack.rounded.android")
+                            overlayEnable("iconpack.rounded.launcher")
+                            overlayEnable("iconpack.rounded.settings")
+                            overlayEnable("iconpack.rounded.systemui")
+                            overlayEnable("iconpack.rounded.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -967,11 +970,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.sam.android")
-                            overlayEnable( "iconpack.sam.launcher")
-                            overlayEnable( "iconpack.sam.settings")
-                            overlayEnable( "iconpack.sam.systemui")
-                            overlayEnable( "iconpack.sam.themepicker")
+                            overlayEnable("iconpack.sam.android")
+                            overlayEnable("iconpack.sam.launcher")
+                            overlayEnable("iconpack.sam.settings")
+                            overlayEnable("iconpack.sam.systemui")
+                            overlayEnable("iconpack.sam.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -1014,11 +1017,11 @@ fun IconPackCard() {
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
                             .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
-                            overlayEnable( "iconpack.victor.android")
-                            overlayEnable( "iconpack.victor.launcher")
-                            overlayEnable( "iconpack.victor.settings")
-                            overlayEnable( "iconpack.victor.systemui")
-                            overlayEnable( "iconpack.victor.themepicker")
+                            overlayEnable("iconpack.victor.android")
+                            overlayEnable("iconpack.victor.launcher")
+                            overlayEnable("iconpack.victor.settings")
+                            overlayEnable("iconpack.victor.systemui")
+                            overlayEnable("iconpack.victor.themepicker")
                         }) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
