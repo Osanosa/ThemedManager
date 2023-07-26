@@ -1,18 +1,20 @@
 <resources>
+    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
+    <string name="title_activity_debug">Debugguage</string>
     <string name="title_activity_debug">Débogage</string>
     <string name="title_activity_faq">FAQ</string>
-    <string name="accents_card_header">Accents</string>
-    <string name="accents_dark">Accents sombres</string>
-    <string name="qspanels_header">QsPanels</string>
+    <string name="accents_card_header">Accentuation</string>
+    <string name="accents_dark">Accentuation sombre</string>
+    <string name="qspanels_header">Panneau réglages rapides</string>
     <string name="rounded_corners_header">Coins arrondis</string>
     <string name="columns_portrait">Colonnes (portrait)</string>
     <string name="rows_portrait">Lignes (portrait)</string>
     <string name="columns_landscape">Colonnes (paysage)</string>
     <string name="rows_landscape">Lignes (paysage)</string>
-    <string name="qsquicktilesize">Taille QsQuickTile</string>
-    <string name="qstileheight">Hauteur QsTile</string>
+    <string name="qsquicktilesize">Taille panneau réglages rapides</string>
+    <string name="qstileheight">Hauteur panneau réglages rapides</string>
     <string name="about_description">Projet Themed par Osanosa</string>
     <string name="app_version">La version du gestionnaire installée est %1$s</string>
     <string name="installing">Installation du module</string>
@@ -24,7 +26,7 @@
     <string name="collect_files">Collecter les fichiers</string>
     <string name="debug">Débogage</string>
     <string name="faq">FAQ</string>
-    <string name="no_root_access">Pas d\'accès root</string>
+    <string name="no_root_access">Pas d\'accès à la racine</string>
     <string name="disable_overlays">Désactiver les superpositions</string>
     <string name="disable_overlays_header">Désactive toutes les superpositions, les thèmes Android par défaut ou uniquement ceux du projet Themed</string>
     <string name="disable_all_overlays_warning">La désactivation de toutes les superpositions peut entraîner la réinitialisation de certains paramètres système</string>
@@ -48,10 +50,10 @@
     <string name="dex2oat">Dex2oat</string>
     <string name="dex2oat_subheader">Pré-compile le code de toutes les applications installées ainsi que leurs mises en page pour réduire les ralentissements et les saccades</string>
     <string name="precompiling_dex_files">Pré-compilation des fichiers dex</string>
-    <string name="precompiling_layouts">Pré-compilation des mises en page</string>
+    <string name="precompiling_layouts">Pré-compilation des mises en pages</string>
     <string name="optimize">Optimiser</string>
     <string name="downscale">Réduire l\'échelle</string>
-    <string name="downscale_subheader">Modifie la résolution et la densité. Veuillez cliquer d\'abord sur "Personnalisé"</string>
+    <string name="downscale_subheader">Modifie la résolution et la densité d\'affichage. Veuillez d\'abord cliquer sur "Personnalisé"</string>
     <string name="enter_your_custom_resolution">Entrez votre résolution personnalisée</string>
     <string name="downscale_warning">Sur certaines ROM comme MIUI, définir une résolution inférieure à 480p peut causer des problèmes. Le bouton de test réinitialisera la taille après 10 secondes.</string>
     <string name="test">Test</string>
@@ -63,7 +65,12 @@
     <string name="_0_25x">0.25x</string>
     <string name="custom">Personnalisé</string>
     <string name="toolbox">Boîte à outils</string>
-    <string name="uninstall_unused_overlays_header">Désinstaller les superpositions inutilisées (désactivées) Themed</string>
+    <string name="uninstall_unused_overlays_header">Désinstaller les superpositions des thèmes inutilisées (désactivées)</string>
     <string name="uninstall_unused_overlays_subheader">Si vous avez choisi votre thème et que vous n\'avez pas l\'intention de le changer, vous pouvez désinstaller les superpositions inutilisées</string>
-
+    <string name="onboarding0">Cette application utilise les RROs (superpositions des ressources en cours d\'exécution) pour to recouvrir les couleures, les icones, les valeures boléennes, etc. La compatibilité maximale avec les ROMs des fabricants ne peut pas être garantie étant donné que les nouvelles ressources ne peuvent pas êtres ajoutées.</string>
+    <string name="onboarding1">Cette application requière l\'accès à la racine pour être en mesure d\'appliquer des superpositions</string>
+    <string name="onboarding2">Si votre système échoue à démarrer après l\'application d\'une superposition, maintenez vol+ durant l\'animation de démarrage, et tous les thèmes à supperposition seront désactivés</string>
+    <string name="onboarding3">Vous pouvez bénéficier d\'un support et demander un correctif de compatibilité dans le groupe Telegram</string>
+    <string name="onboarding4">Vous êtes libre de contribuer au projet sur Localazy si les traductions ne sont pas à la hauteur</string>
+    <string name="FakeMonetUpdate">↑ Appuyer sur la tuile de couleure pour changer une couleure de la palette ou le boutton pour changer toute la palette. Une fois que vous aurez choisis vos couleures appuyer sur le boutton ↓ pour construire et mettre à jour la superposition.</string>
 </resources>
