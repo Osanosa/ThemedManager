@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.AndroidDownloader
 
 class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

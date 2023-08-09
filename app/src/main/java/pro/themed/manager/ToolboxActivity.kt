@@ -371,26 +371,6 @@ class ToolboxActivity : ComponentActivity() {
                 }) {
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
-            },
-            actions = {
-                IconButton(onClick = {
-                    context.startActivity(Intent(context, DebugActivity::class.java))
-
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_bug_report_24),
-                        contentDescription = "debug"
-                    )
-                }
-
-                IconButton(onClick = {
-                    context.startActivity(Intent(context, FaqActivity::class.java))
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_help_24),
-                        contentDescription = "faq"
-                    )
-                }
             })
     }
 }

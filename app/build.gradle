@@ -24,6 +24,20 @@ plugins {
 
 android {
 
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Osanosa\\Key.jks')
+            storePassword 'HolyLumi'
+            keyAlias 'key0'
+            keyPassword 'HolyLumi'
+        }
+        release {
+            storeFile file('C:\\Users\\Osanosa\\Key.jks')
+            storePassword 'HolyLumi'
+            keyAlias 'key0'
+            keyPassword 'HolyLumi'
+        }
+    }
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
             def appName = "ThemedManager"
@@ -33,14 +47,6 @@ android {
     }
 
 
-    signingConfigs {
-        debug {
-            storeFile file('C:\\Users\\Osanosa\\Key.jks')
-            storePassword 'HolyLumi'
-            keyAlias 'key0'
-            keyPassword 'HolyLumi'
-        }
-    }
     namespace 'pro.themed.manager'
     compileSdk 34
 
@@ -75,18 +81,18 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-        freeCompilerArgs = [
-                "-Xopt-in=kotlin.RequiresOptIn",
-                "-Xopt-in=kotlin.Experimental",
-                "-Xopt-in=kotlin.ExperimentalFoundationApi",
-                "-Xopt-in=kotlin.time.ExperimentalTime",
-                "-Xopt-in=com.google.accompanist.flowlayout.ExperimentalFlowLayout",
-                // Add any other OptIn annotations you want to suppress warnings for
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn",
+                            "-Xopt-in=kotlin.Experimental",
+                            "-Xopt-in=kotlin.ExperimentalFoundationApi",
+                            "-Xopt-in=kotlin.time.ExperimentalTime",
+                            "-Xopt-in=com.google.accompanist.flowlayout.ExperimentalFlowLayout",
+                            // Add any other OptIn annotations you want to suppress warnings for
         ]
     }
     buildFeatures {
         compose true
         viewBinding true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.0-alpha02'
@@ -106,7 +112,7 @@ android {
 
 dependencies {
     implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.8.22'))
-    implementation 'androidx.core:core-ktx:1.12.0-alpha05'
+    implementation 'androidx.core:core-ktx:1.12.0-beta01'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
@@ -119,14 +125,14 @@ dependencies {
 
 
     implementation 'com.google.firebase:firebase-perf-ktx:20.4.0'
-    implementation 'com.google.firebase:firebase-messaging-ktx:23.2.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.2.1'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.2'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.3'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
-    implementation 'androidx.paging:paging-common-ktx:3.1.1'
+    implementation 'androidx.paging:paging-common-ktx:3.2.0'
     implementation platform('androidx.compose:compose-bom:2023.06.01')
     implementation "androidx.compose.ui:ui-graphics:$compose_ui_version"
     implementation platform('androidx.compose:compose-bom:2023.06.01')
@@ -138,18 +144,18 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'androidx.navigation:navigation-compose:2.7.0-beta01'
-    implementation platform('com.google.firebase:firebase-bom:32.1.1')
+    implementation 'androidx.navigation:navigation-compose:2.7.0-rc01'
+    implementation platform('com.google.firebase:firebase-bom:32.2.2')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.1'
-    implementation 'com.google.firebase:firebase-perf:20.3.3'
+    implementation 'com.google.firebase:firebase-perf:20.4.0'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
     // Splash API
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.7.0-beta01')
+    implementation('androidx.navigation:navigation-compose:2.7.0-rc01')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.30.1'
@@ -168,7 +174,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha03'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha04'
 
     implementation "androidx.compose.ui:ui-util:$compose_ui_version"
 

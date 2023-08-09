@@ -35,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,11 +51,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getColor
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.GlobalVariables
 import pro.themed.manager.R
+import pro.themed.manager.buildOverlay
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables
+import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
 annotation class Composable
@@ -75,65 +76,285 @@ fun FabricatedMonet(
         context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
     val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-    val SN1_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_10)} else {Color.Black.toArgb()}
-    val SN1_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_50)} else {Color.Black.toArgb()}
-    val SN1_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_100)} else {Color.Black.toArgb()}
-    val SN1_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_200)} else {Color.Black.toArgb()}
-    val SN1_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_300)} else {Color.Black.toArgb()}
-    val SN1_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_400)} else {Color.Black.toArgb()}
-    val SN1_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_500)} else {Color.Black.toArgb()}
-    val SN1_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_600)} else {Color.Black.toArgb()}
-    val SN1_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_700)} else {Color.Black.toArgb()}
-    val SN1_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_800)} else {Color.Black.toArgb()}
-    val SN1_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral1_900)} else {Color.Black.toArgb()}
+    val SN1_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_10)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_50)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_100)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_200)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_300)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_400)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_500)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_600)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_700)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_800)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN1_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral1_900)
+    } else {
+        Color.Black.toArgb()
+    }
 
-    val SN2_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_10)} else {Color.Black.toArgb()}
-    val SN2_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_50)} else {Color.Black.toArgb()}
-    val SN2_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_100)} else {Color.Black.toArgb()}
-    val SN2_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_200)} else {Color.Black.toArgb()}
-    val SN2_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_300)} else {Color.Black.toArgb()}
-    val SN2_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_400)} else {Color.Black.toArgb()}
-    val SN2_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_500)} else {Color.Black.toArgb()}
-    val SN2_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_600)} else {Color.Black.toArgb()}
-    val SN2_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_700)} else {Color.Black.toArgb()}
-    val SN2_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_800)} else {Color.Black.toArgb()}
-    val SN2_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_neutral2_900)} else {Color.Black.toArgb()}
+    val SN2_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_10)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_50)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_100)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_200)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_300)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_400)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_500)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_600)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_700)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_800)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SN2_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_neutral2_900)
+    } else {
+        Color.Black.toArgb()
+    }
 
-    val SA2_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_10)} else {Color.Black.toArgb()}
-    val SA2_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_50)} else {Color.Black.toArgb()}
-    val SA2_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_100)} else {Color.Black.toArgb()}
-    val SA2_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_200)} else {Color.Black.toArgb()}
-    val SA2_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_300)} else {Color.Black.toArgb()}
-    val SA2_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_400)} else {Color.Black.toArgb()}
-    val SA2_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_500)} else {Color.Black.toArgb()}
-    val SA2_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_600)} else {Color.Black.toArgb()}
-    val SA2_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_700)} else {Color.Black.toArgb()}
-    val SA2_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_800)} else {Color.Black.toArgb()}
-    val SA2_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent2_900)} else {Color.Black.toArgb()}
+    val SA2_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_10)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_50)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_100)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_200)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_300)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_400)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_500)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_600)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_700)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_800)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA2_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent2_900)
+    } else {
+        Color.Black.toArgb()
+    }
 
-    val SA1_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_10)} else {Color.Black.toArgb()}
-    val SA1_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_50)} else {Color.Black.toArgb()}
-    val SA1_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_100)} else {Color.Black.toArgb()}
-    val SA1_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_200)} else {Color.Black.toArgb()}
-    val SA1_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_300)} else {Color.Black.toArgb()}
-    val SA1_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_400)} else {Color.Black.toArgb()}
-    val SA1_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_500)} else {Color.Black.toArgb()}
-    val SA1_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_600)} else {Color.Black.toArgb()}
-    val SA1_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_700)} else {Color.Black.toArgb()}
-    val SA1_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_800)} else {Color.Black.toArgb()}
-    val SA1_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent1_900)} else {Color.Black.toArgb()}
+    val SA1_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_10)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_50)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_100)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_200)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_300)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_400)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_500)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_600)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_700)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_800)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA1_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent1_900)
+    } else {
+        Color.Black.toArgb()
+    }
 
-    val SA3_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_10)} else {Color.Black.toArgb()}
-    val SA3_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_50)} else {Color.Black.toArgb()}
-    val SA3_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_100)} else {Color.Black.toArgb()}
-    val SA3_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_200)} else {Color.Black.toArgb()}
-    val SA3_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_300)} else {Color.Black.toArgb()}
-    val SA3_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_400)} else {Color.Black.toArgb()}
-    val SA3_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_500)} else {Color.Black.toArgb()}
-    val SA3_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_600)} else {Color.Black.toArgb()}
-    val SA3_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_700)} else {Color.Black.toArgb()}
-    val SA3_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_800)} else {Color.Black.toArgb()}
-    val SA3_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {getColor(context, android.R.color.system_accent3_900)} else {Color.Black.toArgb()}
+    val SA3_10: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_10)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_50: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_50)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_100: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_100)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_200: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_200)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_300: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_300)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_400: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_400)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_500: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_500)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_600: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_600)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_700: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_700)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_800: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_800)
+    } else {
+        Color.Black.toArgb()
+    }
+    val SA3_900: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getColor(context, android.R.color.system_accent3_900)
+    } else {
+        Color.Black.toArgb()
+    }
 
 
     var hue by rememberSaveable { mutableFloatStateOf(0f) }
@@ -548,95 +769,423 @@ fun FabricatedMonet(
 
                     Text(text = "Apply to")
 
-                    Row {
-                        Button(modifier = Modifier.weight(1f), onClick = {
+                    Row(modifier = Modifier.padding(horizontal = 1.dp)) {
+                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                            Shell.SU.run("""sed -i '/system_neutral1_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_10.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_50.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_100.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_200.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_300.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_400.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_500.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_600.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_700.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_800.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_neutral1_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_900.toArgb())}</g' res/values$isDark/colors.xml""")
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_10.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_50.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_100.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_200.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_300.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_400.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_500.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_600.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_700.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_800.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral1_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_900.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
                         }) {
                             Text(text = "N1")
-
                         }
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        if (!getOverlayList().unsupportedOverlays.contains("n2")) {
-                            Button(modifier = Modifier.weight(1f), onClick = {
-                                Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                                Shell.SU.run("""sed -i '/system_neutral2_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_10.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_50.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_100.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_200.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_300.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_400.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_500.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_600.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_700.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_800.toArgb())}</g' res/values$isDark/colors.xml""")
-                                Shell.SU.run("""sed -i '/system_neutral2_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_900.toArgb())}</g' res/values$isDark/colors.xml""")
-                            }) {
-                                Text(text = "N2")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-
-                        Button(modifier = Modifier.weight(1f), onClick =  {
+                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                            Shell.SU.run("""sed -i '/system_accent1_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_10.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_50.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_100.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_200.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_300.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_400.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_500.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_600.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_700.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_800.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent1_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_900.toArgb())}</g' res/values$isDark/colors.xml""")
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_10.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_50.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_100.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_200.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_300.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_400.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_500.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_600.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_700.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_800.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_neutral2_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_900.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                        }) {
+                            Text(text = "N2")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+
+
+                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                            Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_10.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_50.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_100.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_200.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_300.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_400.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_500.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_600.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_700.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_800.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent1_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_900.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
                         }) {
                             Text(text = "A1")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Button(modifier = Modifier.weight(1f), onClick =  {
+                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                            Shell.SU.run("""sed -i '/system_accent2_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_10.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_50.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_100.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_200.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_300.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_400.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_500.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_600.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_700.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_800.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent2_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_900.toArgb())}</g' res/values$isDark/colors.xml""")
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_10.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_50.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_100.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_200.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_300.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_400.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_500.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_600.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_700.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_800.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent2_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_900.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
                         }) {
                             Text(text = "A2")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Button(modifier = Modifier.weight(1f), onClick = {
+                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                            Shell.SU.run("""sed -i '/system_accent3_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_10.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_50.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_100.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_200.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_300.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_400.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_500.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_600.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_700.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_800.toArgb())}</g' res/values$isDark/colors.xml""")
-                            Shell.SU.run("""sed -i '/system_accent3_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${"%08x".format(C_900.toArgb())}</g' res/values$isDark/colors.xml""")
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_10">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_10.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_50">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_50.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_100">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_100.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_200">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_200.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_300">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_300.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_400">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_400.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_500">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_500.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_600">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_600.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_700">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_700.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_800">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_800.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
+                            Shell.SU.run(
+                                """sed -i '/system_accent3_900">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                                    "%08x".format(
+                                        C_900.toArgb()
+                                    )
+                                }</g' res/values$isDark/colors.xml"""
+                            )
                         }) {
                             Text(text = "A3")
                         }
@@ -679,13 +1228,12 @@ fun FabricatedMonet(
                         },
                     )
 
-                    androidx.compose.material.Button(
+                    Button(
                         modifier = Modifier.fillMaxWidth(), onClick = {
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                             Shell.SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk""")
-                            Shell.SU.run("""zipsigner unsigned.apk signed.apk""")
-                            Shell.SU.run("""pm install signed.apk""")
+                            buildOverlay()
                             Shell.SU.run("""cmd overlay enable themed.fakemonet.generic""")
+                            showInterstitial(context, {})
 
 
                         }, colors = ButtonDefaults.buttonColors(
@@ -696,7 +1244,7 @@ fun FabricatedMonet(
                             }
                         ), shape = CircleShape
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = CenterVertically) {
 
                             Text(text = "Build and update")
                             Icon(

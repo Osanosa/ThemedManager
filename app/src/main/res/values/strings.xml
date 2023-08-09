@@ -69,7 +69,7 @@
     <string name="uninstall_unused_overlays_subheader">If you\'ve settled on your theme of choice and have no plans to change it you can uninstall overlays that are not in use</string>
     <string name="onboarding0">This app uses RROs (resource runtime overlays) to overlay colors, icons, booleans, etc. Full compatibility with OEM ROMs cannot be guaranteed as new resources cannot be added</string>
     <string name="onboarding1">This app requires Root access in order to apply overlays</string>
-    <string name="onboarding2">If your system fails to boot after applying an overlay, click vol+ during the boot animation, and all themed overlays will be disabled</string>
+    <string name="onboarding2">Don\'t forget to install bootloop protector module</string>
     <string name="onboarding3">You can get support and request compatibility fixes in the Telegram group</string>
     <string name="onboarding4">You\'re free to contribute on Localazy if translations aren\'t up to your standarts</string>
     <string name="FakeMonetUpdate">↑ Click color tile to change one color from palette or button to change whole palette.  Once you pick your colors click ↓ button to build and update overlay.</string>

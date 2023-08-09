@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -115,27 +116,41 @@ class DebugActivity : ComponentActivity() {
                         Text(text = stringResource(R.string.collect_files))
                     }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Unsupported")
-                getOverlayList().unsupportedOverlays.forEach { overlay ->
-                    Text(
-                        text = overlay,
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "If you're having issues of something not working you need to collect files and send zipped /sdcard/themeddebug")
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(text = "Enabled")
-                getOverlayList().enabledOverlays.forEach { overlay ->
-                    Text(
-                        text = overlay,
-                    )
-                }
-                Text(text = "Disabled")
-                getOverlayList().disabledOverlays.forEach { overlay ->
-                    Text(
-                        text = overlay,
-                    )
-                }
+                if (getOverlayList().overlayList.isEmpty()) {
+                    Text(text = "Themed overlays are missing")
 
+                }
+                if (getOverlayList().unsupportedOverlays.isNotEmpty()) {
+                    Text(text = "Unsupported")
+                    getOverlayList().unsupportedOverlays.forEach { overlay ->
+                        Text(
+                            text = overlay,
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (getOverlayList().enabledOverlays.isNotEmpty()) {
+                    Text(text = "Enabled")
+                    getOverlayList().enabledOverlays.forEach { overlay ->
+                        Text(
+                            text = overlay,
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if (getOverlayList().disabledOverlays.isNotEmpty()) {
+                    Text(text = "Disabled")
+                    getOverlayList().disabledOverlays.forEach { overlay ->
+                        Text(
+                            text = overlay,
+                        )
+                    }
+                }
             }
         }
     }

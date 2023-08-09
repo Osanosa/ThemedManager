@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 
-val Purple200 = Color(0xFFBB86FC)
+val Purple = Color(0xFFAA00FF)
 
 val backgroundLight = Color(0xFFFFFFFF)
 val backgroundDark = Color(0xFF0F1012)

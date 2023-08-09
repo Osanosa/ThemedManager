@@ -1,8 +1,3 @@
-@file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
-
-    )
-
 package pro.themed.manager
 
 import android.annotation.SuppressLint
@@ -17,6 +12,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -31,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -48,6 +45,7 @@ import com.google.android.gms.ads.AdView
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.launch
@@ -55,6 +53,9 @@ import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.*
+import pro.themed.manager.utils.NavigationItems
+import pro.themed.manager.utils.loadInterstitial
+import pro.themed.manager.utils.removeInterstitial
 
 
 data class OverlayListData(
@@ -63,25 +64,16 @@ data class OverlayListData(
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
-
+@Preview
 @Composable
 fun AdmobBanner(modifier: Modifier = Modifier) {
-    AndroidView(
-        modifier = Modifier.fillMaxWidth(),
-        factory = { context ->
-            // on below line specifying ad view.
-            AdView(context).apply {
-                // on below line specifying ad size
-                //adSize = AdSize.BANNER
-                // on below line specifying ad unit id
-                // currently added a test ad unit id.
-                setAdSize(AdSize.LARGE_BANNER)
-                adUnitId = "ca-app-pub-5920419856758740/9976311451"
-                // calling load ad to load our ad.
-                loadAd(AdRequest.Builder().build())
-            }
+    AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
+        AdView(context).apply {
+            setAdSize(AdSize.LARGE_BANNER)
+            adUnitId = "ca-app-pub-5920419856758740/9976311451"
+            loadAd(AdRequest.Builder().build())
         }
-    )
+    })
     Spacer(modifier = Modifier.height(8.dp))
 }
 
@@ -105,8 +97,6 @@ private fun fetchOverlayList(): OverlayListData {
 }
 
 
-
-
 object SharedPreferencesManager {
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -120,7 +110,6 @@ object SharedPreferencesManager {
 }
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -133,12 +122,8 @@ class MainActivity : ComponentActivity() {
 
                 SharedPreferencesManager.initialize(applicationContext)
                 val context = LocalContext.current
-                if (GlobalVariables.myBoolean) {
-                    showInterstitial(context, onAdDismissed = { finish() })
-                    GlobalVariables.myBoolean = false
-                    removeInterstitial()
 
-                }
+
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
                 val onBoardingCompleted: Boolean =
                     sharedPreferences.getBoolean("onBoardingCompleted", false)
@@ -178,12 +163,10 @@ class MainActivity : ComponentActivity() {
     @Composable
     @OptIn(ExperimentalFoundationApi::class)
     private fun OnBoardingPage(
-        sharedPreferences: SharedPreferences,
-        context: Context
+        sharedPreferences: SharedPreferences, context: Context
     ) {
         Box(
-            Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             //                        verticalArrangement = Arrangement.SpaceBetween,
         ) {
             val pageCount = 5
@@ -191,9 +174,7 @@ class MainActivity : ComponentActivity() {
                 pageCount
             }
             HorizontalPager(
-                state = pagerState,
-                Modifier.fillMaxHeight(0.8f),
-                userScrollEnabled = false
+                state = pagerState, Modifier.fillMaxHeight(0.8f),
             ) {
 
                     index ->
@@ -251,23 +232,19 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
+                OutlinedButton(shape = CircleShape, onClick = {
+                    coroutineScope.launch {
 
-                            if (pagerState.currentPage == 0) {
-                                sharedPreferences.edit()
-                                    .putBoolean("onBoardingCompleted", true).apply()
-                                val intent =
-                                    Intent(this@MainActivity, MainActivity::class.java)
-                                finish()
-                                startActivity(intent)
-                            } else {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                            }
+                        if (pagerState.currentPage == 0) {
+                            sharedPreferences.edit().putBoolean("onBoardingCompleted", true).apply()
+                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                            finish()
+                            startActivity(intent)
+                        } else {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
                         }
                     }
-                ) {
+                }) {
                     when (pagerState.currentPage) {
                         0 -> {
                             androidx.compose.material3.Text(text = "Skip")
@@ -280,35 +257,31 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 // Spacer(modifier = Modifier.fillMaxWidth())
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage == 1) {
+                OutlinedButton(shape = CircleShape, onClick = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage == 1) {
 
-                                val root = SH.run("su -c whoami").stdout()
+                            val root = SH.run("su -c whoami").stdout()
 
 
-                                if ("root" !in root) {
-                                    Toast.makeText(
-                                        context,
-                                        getString(R.string.no_root_access),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
+                            if ("root" !in root) {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.no_root_access),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                            if (pagerState.currentPage == pageCount - 1) {
-                                sharedPreferences.edit()
-                                    .putBoolean("onBoardingCompleted", true).apply()
-                                val intent =
-                                    Intent(this@MainActivity, MainActivity::class.java)
-                                finish()
-                                startActivity(intent)
-                            }
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+
                         }
+                        if (pagerState.currentPage == pageCount - 1) {
+                            sharedPreferences.edit().putBoolean("onBoardingCompleted", true).apply()
+                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                            finish()
+                            startActivity(intent)
+                        }
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-                ) {
+                }) {
                     when (pagerState.currentPage) {
                         pageCount - 1 -> {
                             androidx.compose.material3.Text(text = "Get started")
@@ -530,7 +503,11 @@ fun overlayEnable(overlayname: String) {
     }
 
 
-    GlobalVariables.myBoolean = true
 }
 
+fun buildOverlay () {
+    Shell.SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
+    Shell.SU.run("""zipsigner unsigned.apk signed.apk""")
+    Shell.SU.run("""pm install signed.apk""")
+}
 

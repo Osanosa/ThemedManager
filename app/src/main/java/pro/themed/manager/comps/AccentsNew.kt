@@ -34,8 +34,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.GlobalVariables.modulePath
 import pro.themed.manager.R
+import pro.themed.manager.buildOverlay
+import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
 
@@ -139,7 +140,7 @@ fun AccentsAAPT() {
                     )
                 })
             val hex = String.format("%08x".format(color.toArgb()))
-            val isDark =  if (sharedPreferences.getBoolean("acccents_dark", false)) "-night" else ""
+            val isDark = if (sharedPreferences.getBoolean("acccents_dark", false)) "-night" else ""
             HeaderRow(
                 header = "Override colors for dark theme",
                 showSwitch = true,
@@ -158,12 +159,11 @@ fun AccentsAAPT() {
 
             androidx.compose.material.Button(
                 modifier = Modifier.fillMaxWidth(), onClick = {
-                    Shell.SU.run("cd $modulePath/onDemandCompiler/staticAccent")
+                    Shell.SU.run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
                     Shell.SU.run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
-                    Shell.SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk""")
-                    Shell.SU.run("""zipsigner unsigned.apk signed.apk""")
-                    Shell.SU.run("""pm install signed.apk""")
+                    buildOverlay()
                     Shell.SU.run("""cmd overlay enable themed.accent.generic""")
+                    showInterstitial(context, {})
 
 
                 }, colors = ButtonDefaults.buttonColors(

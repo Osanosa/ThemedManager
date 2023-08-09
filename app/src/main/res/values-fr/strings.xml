@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
-    <string name="title_activity_debug">Debugguage</string>
     <string name="title_activity_debug">Débogage</string>
     <string name="title_activity_faq">FAQ</string>
     <string name="accents_card_header">Accentuation</string>
@@ -69,7 +68,7 @@
     <string name="uninstall_unused_overlays_subheader">Si vous avez choisi votre thème et que vous n\'avez pas l\'intention de le changer, vous pouvez désinstaller les superpositions inutilisées</string>
     <string name="onboarding0">Cette application utilise les RROs (superpositions des ressources en cours d\'exécution) pour to recouvrir les couleures, les icones, les valeures boléennes, etc. La compatibilité maximale avec les ROMs des fabricants ne peut pas être garantie étant donné que les nouvelles ressources ne peuvent pas êtres ajoutées.</string>
     <string name="onboarding1">Cette application requière l\'accès à la racine pour être en mesure d\'appliquer des superpositions</string>
-    <string name="onboarding2">Si votre système échoue à démarrer après l\'application d\'une superposition, maintenez vol+ durant l\'animation de démarrage, et tous les thèmes à supperposition seront désactivés</string>
+    <string name="onboarding2">N\'oubliez pas d\'installer le module de protection bootloop</string>
     <string name="onboarding3">Vous pouvez bénéficier d\'un support et demander un correctif de compatibilité dans le groupe Telegram</string>
     <string name="onboarding4">Vous êtes libre de contribuer au projet sur Localazy si les traductions ne sont pas à la hauteur</string>
     <string name="FakeMonetUpdate">↑ Appuyer sur la tuile de couleure pour changer une couleure de la palette ou le boutton pour changer toute la palette. Une fois que vous aurez choisis vos couleures appuyer sur le boutton ↓ pour construire et mettre à jour la superposition.</string>

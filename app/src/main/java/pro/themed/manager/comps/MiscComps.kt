@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -135,7 +136,7 @@ fun Slideritem(
                                 Toast
                                     .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
                                     .show()
-                                overlayEnable( "$overlayName$intvalue")
+                                overlayEnable("$overlayName$intvalue")
 
                             },
                         painter = painterResource(R.drawable.remove_48px),
@@ -151,7 +152,7 @@ fun Slideritem(
                         valueRange = minSliderValue..maxSliderValue,
                         onValueChangeFinished = {
                             Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
-                            overlayEnable( "$overlayName$intvalue")
+                            overlayEnable("$overlayName$intvalue")
                         },
                         steps = sliderSteps,
                         thumb = {
@@ -222,8 +223,8 @@ fun HeaderRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
-           // verticalAlignment = Alignment.CenterVertically,
-           // horizontalArrangement = Arrangement.SpaceBetween
+            // verticalAlignment = Alignment.CenterVertically,
+            // horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (showSwitch && switchDescription.isEmpty()) {
                 Row(
@@ -236,12 +237,12 @@ fun HeaderRow(
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.subtitle1
                         )
-                       if (subHeader.isNotEmpty()) {
-                           Text(
-                               text = subHeader,
-                               style = MaterialTheme.typography.body1,
-                           )
-                       }
+                        if (subHeader.isNotEmpty()) {
+                            Text(
+                                text = subHeader,
+                                style = MaterialTheme.typography.body1,
+                            )
+                        }
                     }
 
                     Switch(
@@ -279,15 +280,17 @@ fun HeaderRow(
                         )
                     }
                 }
-            } else { Text(
-                text = header,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.subtitle1
-            )
+            } else {
+                Text(
+                    text = header,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.subtitle1
+                )
                 Text(
                     text = subHeader,
                     style = MaterialTheme.typography.body1,
-                )}
+                )
+            }
 
 
             Row {
@@ -295,7 +298,7 @@ fun HeaderRow(
                     OutlinedButton(
                         onClick = { scope.launch { button1onClick() } },
                         modifier = Modifier.weight(button1weight),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
                     ) { Text(text = button1text) }
                 }
@@ -305,7 +308,7 @@ fun HeaderRow(
                     OutlinedButton(
                         onClick = { scope.launch { button2onClick() } },
                         modifier = Modifier.weight(button2weight),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
                     ) { Text(text = button2text) }
                 }
@@ -314,7 +317,7 @@ fun HeaderRow(
                     OutlinedButton(
                         onClick = { scope.launch { button3onClick() } },
                         modifier = Modifier.weight(button3weight),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
                     ) { Text(text = button3text) }
                 }
@@ -323,7 +326,7 @@ fun HeaderRow(
                     OutlinedButton(
                         onClick = { scope.launch { button4onClick() } },
                         modifier = Modifier.weight(button4weight),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
                     ) { Text(text = button4text) }
                 }
@@ -462,21 +465,21 @@ fun MiscTab() {
                 },
                 isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
             )
-/*
-            HeaderRow(
-                header = "DokeOS support package",
-                subHeader = "Remaps accents",
-                showSwitch = true,
-                onCheckedChange = {
-                    if (it) {
-                        Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
-                    } else {
-                        Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
-                    }
-                },
-                isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
-            )
-*/
+            /*
+                        HeaderRow(
+                            header = "DokeOS support package",
+                            subHeader = "Remaps accents",
+                            showSwitch = true,
+                            onCheckedChange = {
+                                if (it) {
+                                    Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
+                                } else {
+                                    Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
+                                }
+                            },
+                            isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
+                        )
+            */
 
         }
     }

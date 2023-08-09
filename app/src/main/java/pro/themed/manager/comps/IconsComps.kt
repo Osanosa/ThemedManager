@@ -12,15 +12,11 @@ package pro.themed.manager.comps
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,29 +40,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.calculateCurrentOffsetForPage
-import com.google.accompanist.pager.rememberPagerState
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.AdmobBanner
-import pro.themed.manager.GlobalVariables
 import pro.themed.manager.R
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.cardcol
-import kotlin.math.absoluteValue
 
 @Composable
 fun IconsTab() {
@@ -76,9 +62,8 @@ fun IconsTab() {
             .padding(bottom = 56.dp),
         color = MaterialTheme.colors.cardcol
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 8.dp)) {
             AdmobBanner()
-            Text(text = "${GlobalVariables.myBoolean}")
 
             QSTileCard()
             NavbarCard()
@@ -91,315 +76,6 @@ fun IconsTab() {
 
 
 @OptIn(ExperimentalPagerApi::class)
-@Preview
-@Composable
-fun QSTileCard() {
-    val context = LocalContext.current
-
-    var qspanelstyle by remember { mutableStateOf("default") }
-    var qstilestyle by remember { mutableStateOf("default") }
-
-
-    @Composable
-    fun MyIconButton(overlayname: String, sizedp: Int, contentdescription: String, iconname: Int) {
-
-        if (getOverlayList().overlayList.any { it.contains(overlayname) }) {
-            IconButton(
-                onClick = {
-                    qstilestyle = overlayname
-                    overlayEnable("qspanel.$qspanelstyle.$qstilestyle")
-                },
-                modifier = Modifier
-                    .size(sizedp.dp)
-                    .background(color = MaterialTheme.colors.cardcol)
-            ) {
-                Image(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    painter = painterResource(iconname),
-                    contentDescription = contentdescription,
-                )
-            }
-        }
-    }
-
-
-    Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(8.dp),
-        elevation = (0.dp),
-        shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
-    ) {
-        val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
-
-        Column(modifier = Modifier) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .padding(start = 8.dp),
-                    text = stringResource(R.string.qspanels_header),
-                    fontSize = 24.sp
-                )
-                IconButton(onClick = {
-                    Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qspanel' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
-                }) {
-                    Image(
-                        painter = painterResource(R.drawable.reset), contentDescription = null
-                    )
-                }
-            }
-
-            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
-            val pagerState = rememberPagerState()
-            Spacer(modifier = Modifier.height(16.dp))
-            HorizontalPager(
-                count = 2,
-                state = pagerState,
-                // Add 32.dp horizontal padding to 'center' the pages
-                contentPadding = PaddingValues(horizontal = 96.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) { index ->
-                if (index == 0) {
-                    Card(Modifier
-                        .graphicsLayer {
-                            val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
-
-                            lerp(
-                                start = 0.85f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            ).also { scale ->
-                                scaleX = scale
-                                scaleY = scale
-                            }
-
-                            alpha = lerp(
-                                start = 0.5f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            )
-                        }
-                        .fillMaxWidth()
-                        .clickable {
-                            qspanelstyle = "default"
-                        }, elevation = 2.dp
-                    ) {
-                        Text(text = "default", Modifier.padding(24.dp))
-                    }
-                } else if (index == 1) {
-                    Card(Modifier
-                        .graphicsLayer {
-                            // Calculate the absolute offset for the current page from the
-                            // scroll position. We use the absolute value which allows us to mirror
-                            // any effects for both directions
-                            val pageOffset = calculateCurrentOffsetForPage(page = 1).absoluteValue
-
-                            // We animate the scaleX + scaleY, between 85% and 100%
-                            lerp(
-                                start = 0.85f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            ).also { scale ->
-                                scaleX = scale
-                                scaleY = scale
-                            }
-
-                            // We animate the alpha, between 50% and 100%
-                            alpha = lerp(
-                                start = 0.5f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            )
-                        }
-                        .fillMaxWidth()
-                        .clickable {
-                            qspanelstyle = "clear"
-                        }, elevation = 2.dp
-                    ) {
-                        Text(text = "clear", Modifier.padding(24.dp))
-                    }
-                }
-
-            }
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp),
-            )
-
-
-
-
-            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
-
-            Surface {
-                Column {
-                    FlowRow {
-                        MyIconButton(
-                            overlayname = "dualtonecircle",
-                            sizedp = testdp,
-                            contentdescription = "Circle with Dual Tone",
-                            iconname = R.drawable.qscirclewithdualtone
-                        )
-                        MyIconButton(
-                            overlayname = "circlegradient",
-                            sizedp = testdp,
-                            contentdescription = "Circle with Gradient",
-                            iconname = R.drawable.qscirclewithgradient
-                        )
-
-                        MyIconButton(
-                            overlayname = "circletrim",
-                            sizedp = testdp,
-                            contentdescription = "Circle with Trim",
-                            iconname = R.drawable.qscirclewithtrim
-                        )
-                        MyIconButton(
-                            overlayname = "cookie",
-                            sizedp = testdp,
-                            contentdescription = "Cookie",
-                            iconname = R.drawable.qscookie
-                        )
-                        MyIconButton(
-                            overlayname = "cosmos",
-                            sizedp = testdp,
-                            contentdescription = "Cosmos",
-                            iconname = R.drawable.qscosmos
-                        )
-                        MyIconButton(
-                            overlayname = "default",
-                            sizedp = testdp,
-                            contentdescription = "Default",
-                            iconname = R.drawable.qsdefault
-                        )
-                        MyIconButton(
-                            overlayname = "dividedcircle",
-                            sizedp = testdp,
-                            contentdescription = "Divided Circle",
-                            iconname = R.drawable.qsdividedcircle
-                        )
-                        MyIconButton(
-                            overlayname = "dottedcircle",
-                            sizedp = testdp,
-                            contentdescription = "Dotted Circle",
-                            iconname = R.drawable.qsdottedcircle
-                        )
-                        MyIconButton(
-                            overlayname = "dualtonecircletrim",
-                            sizedp = testdp,
-                            contentdescription = "DualTone Circle with Trim",
-                            iconname = R.drawable.qsdualtonecircletrim
-                        )
-                        MyIconButton(
-                            overlayname = "ink",
-                            sizedp = testdp,
-                            contentdescription = "Ink",
-                            iconname = R.drawable.qsink
-                        )
-                        MyIconButton(
-                            overlayname = "inkdrop",
-                            sizedp = testdp,
-                            contentdescription = "Inkdrop",
-                            iconname = R.drawable.qsinkdrop
-                        )
-                        MyIconButton(
-                            overlayname = "justicons",
-                            sizedp = testdp,
-                            contentdescription = "Just Icons",
-                            iconname = R.drawable.qsjusticons
-                        )
-                        MyIconButton(
-                            overlayname = "mountain",
-                            sizedp = testdp,
-                            contentdescription = "Mountain",
-                            iconname = R.drawable.qsmountain
-                        )
-                        MyIconButton(
-                            overlayname = "neonlike",
-                            sizedp = testdp,
-                            contentdescription = "NeonLike",
-                            iconname = R.drawable.qsneonlike
-                        )
-                        MyIconButton(
-                            overlayname = "ninja",
-                            sizedp = testdp,
-                            contentdescription = "Ninja",
-                            iconname = R.drawable.qsninja
-                        )
-                        MyIconButton(
-                            overlayname = "oreocircletrim",
-                            sizedp = testdp,
-                            contentdescription = "Oreo (Circle Trim)",
-                            iconname = R.drawable.qsoreocircletrim
-                        )
-                        MyIconButton(
-                            overlayname = "oreosquircletrim",
-                            sizedp = testdp,
-                            contentdescription = "Oreo (Squircle Trim)",
-                            iconname = R.drawable.qsoreosquircletrim
-                        )
-                        MyIconButton(
-                            overlayname = "pokesign",
-                            sizedp = testdp,
-                            contentdescription = "Pokesign",
-                            iconname = R.drawable.qspokesign
-                        )
-                        MyIconButton(
-                            overlayname = "squaremedo",
-                            sizedp = testdp,
-                            contentdescription = "Squaremedo",
-                            iconname = R.drawable.qssquaremedo
-                        )
-                        MyIconButton(
-                            overlayname = "squircle",
-                            sizedp = testdp,
-                            contentdescription = "Squircle",
-                            iconname = R.drawable.qssquircle
-                        )
-                        MyIconButton(
-                            overlayname = "squircletrim",
-                            sizedp = testdp,
-                            contentdescription = "Squircle with trim",
-                            iconname = R.drawable.qssquircletrim
-                        )
-                        MyIconButton(
-                            overlayname = "teardrop",
-                            sizedp = testdp,
-                            contentdescription = "TearDrop",
-                            iconname = R.drawable.qsteardrop
-                        )
-                        MyIconButton(
-                            overlayname = "triangle",
-                            sizedp = testdp,
-                            contentdescription = "Triangle",
-                            iconname = R.drawable.qstriangle
-                        )
-                        MyIconButton(
-                            overlayname = "wavey",
-                            sizedp = testdp,
-                            contentdescription = "Wavey",
-                            iconname = R.drawable.qswavey
-                        )
-
-                    }
-
-                }
-            }
-
-        }
-    }
-}
 
 //@Preview
 @Composable
@@ -543,6 +219,7 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
 }
 
 //@Preview
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IconPackCard() {
     val context = LocalContext.current
