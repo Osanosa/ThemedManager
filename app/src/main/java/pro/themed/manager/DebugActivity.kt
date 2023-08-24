@@ -4,18 +4,25 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -26,11 +33,19 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
@@ -49,6 +64,7 @@ class DebugActivity : ComponentActivity() {
     }
 
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Preview
     @Composable
     fun DebugPage() {
@@ -62,6 +78,46 @@ class DebugActivity : ComponentActivity() {
                     .padding(8.dp)
             ) {
                 TopAppBarDebug()
+                var showDialog by rememberSaveable { mutableStateOf(false) }
+                var dialogtext by rememberSaveable { mutableStateOf("empty") }
+                var dialogname by rememberSaveable {
+                    mutableStateOf(
+                        "empty".removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
+                    )
+                }
+                val clipboardManager: ClipboardManager = LocalClipboardManager.current
+                val scroll = rememberScrollState()
+                if (showDialog) {
+                    Dialog(
+                        onDismissRequest = {
+                            showDialog = false
+                        },
+                    ) {
+                        Card {
+
+                            Column(modifier = Modifier.padding(16.dp)) {
+
+
+                                Column(
+                                    Modifier
+
+                                        .fillMaxHeight(0.5f)
+                                        .verticalScroll(scroll)
+
+                                ) {
+                                    Text(dialogtext)
+                                }
+
+                                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
+                                        clipboardManager.setText(AnnotatedString((dialogtext)))
+                                    }) {
+                                        Text(text = "Copy")
+                                    }
+
+                            }
+                        }
+                    }
+                }
                 Row {
                     OutlinedButton(
                         onClick = {
@@ -127,9 +183,17 @@ class DebugActivity : ComponentActivity() {
                 if (getOverlayList().unsupportedOverlays.isNotEmpty()) {
                     Text(text = "Unsupported")
                     getOverlayList().unsupportedOverlays.forEach { overlay ->
-                        Text(
-                            text = overlay,
-                        )
+                        Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
+                            dialogname = overlay
+                            dialogtext = Shell.SU.run(
+                                "cmd overlay dump ${
+                                    overlay.removePrefix("[x] ").removePrefix("[ ] ")
+                                        .removePrefix("--- ")
+                                }"
+                            ).stdout()
+                            showDialog = true
+
+                        }))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -137,18 +201,34 @@ class DebugActivity : ComponentActivity() {
                 if (getOverlayList().enabledOverlays.isNotEmpty()) {
                     Text(text = "Enabled")
                     getOverlayList().enabledOverlays.forEach { overlay ->
-                        Text(
-                            text = overlay,
-                        )
+                        Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
+                            dialogname = overlay
+                            dialogtext = Shell.SU.run(
+                                "cmd overlay dump ${
+                                    overlay.removePrefix("[x] ").removePrefix("[ ] ")
+                                        .removePrefix("--- ")
+                                }"
+                            ).stdout()
+                            showDialog = true
+
+                        }))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 if (getOverlayList().disabledOverlays.isNotEmpty()) {
                     Text(text = "Disabled")
                     getOverlayList().disabledOverlays.forEach { overlay ->
-                        Text(
-                            text = overlay,
-                        )
+                        Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
+                            dialogname = overlay
+                            dialogtext = Shell.SU.run(
+                                "cmd overlay dump ${
+                                    overlay.removePrefix("[x] ").removePrefix("[ ] ")
+                                        .removePrefix("--- ")
+                                }"
+                            ).stdout()
+                            showDialog = true
+
+                        }))
                     }
                 }
             }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -32,6 +31,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,7 +48,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
 import pro.themed.manager.getOverlayList
@@ -67,8 +70,8 @@ fun Slideritem(
     overlayName: String
 ) {
     val context = LocalContext.current
-    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
-    var intvalue by rememberSaveable { mutableStateOf(sliderPosition.roundToInt()) }
+    var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
+    var intvalue by rememberSaveable { mutableIntStateOf(sliderPosition.roundToInt()) }
 
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
@@ -296,7 +299,7 @@ fun HeaderRow(
             Row {
                 if (button1text.isNotEmpty()) {
                     OutlinedButton(
-                        onClick = { scope.launch { button1onClick() } },
+                        onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
                         modifier = Modifier.weight(button1weight),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
@@ -306,7 +309,7 @@ fun HeaderRow(
                 if (button2text.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        onClick = { scope.launch { button2onClick() } },
+                        onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
                         modifier = Modifier.weight(button2weight),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
@@ -315,7 +318,7 @@ fun HeaderRow(
                 if (button3text.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        onClick = { scope.launch { button3onClick() } },
+                        onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
                         modifier = Modifier.weight(button3weight),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
@@ -324,7 +327,7 @@ fun HeaderRow(
                 if (button4text.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        onClick = { scope.launch { button4onClick() } },
+                        onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
                         modifier = Modifier.weight(button4weight),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)

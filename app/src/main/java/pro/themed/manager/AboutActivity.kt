@@ -38,6 +38,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,7 @@ import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.AndroidDownloader
+import pro.themed.manager.utils.GlobalVariables
 
 class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,17 +104,16 @@ class AboutActivity : ComponentActivity() {
                     text = stringResource(R.string.app_version, versionName),
                     textAlign = TextAlign.Center
                 )
+                Text(text = GlobalVariables.isdownloaded.toString())
                 var path =
                     Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS + "/ThemedProject.zip"
 
 
                 fun showBigTextMessage(context: Context, message: String) {
-                    val dialog = AlertDialog.Builder(context)
-                        .setMessage(message)
+                    val dialog = AlertDialog.Builder(context).setMessage(message)
                         .setPositiveButton("OK") { dialog, _ ->
                             dialog.dismiss()
-                        }
-                        .create()
+                        }.create()
 
                     dialog.setOnShowListener {
                         val textView = dialog.findViewById<TextView>(android.R.id.message)
@@ -132,14 +133,6 @@ class AboutActivity : ComponentActivity() {
 
                         AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
-                        Toast.makeText(
-                            context, getString(R.string.installing), Toast.LENGTH_SHORT
-                        ).show()
-                        val test = Shell.SU.run(
-                            """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
-                        )
-
-
 
 
                     },
@@ -153,6 +146,15 @@ class AboutActivity : ComponentActivity() {
                         Text(text = stringResource(R.string.install_latest_module))
                     }
                 }
+LaunchedEffect(GlobalVariables.isdownloaded){if (GlobalVariables.isdownloaded) {Toast.makeText(
+    context, getString(R.string.installing), Toast.LENGTH_SHORT
+).show()
+    val test = Shell.SU.run(
+        """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
+    ).stdout()
+    showBigTextMessage(context, test)
+    GlobalVariables.isdownloaded = false
+}}
 
                 AnimatedVisibility(easteregg, modifier = Modifier.padding(8.dp)) {
                     Column {

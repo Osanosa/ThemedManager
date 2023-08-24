@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -16,14 +17,21 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import java.util.concurrent.TimeUnit
 
 class FaqActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +57,19 @@ class FaqActivity : ComponentActivity() {
                 TopAppBarFaq()
                 Column {
                     Text(text = "To be filled")
+                    var test by remember { mutableStateOf("") }
+                    Text(text = test)
+                    LaunchedEffect(Unit) {
+                        Shell.SU.run("ping google.com") {
+                            onStdOut = { line: String ->
+                                test = line
+                            }
+                            timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                        }
+
+                    }
+
+
                 }
             }
         }

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
     <string name="title_activity_debug">Débogage</string>

@@ -7,5 +7,5 @@ import androidx.compose.runtime.setValue
 
 object GlobalVariables {
     var modulePath by mutableStateOf("/data/adb/modules/ThemedProject")
-
+var isdownloaded by mutableStateOf( false)
 }
