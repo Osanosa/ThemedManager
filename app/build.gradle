@@ -20,6 +20,8 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.firebase.firebase-perf'
     id 'kotlin-kapt'
+    id("com.google.firebase.crashlytics")
+
 }
 
 android {
@@ -125,7 +127,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:22.3.0'
 
 
-    implementation 'com.google.firebase:firebase-perf-ktx:20.4.0'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.4.1'
     implementation 'com.google.firebase:firebase-messaging-ktx:23.2.1'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -146,10 +148,10 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
     implementation 'androidx.navigation:navigation-compose:2.7.1'
-    implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    implementation platform('com.google.firebase:firebase-bom:32.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.32.0'
-    implementation 'com.google.firebase:firebase-perf:20.4.0'
+    implementation 'com.google.firebase:firebase-perf:20.4.1'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
     // Splash API
@@ -181,5 +183,14 @@ dependencies {
 
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+
+    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+
 
 }

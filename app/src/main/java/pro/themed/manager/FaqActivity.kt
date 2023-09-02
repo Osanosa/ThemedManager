@@ -1,13 +1,14 @@
 package pro.themed.manager
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -18,7 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,9 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.delay
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.MyBackgroundService
 import java.util.concurrent.TimeUnit
+
 
 class FaqActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +46,7 @@ class FaqActivity : ComponentActivity() {
 
             ThemedManagerTheme {
                 FaqPage()
-
+                startService(Intent(this, MyBackgroundService::class.java));
             }
         }
     }
@@ -58,14 +64,33 @@ class FaqActivity : ComponentActivity() {
                 Column {
                     Text(text = "To be filled")
                     var test by remember { mutableStateOf("") }
+                    val shell1 = Shell.SH
+                    val shell2 = Shell.SU
                     Text(text = test)
-                    LaunchedEffect(Unit) {
-                        Shell.SU.run("ping google.com") {
+                    SideEffect {
+                        shell1.run("su -c getevent | grep 0003") {
                             onStdOut = { line: String ->
                                 test = line
+                                //
+
                             }
-                            timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                            timeout = Shell.Timeout(100, TimeUnit.MILLISECONDS)
                         }
+                    }
+                    var countdown by remember(test) { mutableIntStateOf(3) }
+
+                    LaunchedEffect(test ){
+                        shell2.run("service call SurfaceFlinger 1035 i32 0")
+
+                        while (countdown > 0) {
+                            delay(1000) // 1 second delay
+                            countdown -= 1
+                        }
+
+                        Toast.makeText(context, "toast", Toast.LENGTH_SHORT).show()
+
+                        shell2.run("service call SurfaceFlinger 1035 i32 2")
+
 
                     }
 

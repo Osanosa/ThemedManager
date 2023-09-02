@@ -5,20 +5,46 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,15 +70,20 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.launch
 import pro.themed.manager.comps.ColorsTab
 import pro.themed.manager.comps.IconsTab
 import pro.themed.manager.comps.MiscTab
-import pro.themed.manager.ui.theme.*
+import pro.themed.manager.ui.theme.ThemedManagerTheme
+import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
 import pro.themed.manager.utils.loadInterstitial
 import pro.themed.manager.utils.removeInterstitial
@@ -64,9 +95,11 @@ data class OverlayListData(
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
+
 @Preview
 @Composable
 fun AdmobBanner(modifier: Modifier = Modifier) {
+    if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContibutor", false)){
     AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
         AdView(context).apply {
             setAdSize(AdSize.LARGE_BANNER)
@@ -74,7 +107,7 @@ fun AdmobBanner(modifier: Modifier = Modifier) {
             loadAd(AdRequest.Builder().build())
         }
     })
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(8.dp))}
 }
 
 @Composable
@@ -149,6 +182,45 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         //  delay(1000)
                         splashScreen.setKeepOnScreenCondition { false }
+                        val themedId =
+                            SU.run("""getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""").stdout()
+                        // Initialize Firebase Database reference
+                        val database = FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
+                        val reference = database.getReference("Contributors/$themedId")
+
+                        var isSubkeyPresent: Boolean
+
+                        // Add a ValueEventListener to check for the subkey just once
+                        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                // Check if the subkey exists
+                                isSubkeyPresent = dataSnapshot.exists()
+                                Log.d("DATABASE", "THEMED ID IS $themedId")
+
+                                // If the subkey doesn't exist, set isSubkeyPresent to false
+                                if (isSubkeyPresent) {
+                                    sharedPreferences.edit().putBoolean("isContibutor", true).apply()
+                                    sharedPreferences.edit().putString("isContibutorDate", "${dataSnapshot.getValue(String::class.java)}").apply()
+
+                                    Log.d("DATABASE", "ENTRY FOUND")
+                                } else {
+                                    sharedPreferences.edit().putBoolean("isContibutor", false).apply()
+                                    sharedPreferences.edit().putString("isContibutorDate", "null").apply()
+
+                                    Log.d("DATABASE", "ENTRY NOT FOUND")
+
+                                }
+                            }
+
+                            override fun onCancelled(databaseError: DatabaseError) {
+                                // Handle any errors here
+                                sharedPreferences.edit().putBoolean("isContibutor", false).apply()
+                                Log.d("DATABASE", "ENTRY SEARCH FAILED")
+
+                            }
+                        })
+
+
                     }
                 } else {
                     splashScreen.setKeepOnScreenCondition { false }
@@ -266,9 +338,7 @@ class MainActivity : ComponentActivity() {
 
                             if ("root" !in root) {
                                 Toast.makeText(
-                                    context,
-                                    getString(R.string.no_root_access),
-                                    Toast.LENGTH_SHORT
+                                    context, getString(R.string.no_root_access), Toast.LENGTH_SHORT
                                 ).show()
                             }
 
@@ -505,9 +575,9 @@ fun overlayEnable(overlayname: String) {
 
 }
 
-fun buildOverlay () {
-    Shell.SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
-    Shell.SU.run("""zipsigner unsigned.apk signed.apk""")
-    Shell.SU.run("""pm install signed.apk""")
+fun buildOverlay() {
+    SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
+    SU.run("""zipsigner unsigned.apk signed.apk""")
+    SU.run("""pm install signed.apk""")
 }
 

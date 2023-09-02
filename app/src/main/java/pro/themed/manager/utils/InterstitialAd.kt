@@ -8,6 +8,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import pro.themed.manager.SharedPreferencesManager
 
 
 var mInterstitialAd: InterstitialAd? = null
@@ -32,7 +33,7 @@ fun loadInterstitial(context: Context) {
 fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
     val activity = context.findActivity()
 
-    if (mInterstitialAd != null && activity != null) {
+    if (mInterstitialAd != null && activity != null && !SharedPreferencesManager.getSharedPreferences().getBoolean("isContibutor", false)) {
         mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdFailedToShowFullScreenContent(e: com.google.android.gms.ads.AdError) {
                 mInterstitialAd = null

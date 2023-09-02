@@ -5,8 +5,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -108,16 +107,26 @@ class DebugActivity : ComponentActivity() {
                                     Text(dialogtext)
                                 }
 
-                                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
-                                        clipboardManager.setText(AnnotatedString((dialogtext)))
-                                    }) {
-                                        Text(text = "Copy")
-                                    }
+                                Button(modifier = Modifier.fillMaxWidth(), onClick = {
+                                    clipboardManager.setText(AnnotatedString((dialogtext)))
+                                }) {
+                                    Text(text = "Copy")
+                                }
 
                             }
                         }
                     }
                 }
+                val themedId =
+                    Shell.SU.run("""getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
+                        .stdout()
+
+                Text(text = "Your ThemedId is ${themedId}, your prevelegies are due ${
+                    SharedPreferencesManager.getSharedPreferences()
+                        .getString("isContibutorDate", "null")
+                }", modifier = Modifier.clickable {
+                    clipboardManager.setText(AnnotatedString((themedId)))
+                })
                 Row {
                     OutlinedButton(
                         onClick = {

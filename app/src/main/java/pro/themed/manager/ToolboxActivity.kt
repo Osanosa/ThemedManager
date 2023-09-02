@@ -152,6 +152,7 @@ class ToolboxActivity : ComponentActivity() {
 
                                     else -> "${DecimalFormat("#").format(difference)}Kb"
                                 }
+
                                 Handler(Looper.getMainLooper()).post {
                                     Toast.makeText(
                                         context, "+$toast", Toast.LENGTH_SHORT

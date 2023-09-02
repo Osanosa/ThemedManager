@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,6 +17,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager.Starting"
         tools:targetApi="33">
+        <service android:name=".MyBackgroundService" />
+        <service android:name=".MyForegroundService" android:foregroundServiceType="specialUse">
+
+        </service>
+        <receiver android:name=".MyBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".DownloadBroadcastReceiver"
             android:enabled="true"
