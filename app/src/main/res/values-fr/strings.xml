@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
     <string name="title_activity_debug">Débogage</string>
@@ -34,6 +35,7 @@
     <string name="all">Tous</string>
     <string name="process_started_now_wait">Processus démarré, veuillez patienter</string>
     <string name="stock">Par défaut</string>
+    <string name="themed" translatable="false">Themed</string>
     <string name="restart_systemui">Redémarrer SystemUI</string>
     <string name="systemui_restart_header">Redémarre SystemUI si votre ROM ne le rafraîchit pas automatiquement</string>
     <string name="restart_now">Redémarrer maintenant</string>
