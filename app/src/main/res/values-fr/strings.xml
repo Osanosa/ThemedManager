@@ -14,11 +14,11 @@
     <string name="rows_landscape">Lignes (paysage)</string>
     <string name="qsquicktilesize">Taille panneau réglages rapides</string>
     <string name="qstileheight">Hauteur panneau réglages rapides</string>
-    <string name="about_description">Projet Themed par Osanosa</string>
-    <string name="app_version">La version du gestionnaire installée est %1$s</string>
+    <string name="about_description">Projet de hèmes par Osanosa</string>
+    <string name="app_version">La version du gestionnaire actuellement installée est la %1$s</string>
     <string name="installing">Installation du module</string>
     <string name="done">Terminé</string>
-    <string name="install_latest_module">Télécharger le dernier module</string>
+    <string name="install_latest_module">Télécharger la dernière version du module</string>
     <string name="feedback_thank_you">Merci d\'utiliser l\'application. Veuillez signaler tout dysfonctionnement, c\'est très important !</string>
     <string name="about">À propos</string>
     <string name="collect_logs">Collecter les journaux</string>
