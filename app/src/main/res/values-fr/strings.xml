@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
     <string name="title_activity_debug">Débogage</string>
@@ -13,11 +14,11 @@
     <string name="rows_landscape">Lignes (paysage)</string>
     <string name="qsquicktilesize">Taille panneau réglages rapides</string>
     <string name="qstileheight">Hauteur panneau réglages rapides</string>
-    <string name="about_description">Projet Themed par Osanosa</string>
-    <string name="app_version">La version du gestionnaire installée est %1$s</string>
+    <string name="about_description">Projet de hèmes par Osanosa</string>
+    <string name="app_version">La version du gestionnaire actuellement installée est la %1$s</string>
     <string name="installing">Installation du module</string>
     <string name="done">Terminé</string>
-    <string name="install_latest_module">Télécharger le dernier module</string>
+    <string name="install_latest_module">Télécharger la dernière version du module</string>
     <string name="feedback_thank_you">Merci d\'utiliser l\'application. Veuillez signaler tout dysfonctionnement, c\'est très important !</string>
     <string name="about">À propos</string>
     <string name="collect_logs">Collecter les journaux</string>
@@ -34,6 +35,7 @@
     <string name="all">Tous</string>
     <string name="process_started_now_wait">Processus démarré, veuillez patienter</string>
     <string name="stock">Par défaut</string>
+    <string name="themed" translatable="false">Themed</string>
     <string name="restart_systemui">Redémarrer SystemUI</string>
     <string name="systemui_restart_header">Redémarre SystemUI si votre ROM ne le rafraîchit pas automatiquement</string>
     <string name="restart_now">Redémarrer maintenant</string>
