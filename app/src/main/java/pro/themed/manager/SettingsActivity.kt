@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -70,6 +71,7 @@ class SettingsActivity : ComponentActivity() {
                         HeaderRow(header = stringResource(R.string.uninstall_unused_overlays_header),
                             subHeader = stringResource(R.string.uninstall_unused_overlays_subheader),
                             button1onClick = {
+                                Looper.prepare()
                                 Toast.makeText(
                                     context, R.string.process_started_now_wait, Toast.LENGTH_SHORT
                                 ).show()

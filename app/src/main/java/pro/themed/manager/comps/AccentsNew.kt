@@ -163,7 +163,7 @@ fun AccentsAAPT() {
                     Shell.SU.run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
                     buildOverlay()
                     Shell.SU.run("""cmd overlay enable themed.accent.generic""")
-                    showInterstitial(context, {})
+                    showInterstitial(context) {}
 
 
                 }, colors = ButtonDefaults.buttonColors(

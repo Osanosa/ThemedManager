@@ -1,11 +1,19 @@
 package pro.themed.manager.utils
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import pro.themed.manager.MyApplication
 
 
 object GlobalVariables {
+    val sharedPreferences: SharedPreferences =
+        MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+
     var modulePath by mutableStateOf("/data/adb/modules/ThemedProject")
-var isdownloaded by mutableStateOf( false)
+    var isdownloaded by mutableStateOf(false)
+    var maxRate by mutableStateOf(sharedPreferences.getString("maxRate", "0").toString())
+    var minRate by mutableStateOf(sharedPreferences.getString("minRate", "1").toString())
 }

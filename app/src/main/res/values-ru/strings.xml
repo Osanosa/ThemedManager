@@ -3,8 +3,6 @@
     <string name="title_activity_about">О приложении</string>
     <string name="title_activity_debug">Отладка</string>
     <string name="title_activity_faq">ЧаВо</string>
-    <string name="accents_card_header">Акценты</string>
-    <string name="accents_dark">Темные акценты</string>
     <string name="qspanels_header">Панели быстрого доступа (QsPanels)</string>
     <string name="rounded_corners_header">Закругленные углы</string>
     <string name="columns_portrait">Столбцы (портрет)</string>
@@ -27,10 +25,6 @@
     <string name="no_root_access">Отсутствует root-доступ</string>
     <string name="disable_overlays">Отключить оверлеи</string>
     <string name="disable_overlays_header">Отключить все оверлеи, стандартные темы Android или только Themed</string>
-    <string name="disable_all_overlays_warning">Отключение всех оверлеев может привести к сбросу некоторых системных настроек</string>
-    <string name="proceed">Вы уверены, что хотите продолжить?</string>
-    <string name="yes">Да</string>
-    <string name="no">Нет</string>
     <string name="all">Все</string>
     <string name="process_started_now_wait">Процесс начат, ожидайте</string>
     <string name="stock">Системные</string>
@@ -47,9 +41,6 @@
     <string name="clear_all">Очистить кеш</string>
     <string name="dex2oat">Dex2oat</string>
     <string name="dex2oat_subheader">Предварительная компиляция кода всех установленных приложений, а также их лейаутов для уменьшения лагов и подтормаживаний</string>
-    <string name="precompiling_dex_files">Идёт предварительная компиляция dex-файлов</string>
-    <string name="precompiling_layouts">Идёт предварительная компиляция лейаутов</string>
-    <string name="optimize">Оптимизировать</string>
     <string name="downscale">Уменьшение разрешения</string>
     <string name="downscale_subheader">Изменение разрешения и плотности</string>
     <string name="enter_your_custom_resolution">Введите ваше собственное разрешение</string>
@@ -58,10 +49,6 @@
     <string name="apply">Применить</string>
     <string name="close">Закрыть</string>
     <string name="reset_to_defaults_after_10_seconds">Сбросить настройки после 10 секунд</string>
-    <string name="_0_5x">0.5x</string>
-    <string name="_0_33x">0.33x</string>
-    <string name="_0_25x">0.25x</string>
-    <string name="custom">Настроить</string>
     <string name="toolbox">Набор инструментов</string>
     <string name="uninstall_unused_overlays_header">Удалить неиспользуемые (отключенные) оверлеи Themed</string>
     <string name="uninstall_unused_overlays_subheader">Если вы выбрали свою тему и не планируете ее менять, вы можете удалить неиспользуемые оверлеи</string>

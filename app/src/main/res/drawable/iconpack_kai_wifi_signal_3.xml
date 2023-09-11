@@ -13,7 +13,5 @@
     <path
         android:fillAlpha="0.3"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M1.62 7.94L0.63 6.82C10.98-2.33 20 3.76 23.39 6.8l-1 1.12C19.29 5.15 11.07-0.4 1.62 7.94z"
-        android:strokeWidth="1.0"
-        android:strokeAlpha="0.3" />
+        android:pathData="M1.62 7.94L0.63 6.82C10.98-2.33 20 3.76 23.39 6.8l-1 1.12C19.29 5.15 11.07-0.4 1.62 7.94z" />
 </vector>

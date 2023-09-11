@@ -26,5 +26,4 @@
                 android:strokeColor="@color/DrawableColor" />
         </group>
     </group>
-    <group android:name="time_group" />
 </vector>

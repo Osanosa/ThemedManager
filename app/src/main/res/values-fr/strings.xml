@@ -1,11 +1,8 @@
 <resources>
-    <string name="app_name" translatable="false">Themed Manager</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_about">À propos</string>
     <string name="title_activity_debug">Débogage</string>
     <string name="title_activity_faq">FAQ</string>
-    <string name="accents_card_header">Accentuation</string>
-    <string name="accents_dark">Accentuation sombre</string>
     <string name="qspanels_header">Panneau réglages rapides</string>
     <string name="rounded_corners_header">Coins arrondis</string>
     <string name="columns_portrait">Colonnes (portrait)</string>
@@ -28,14 +25,9 @@
     <string name="no_root_access">Pas d\'accès à la racine</string>
     <string name="disable_overlays">Désactiver les superpositions</string>
     <string name="disable_overlays_header">Désactive toutes les superpositions, les thèmes Android par défaut ou uniquement ceux du projet Themed</string>
-    <string name="disable_all_overlays_warning">La désactivation de toutes les superpositions peut entraîner la réinitialisation de certains paramètres système</string>
-    <string name="proceed">Êtes-vous sûr de vouloir continuer ?</string>
-    <string name="yes">Oui</string>
-    <string name="no">Non</string>
     <string name="all">Tous</string>
     <string name="process_started_now_wait">Processus démarré, veuillez patienter</string>
     <string name="stock">Par défaut</string>
-    <string name="themed" translatable="false">Themed</string>
     <string name="restart_systemui">Redémarrer SystemUI</string>
     <string name="systemui_restart_header">Redémarre SystemUI si votre ROM ne le rafraîchit pas automatiquement</string>
     <string name="restart_now">Redémarrer maintenant</string>
@@ -49,9 +41,6 @@
     <string name="clear_all">Tout effacer</string>
     <string name="dex2oat">Dex2oat</string>
     <string name="dex2oat_subheader">Pré-compile le code de toutes les applications installées ainsi que leurs mises en page pour réduire les ralentissements et les saccades</string>
-    <string name="precompiling_dex_files">Pré-compilation des fichiers dex</string>
-    <string name="precompiling_layouts">Pré-compilation des mises en pages</string>
-    <string name="optimize">Optimiser</string>
     <string name="downscale">Réduire l\'échelle</string>
     <string name="downscale_subheader">Modifie la résolution et la densité d\'affichage. Veuillez d\'abord cliquer sur "Personnalisé"</string>
     <string name="enter_your_custom_resolution">Entrez votre résolution personnalisée</string>
@@ -60,10 +49,6 @@
     <string name="apply">Appliquer</string>
     <string name="close">Fermer</string>
     <string name="reset_to_defaults_after_10_seconds">Rétablir les valeurs par défaut après 10 secondes</string>
-    <string name="_0_5x">0.5x</string>
-    <string name="_0_33x">0.33x</string>
-    <string name="_0_25x">0.25x</string>
-    <string name="custom">Personnalisé</string>
     <string name="toolbox">Boîte à outils</string>
     <string name="uninstall_unused_overlays_header">Désinstaller les superpositions des thèmes inutilisées (désactivées)</string>
     <string name="uninstall_unused_overlays_subheader">Si vous avez choisi votre thème et que vous n\'avez pas l\'intention de le changer, vous pouvez désinstaller les superpositions inutilisées</string>

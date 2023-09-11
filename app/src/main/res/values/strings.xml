@@ -4,8 +4,6 @@
     <string name="title_activity_about">About</string>
     <string name="title_activity_debug">Debug</string>
     <string name="title_activity_faq">Faq</string>
-    <string name="accents_card_header">Accents</string>
-    <string name="accents_dark">Accents Dark</string>
     <string name="qspanels_header">QsPanels</string>
     <string name="rounded_corners_header">Rounded corners</string>
     <string name="columns_portrait">Columns (portrait)</string>
@@ -28,10 +26,6 @@
     <string name="no_root_access">No root access</string>
     <string name="disable_overlays">Disable overlays</string>
     <string name="disable_overlays_header">Disable all overlays, stock android themes, or only themed project\'s</string>
-    <string name="disable_all_overlays_warning">Disabling all overlays may cause some system settings to reset</string>
-    <string name="proceed">Are you sure you want to proceed?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="all">All</string>
     <string name="process_started_now_wait">Process started, now wait</string>
     <string name="stock">Stock</string>
@@ -49,9 +43,6 @@
     <string name="clear_all">Clear all</string>
     <string name="dex2oat">Dex2oat</string>
     <string name="dex2oat_subheader">Pre-compiles code of all installed apps as well as it\'s layouts to reduce lag ans stutter</string>
-    <string name="precompiling_dex_files">Precompiling dex files</string>
-    <string name="precompiling_layouts">Precompiling layouts</string>
-    <string name="optimize">Optimize</string>
     <string name="downscale">Downscale</string>
     <string name="downscale_subheader">Changes resolution and density. Please click custom first</string>
     <string name="enter_your_custom_resolution">Enter your custom resolution</string>
@@ -60,10 +51,6 @@
     <string name="apply">Apply</string>
     <string name="close">close</string>
     <string name="reset_to_defaults_after_10_seconds">Reset to defaults after 10 seconds</string>
-    <string name="_0_5x">0.5x</string>
-    <string name="_0_33x">0.33x</string>
-    <string name="_0_25x">0.25x</string>
-    <string name="custom">Custom</string>
     <string name="toolbox">Toolbox</string>
     <string name="uninstall_unused_overlays_header">Uninstall unused (disabled) Themed overlays</string>
     <string name="uninstall_unused_overlays_subheader">If you\'ve settled on your theme of choice and have no plans to change it you can uninstall overlays that are not in use</string>

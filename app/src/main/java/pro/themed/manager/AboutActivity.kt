@@ -105,7 +105,7 @@ class AboutActivity : ComponentActivity() {
                     textAlign = TextAlign.Center
                 )
                 Text(text = GlobalVariables.isdownloaded.toString())
-                var path =
+                val path =
                     Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS + "/ThemedProject.zip"
 
 

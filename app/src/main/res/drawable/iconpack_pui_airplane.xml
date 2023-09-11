@@ -12,7 +12,6 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:fillColor="#00ffffff"
         android:pathData="M10 18l-2 3 6-3"
         android:strokeWidth="2.8799999"
         android:strokeColor="@color/DrawableColor"

@@ -3,8 +3,6 @@
     <string name="title_activity_about">Про Додаток</string>
     <string name="title_activity_debug">Налагодження</string>
     <string name="title_activity_faq">ЧаПи</string>
-    <string name="accents_card_header">Акценти</string>
-    <string name="accents_dark">Темні акценти</string>
     <string name="qspanels_header">Швидкі Панелі (QsPanels)</string>
     <string name="rounded_corners_header">Закруглені Кути</string>
     <string name="columns_portrait">Колонки (портрет)</string>
@@ -27,10 +25,6 @@
     <string name="no_root_access">Відсутній root-доступ</string>
     <string name="disable_overlays">Вимкнути Оверлеї</string>
     <string name="disable_overlays_header">Вимкнути всі оверлеї, стандартні теми Android або лише Themed</string>
-    <string name="disable_all_overlays_warning">Вимкнення всіх оверлеїв може привести до скидання деяких системних налаштувань</string>
-    <string name="proceed">Ви впевнені, що бажаєте продовжити?</string>
-    <string name="yes">Так</string>
-    <string name="no">Ні</string>
     <string name="all">Всі</string>
     <string name="process_started_now_wait">Процес розпочато, зачекайте</string>
     <string name="stock">Системні</string>
@@ -47,9 +41,6 @@
     <string name="clear_all">Очистити кеш</string>
     <string name="dex2oat">Dex2oat</string>
     <string name="dex2oat_subheader">Попередня компіляція коду всіх встановлених додатків та їхніх макетів для зменшення лагів та затримок</string>
-    <string name="precompiling_dex_files">Попередня компіляція dex-файлів</string>
-    <string name="precompiling_layouts">Попередня компіляція макетів</string>
-    <string name="optimize">Оптимізувати</string>
     <string name="downscale">Зменшення роздільної здатності</string>
     <string name="downscale_subheader">Зміна роздільної здатності та щільності</string>
     <string name="enter_your_custom_resolution">Введіть свою роздільну здатність</string>
@@ -58,10 +49,6 @@
     <string name="apply">Застосувати</string>
     <string name="close">Закрити</string>
     <string name="reset_to_defaults_after_10_seconds">Скидання налаштувань через 10 секунд</string>
-    <string name="_0_5x">0.5x</string>
-    <string name="_0_33x">0.33x</string>
-    <string name="_0_25x">0.25x</string>
-    <string name="custom">Налаштувати</string>
     <string name="toolbox">Набір Інструментів</string>
     <string name="uninstall_unused_overlays_header">Видалити невикористані (вимкнені) оверлеї Темовані</string>
     <string name="uninstall_unused_overlays_subheader">Якщо ви вибрали свою тему і не плануєте її змінювати, ви можете видалити невикористані оверлеї</string>

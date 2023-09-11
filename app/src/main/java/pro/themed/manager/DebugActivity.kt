@@ -185,10 +185,7 @@ class DebugActivity : ComponentActivity() {
                 Text(text = "If you're having issues of something not working you need to collect files and send zipped /sdcard/themeddebug")
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (getOverlayList().overlayList.isEmpty()) {
-                    Text(text = "Themed overlays are missing")
 
-                }
                 if (getOverlayList().unsupportedOverlays.isNotEmpty()) {
                     Text(text = "Unsupported")
                     getOverlayList().unsupportedOverlays.forEach { overlay ->

@@ -5,7 +5,7 @@
     ExperimentalMaterialApi::class,
     ExperimentalFoundationApi::class,
     ExperimentalFoundationApi::class
-) @file:Suppress("LocalVariableName")
+)
 
 package pro.themed.manager.comps
 
@@ -50,7 +50,6 @@ fun ColorsTab() {
             AdmobBanner()
             val sharedPreferences: SharedPreferences =
                 context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-            val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
             AccentsAAPT()
 

@@ -185,9 +185,6 @@ fun Slideritem(
 
 
         }
-    } else {
-
-
     }
 }
 

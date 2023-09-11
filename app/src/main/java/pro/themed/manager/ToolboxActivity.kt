@@ -1,6 +1,7 @@
 package pro.themed.manager
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -45,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
@@ -53,6 +53,7 @@ import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.HeaderRow
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.MyForegroundService
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 
@@ -68,7 +69,7 @@ class ToolboxActivity : ComponentActivity() {
         }
     }
 
-    @Preview
+
     @Composable
     fun ToolboxPage() {
         val context = LocalContext.current
@@ -324,6 +325,45 @@ class ToolboxActivity : ComponentActivity() {
                             },
                         )
 
+                        HeaderRow(header = "AutoRefreshRate ForegroundService",
+                            subHeader = "Dynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
+                            button1text = "Stop",
+                            button2text = "Start",
+                            button2onClick = {
+                                startService(Intent(context, MyForegroundService::class.java))
+                            },
+                            button1onClick = {
+                                stopService(Intent(context, MyForegroundService::class.java))
+                            })
+                        var MaxRate by remember { mutableStateOf("0") }
+                        MaxRate = sharedPreferences.getString("maxRate", "0").toString()
+                        var MinRate by remember { mutableStateOf("0") }
+                        MinRate = sharedPreferences.getString("minRate", "0").toString()
+                        Row {
+                            TextField(modifier = Modifier
+                                .fillMaxWidth(0.5f)
+                                .padding(horizontal = 8.dp),
+                                value = MaxRate,
+                                singleLine = true,
+                                onValueChange = {
+                                    MaxRate = it; editor.putString("maxRate", it)
+                                    editor.apply()
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                label = { Text("Enter max refresh mode") })
+                            TextField(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                                value = MinRate,
+                                singleLine = true,
+                                onValueChange = {
+                                    MinRate = it;editor.putString("minRate", it)
+                                    editor.apply()
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                label = { Text("Enter min refresh mode") })
+                        }
+                        Text("Stop service and restart app in order to apply changes to min/max modes\nYou'll likely will need to force stop app to open it again or reboot device, sorry about that, no workaround yet", modifier = Modifier.padding(8.dp))
 
                     }
 

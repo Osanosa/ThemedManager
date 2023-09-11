@@ -14,9 +14,6 @@ val borderLight = Color(0xFFD9D9D9)
 val borderDark = Color(0xFF2C2E33)
 
 
-val uibgAmoled = Color(0xFF000000)
-val uibgCharcoal = Color(0xFF151618)
-
 @get:Composable
 val Colors.bordercol: Color
     get() = if (isLight) borderLight else borderDark

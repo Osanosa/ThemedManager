@@ -1,6 +1,7 @@
 package pro.themed.manager
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -28,6 +29,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -75,6 +77,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.launch
@@ -88,6 +91,19 @@ import pro.themed.manager.utils.NavigationItems
 import pro.themed.manager.utils.loadInterstitial
 import pro.themed.manager.utils.removeInterstitial
 
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        appContext = applicationContext // Initialize the appContext property
+
+        // Initialize any application-wide resources or settings here
+    }
+
+    companion object {
+        lateinit var appContext: Context
+            private set
+    }
+}
 
 data class OverlayListData(
     val overlayList: List<String>,
@@ -166,7 +182,7 @@ class MainActivity : ComponentActivity() {
 
 
                     val root by rememberSaveable {
-                        mutableStateOf(SU.run(" whoami").stdout())
+                        mutableStateOf(SH.run("su -c whoami").stdout())
                     }
 
                     if ("root" !in root) {
@@ -183,7 +199,7 @@ class MainActivity : ComponentActivity() {
                         //  delay(1000)
                         splashScreen.setKeepOnScreenCondition { false }
                         val themedId =
-                            SU.run("""getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""").stdout()
+                            Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""").stdout()
                         // Initialize Firebase Database reference
                         val database = FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
                         val reference = database.getReference("Contributors/$themedId")
@@ -304,7 +320,7 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                OutlinedButton(shape = CircleShape, onClick = {
+                OutlinedButton(shape = CircleShape,colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface), onClick = {
                     coroutineScope.launch {
 
                         if (pagerState.currentPage == 0) {
@@ -329,7 +345,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 // Spacer(modifier = Modifier.fillMaxWidth())
-                OutlinedButton(shape = CircleShape, onClick = {
+                OutlinedButton(shape = CircleShape,colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface), onClick = {
                     coroutineScope.launch {
                         if (pagerState.currentPage == 1) {
 
@@ -411,7 +427,7 @@ fun OnBoarding(image: Int, text: String) {
 @Composable
 fun getOverlay(): String {
     val overlay = rememberSaveable {
-        mutableStateOf(SU.run("su -c cmd overlay").stdout())
+        mutableStateOf(SH.run("su -c cmd overlay").stdout())
     }
 
     return overlay.value
@@ -430,12 +446,15 @@ fun Main() {
 
         Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
             topBar = { TopAppBar() },
-            bottomBar = { BottomNavigationBar(navController) }) {
-            Box {
+            bottomBar = { if (getOverlayList().overlayList.isNotEmpty()) { BottomNavigationBar(navController) }}) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if (getOverlayList().overlayList.isEmpty()) {
+                    Text(textAlign = TextAlign.Center,text = "Themed overlays are missing\nTry installing module from about screen")
 
+                } else {
                 PaddingValues(bottom = 200.dp)
                 Navigation(navController)
-            }
+            }}
         }
         //ColorsTab()
     }

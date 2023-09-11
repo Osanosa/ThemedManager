@@ -33,16 +33,13 @@
                 android:pathData=" M5.44 6 C5.44,6 11.44,12 11.44,12 "
                 android:strokeWidth="2.0"
                 android:strokeColor="@color/DrawableColor"
-                android:strokeLineCap="round"
-                android:strokeLineJoin="round" />
+                android:strokeLineCap="round" />
             <path
                 android:name="_R_G_L_0_G_D_5_P_0"
                 android:pathData=" M5.44 18 C5.44,18 11.44,12 11.44,12 "
                 android:strokeWidth="2.0"
                 android:strokeColor="@color/DrawableColor"
-                android:strokeLineCap="round"
-                android:strokeLineJoin="round" />
+                android:strokeLineCap="round" />
         </group>
     </group>
-    <group android:name="time_group" />
 </vector>

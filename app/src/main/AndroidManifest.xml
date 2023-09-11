@@ -4,11 +4,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+    <uses-permission android:name="android.permission.BIND_QUICK_SETTINGS_TILE" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,11 +20,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager.Starting"
         tools:targetApi="33">
-        <service android:name=".MyBackgroundService" />
-        <service android:name=".MyForegroundService" android:foregroundServiceType="specialUse">
-
+        <service android:name=".utils.MyBackgroundService" />
+        <service android:name=".utils.MyForegroundService" android:foregroundServiceType="specialUse"/>
+        <service
+            android:name=".utils.MyTileService"
+            android:label="AutoRefreshRate"
+            android:icon="@drawable/palette_48px"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
         </service>
-        <receiver android:name=".MyBroadcastReceiver"
+
+        <receiver android:name=".utils.MyBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

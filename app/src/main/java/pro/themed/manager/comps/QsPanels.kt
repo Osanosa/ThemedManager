@@ -294,8 +294,8 @@ fun QSTileCard() {
 
         var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
         var intvalue by rememberSaveable { mutableIntStateOf(sliderPosition.roundToInt()) }
-        var minSliderValue by rememberSaveable { mutableFloatStateOf(0f) }
-        var maxSliderValue by rememberSaveable { mutableFloatStateOf(60f) }
+        val minSliderValue by rememberSaveable { mutableFloatStateOf(0f) }
+        val maxSliderValue by rememberSaveable { mutableFloatStateOf(60f) }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Rounded corners: $intvalue")
         Spacer(modifier = Modifier.height(8.dp))

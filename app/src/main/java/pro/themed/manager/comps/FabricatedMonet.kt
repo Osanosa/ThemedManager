@@ -756,7 +756,7 @@ fun FabricatedMonet(
                         onValueChange = {
                             lightness = it.roundToInt().toFloat()
                         },
-                        valueRange = -10f..+10f,
+                        valueRange = -10f..10f,
                         onValueChangeFinished = {},
                         steps = 19,
                         thumb = {
@@ -1233,7 +1233,7 @@ fun FabricatedMonet(
                             Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
                             buildOverlay()
                             Shell.SU.run("""cmd overlay enable themed.fakemonet.generic""")
-                            showInterstitial(context, {})
+                            showInterstitial(context) {}
 
 
                         }, colors = ButtonDefaults.buttonColors(
