@@ -1,8 +1,8 @@
 package pro.themed.manager.utils
 
-import android.content.Intent
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.jaredrummler.ktsh.Shell
 
 class MyTileService : TileService() {
 
@@ -12,13 +12,15 @@ class MyTileService : TileService() {
         val tile = qsTile
         if (tile != null) {
             if (tile.state == Tile.STATE_ACTIVE) {
-                stopService(Intent(applicationContext, MyForegroundService::class.java))
+
                 // Tile is active, deactivate it
                 tile.state = Tile.STATE_INACTIVE
                 tile.updateTile()
 
+                Shell.SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                Shell.SU.run("killall pro.themed.manager")
             } else {
-                startService(Intent(applicationContext, MyForegroundService::class.java))
+                Shell.SU.run("am start-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
                 // Tile is inactive, activate it
                 tile.state = Tile.STATE_ACTIVE
                 tile.updateTile()

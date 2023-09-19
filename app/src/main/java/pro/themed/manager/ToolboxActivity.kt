@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
@@ -35,7 +35,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +53,7 @@ import com.jaredrummler.ktsh.Shell.Companion.SU
 import pro.themed.manager.comps.HeaderRow
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.MyForegroundService
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
@@ -176,15 +177,15 @@ class ToolboxActivity : ComponentActivity() {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
-                                    timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                                 }
                                 SU.run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
-                                    timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+
                                 }
-                                progress = false
 
                             },
                             button2text = "Layouts",
@@ -194,9 +195,8 @@ class ToolboxActivity : ComponentActivity() {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
-                                    timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                                 }
-                                progress = false
 
                             },
                             button3text = "Reset",
@@ -206,25 +206,16 @@ class ToolboxActivity : ComponentActivity() {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
-                                    timeout = Shell.Timeout(1, TimeUnit.MILLISECONDS)
+                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                                 }
-                                progress = false
 
                             },
                             showSwitch = true,
                             switchDescription = "Force recompile even if not needed",
                             isChecked = sharedPreferences.getBoolean("force_dex2oat", false),
                             onCheckedChange = {
-                                if (it) {
-                                    editor.putBoolean("force_dex2oat", true)
-                                    editor.apply()
-                                    Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    editor.putBoolean("force_dex2oat", false)
-                                    editor.apply()
-                                    Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
+                                editor.putBoolean("force_dex2oat", it).apply()
 
-                                }
                             },
                         )
                         var customresShown by remember { mutableStateOf(false) }
@@ -312,16 +303,8 @@ class ToolboxActivity : ComponentActivity() {
                             switchDescription = stringResource(R.string.reset_to_defaults_after_10_seconds),
                             isChecked = sharedPreferences.getBoolean("resetwm", false),
                             onCheckedChange = {
-                                if (it) {
-                                    editor.putBoolean("resetwm", true)
-                                    editor.apply()
-                                    Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    editor.putBoolean("resetwm", false)
-                                    editor.apply()
-                                    Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
+                                editor.putBoolean("resetwm", it).apply()
 
-                                }
                             },
                         )
 
@@ -334,11 +317,30 @@ class ToolboxActivity : ComponentActivity() {
                             },
                             button1onClick = {
                                 stopService(Intent(context, MyForegroundService::class.java))
+                            },
+                            showSwitch = true,
+                            switchDescription = "Start on boot",
+                            isChecked = GlobalVariables.sharedPreferences.getBoolean(
+                                "autoRateOnBoot", false
+                            ),
+                            onCheckedChange = {
+                                sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
                             })
-                        var MaxRate by remember { mutableStateOf("0") }
-                        MaxRate = sharedPreferences.getString("maxRate", "0").toString()
-                        var MinRate by remember { mutableStateOf("0") }
-                        MinRate = sharedPreferences.getString("minRate", "0").toString()
+                        var MaxRate by remember {
+                            mutableStateOf(
+                                sharedPreferences.getString(
+                                    "maxRate", "0"
+                                ).toString()
+                            )
+                        }
+
+                        var MinRate by remember {
+                            mutableStateOf(
+                                sharedPreferences.getString(
+                                    "minRate", "0"
+                                ).toString()
+                            )
+                        }
                         Row {
                             TextField(modifier = Modifier
                                 .fillMaxWidth(0.5f)
@@ -346,8 +348,7 @@ class ToolboxActivity : ComponentActivity() {
                                 value = MaxRate,
                                 singleLine = true,
                                 onValueChange = {
-                                    MaxRate = it; editor.putString("maxRate", it)
-                                    editor.apply()
+                                    MaxRate = it; editor.putString("maxRate", it).apply()
                                 },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 label = { Text("Enter max refresh mode") })
@@ -357,13 +358,12 @@ class ToolboxActivity : ComponentActivity() {
                                 value = MinRate,
                                 singleLine = true,
                                 onValueChange = {
-                                    MinRate = it;editor.putString("minRate", it)
-                                    editor.apply()
+                                    MinRate = it;editor.putString("minRate", it).apply()
                                 },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 label = { Text("Enter min refresh mode") })
                         }
-                        Text("Stop service and restart app in order to apply changes to min/max modes\nYou'll likely will need to force stop app to open it again or reboot device, sorry about that, no workaround yet", modifier = Modifier.padding(8.dp))
+                        Spacer(Modifier.height(18.dp))
 
                     }
 
@@ -377,17 +377,24 @@ class ToolboxActivity : ComponentActivity() {
                         .padding(16.dp), enter = scaleIn()
                 ) {
                     androidx.compose.material.Card(
-                        Modifier.fillMaxWidth(), elevation = 24.dp, shape = CircleShape
+                        Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                        elevation = 24.dp,
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Column {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(16.dp)
                             ) {
-                                CircularProgressIndicator()
-                                Spacer(Modifier.width(16.dp))
+                                if (progresstext.contains("/")) CircularProgressIndicator()
+                                if (progresstext.contains("/")) Spacer(Modifier.width(16.dp))
                                 Text(text = progresstext)
                             }
+                            if (!progresstext.contains("/")) Button(onClick = {
+                                progress = false
+                            }) { Text("Hide") }
                         }
                     }
                 }
@@ -484,7 +491,7 @@ class ToolboxActivity : ComponentActivity() {
                     navController.navigateUp()
                     finish()
                 }) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
                 }
             })
     }

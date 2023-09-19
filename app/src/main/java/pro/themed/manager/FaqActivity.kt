@@ -14,7 +14,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -69,7 +69,7 @@ class FaqActivity : ComponentActivity() {
                     navController.navigateUp()
                     finish()
                 }) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
                 }
             },
         )

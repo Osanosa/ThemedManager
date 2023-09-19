@@ -30,7 +30,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables.themedId
 
 class DebugActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,13 +118,11 @@ class DebugActivity : ComponentActivity() {
                         }
                     }
                 }
-                val themedId =
-                    Shell.SU.run("""getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
-                        .stdout()
+
 
                 Text(text = "Your ThemedId is ${themedId}, your prevelegies are due ${
                     SharedPreferencesManager.getSharedPreferences()
-                        .getString("isContibutorDate", "null")
+                        .getString("isContributorDate", "null")
                 }", modifier = Modifier.clickable {
                     clipboardManager.setText(AnnotatedString((themedId)))
                 })
@@ -254,7 +253,7 @@ class DebugActivity : ComponentActivity() {
                     navController.navigateUp()
                     finish()
                 }) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
                 }
             },
         )

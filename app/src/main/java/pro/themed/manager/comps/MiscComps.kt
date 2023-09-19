@@ -465,21 +465,7 @@ fun MiscTab() {
                 },
                 isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
             )
-            /*
-                        HeaderRow(
-                            header = "DokeOS support package",
-                            subHeader = "Remaps accents",
-                            showSwitch = true,
-                            onCheckedChange = {
-                                if (it) {
-                                    Shell.SH.run("su -c cmd overlay enable themed.misc.dokeos.sysui")
-                                } else {
-                                    Shell.SH.run("su -c cmd overlay disable themed.misc.dokeos.sysui")
-                                }
-                            },
-                            isChecked = getOverlayList().enabledOverlays.any { it.contains("dokeos.sysui") },
-                        )
-            */
+
 
         }
     }

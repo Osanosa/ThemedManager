@@ -6,7 +6,7 @@ import android.os.Environment
 import androidx.core.net.toUri
 
 class AndroidDownloader(
-    private val context: Context
+    context: Context
 ) : Downloader {
 
     private val downloadManager = context.getSystemService(DownloadManager::class.java)

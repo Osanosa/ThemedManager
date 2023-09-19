@@ -16,7 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -55,17 +55,11 @@ class SettingsActivity : ComponentActivity() {
                             subHeader = "Enabling this will automatically restart system interface after applying overlays",
                             isChecked = sharedPreferences.getBoolean("restart_system_ui", false),
                             onCheckedChange = {
-                                if (it) {
-                                    editor.putBoolean("restart_system_ui", true)
-                                    editor.apply()
-                                    Toast.makeText(context, "true", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    editor.putBoolean("restart_system_ui", false)
-                                    editor.apply()
-                                    Toast.makeText(context, "false", Toast.LENGTH_SHORT).show()
+                                editor.putBoolean("restart_system_ui", it).apply()
 
-                                }
-                            }, showSwitch = true)
+                            },
+                            showSwitch = true
+                        )
                         val scope = rememberCoroutineScope()
 
                         HeaderRow(header = stringResource(R.string.uninstall_unused_overlays_header),
@@ -75,14 +69,18 @@ class SettingsActivity : ComponentActivity() {
                                 Toast.makeText(
                                     context, R.string.process_started_now_wait, Toast.LENGTH_SHORT
                                 ).show()
-                                Shell.SU.run("""cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
+                                Shell.SU.run(
+                                    """cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
                                              path=${'$'}(cmd package path "${'$'}ol" | awk -F':' '{print ${'$'}2}')
                                              rm_path="/data/adb/modules/ThemedProject/system${'$'}(echo "${'$'}path" | sed 's/^package://')"
-                                             rm "${'$'}rm_path" done""")
+                                             rm "${'$'}rm_path" done"""
+                                )
                                 Toast.makeText(
                                     context, R.string.done, Toast.LENGTH_SHORT
                                 ).show()
-                            }, button1text = "Uninstall")
+                            },
+                            button1text = "Uninstall"
+                        )
                     }
                 }
             }
@@ -101,7 +99,7 @@ class SettingsActivity : ComponentActivity() {
                     navController.navigateUp()
                     finish()
                 }) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
                 }
             },
             actions = {

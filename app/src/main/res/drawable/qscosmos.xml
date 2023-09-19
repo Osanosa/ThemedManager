@@ -28,31 +28,31 @@
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M27.240002,14.740001a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M27.24,14.74a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M15.290002,23.36a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M15.29,23.36a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M29.210003,18.08a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M29.21,18.08a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M25.400003,29.6a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M25.4,29.6a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M15.640003,29.6a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M15.64,29.6a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M20.130003,36.16a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M20.13,36.16a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M31.210003,34.08a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M31.21,34.08a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
@@ -72,15 +72,15 @@
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M28.099998,25.96a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M28.1,25.96a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M21.059998,24.839998a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M21.06,24.84a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M11.069998,18.149998a0.36 0.36 0 0 1-0.67 0 0.36 0.36 0 0 1 0.67 0z" />
+        android:pathData="M11.07,18.15a0.36 0.36 0 0 1-0.67 0 0.36 0.36 0 0 1 0.67 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
@@ -88,7 +88,7 @@
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M13.98,33.739998a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M13.98,33.74a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
@@ -116,15 +116,15 @@
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M29.099998,29.59a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M29.1,29.59a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M35.339996,26.8a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M35.34,26.8a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M36.579998,15.599999a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
+        android:pathData="M36.58,15.6a0.36 0.36 0 0 1-0.72 0 0.36 0.36 0 0 1 0.72 0z" />
     <path
         android:fillAlpha="0.17"
         android:fillColor="@color/DrawableColor"

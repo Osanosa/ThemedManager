@@ -1,6 +1,7 @@
 package pro.themed.manager
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -47,7 +48,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -61,35 +61,37 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pro.themed.manager.comps.ColorsTab
-import pro.themed.manager.comps.IconsTab
-import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.utils.GlobalVariables.magiskVersion
+import pro.themed.manager.utils.GlobalVariables.themedId
+import pro.themed.manager.utils.GlobalVariables.whoami
+import pro.themed.manager.utils.MyForegroundService
 import pro.themed.manager.utils.NavigationItems
 import pro.themed.manager.utils.loadInterstitial
 import pro.themed.manager.utils.removeInterstitial
+
 
 class MyApplication : Application() {
     override fun onCreate() {
@@ -115,15 +117,35 @@ data class OverlayListData(
 @Preview
 @Composable
 fun AdmobBanner(modifier: Modifier = Modifier) {
-    if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContibutor", false)){
-    AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
-        AdView(context).apply {
-            setAdSize(AdSize.LARGE_BANNER)
-            adUnitId = "ca-app-pub-5920419856758740/9976311451"
-            loadAd(AdRequest.Builder().build())
+    if (!MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+            .getBoolean("isContributor", false)
+    ) {
+        val isAdLoaded = remember { mutableStateOf(false) }
+
+        AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
+            AdView(context).apply {
+                setAdSize(AdSize.LARGE_BANNER)
+                adUnitId = "ca-app-pub-5920419856758740/9976311451"
+                adListener = object : AdListener() {
+                    override fun onAdLoaded() {
+                        super.onAdLoaded()
+                        isAdLoaded.value = true
+                    }
+
+                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                        super.onAdFailedToLoad(loadAdError)
+                        isAdLoaded.value = false
+                    }
+                }
+                loadAd(AdRequest.Builder().build())
+            }
+        })
+
+        if (isAdLoaded.value) {
+            Spacer(modifier = Modifier.height(8.dp))
         }
-    })
-    Spacer(modifier = Modifier.height(8.dp))}
+
+    }
 }
 
 @Composable
@@ -158,50 +180,55 @@ object SharedPreferencesManager {
     }
 }
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
+        SharedPreferencesManager.initialize(applicationContext)
+        Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        loadInterstitial(this)
+        if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
+            loadInterstitial(this)
+        }
+        fun foregroundServiceRunning(): Boolean {
+            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+                if (MyForegroundService::class.java.name == service.service.className) {
+                    return true
 
+                }
+            }
+            return false
+        }
+
+        if (foregroundServiceRunning()) {
+            Log.d("service", "attempting to stop")
+            SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+            SU.run("killall pro.themed.manager")
+
+        }
         setContent {
 
             ThemedManagerTheme {
-
-
-                SharedPreferencesManager.initialize(applicationContext)
-                val context = LocalContext.current
-
-
+                val context = MyApplication.appContext
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
-                val onBoardingCompleted: Boolean =
-                    sharedPreferences.getBoolean("onBoardingCompleted", false)
-
-                if (onBoardingCompleted) {
+                if ("root" !in whoami) {
+                    Toast.makeText(
+                        context, getString(R.string.no_root_access), Toast.LENGTH_LONG
+                    ).show()
+                }
+                if (sharedPreferences.getBoolean("onBoardingCompleted", false)) {
                     splashScreen.setKeepOnScreenCondition { true }
-
-
-                    val root by rememberSaveable {
-                        mutableStateOf(SH.run("su -c whoami").stdout())
-                    }
-
-                    if ("root" !in root) {
-                        Toast.makeText(
-                            LocalContext.current,
-                            getString(R.string.no_root_access),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
                     getOverlayList()
-                    getOverlay()
                     Main()
                     LaunchedEffect(Unit) {
-                        //  delay(1000)
                         splashScreen.setKeepOnScreenCondition { false }
-                        val themedId =
-                            Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""").stdout()
+
                         // Initialize Firebase Database reference
-                        val database = FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
+                        val database =
+                            FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
                         val reference = database.getReference("Contributors/$themedId")
 
                         var isSubkeyPresent: Boolean
@@ -215,13 +242,19 @@ class MainActivity : ComponentActivity() {
 
                                 // If the subkey doesn't exist, set isSubkeyPresent to false
                                 if (isSubkeyPresent) {
-                                    sharedPreferences.edit().putBoolean("isContibutor", true).apply()
-                                    sharedPreferences.edit().putString("isContibutorDate", "${dataSnapshot.getValue(String::class.java)}").apply()
+                                    sharedPreferences.edit().putBoolean("isContributor", true)
+                                        .apply()
+                                    sharedPreferences.edit().putString(
+                                        "isContributorDate",
+                                        "${dataSnapshot.getValue(String::class.java)}"
+                                    ).apply()
 
                                     Log.d("DATABASE", "ENTRY FOUND")
                                 } else {
-                                    sharedPreferences.edit().putBoolean("isContibutor", false).apply()
-                                    sharedPreferences.edit().putString("isContibutorDate", "null").apply()
+                                    sharedPreferences.edit().putBoolean("isContributor", false)
+                                        .apply()
+                                    sharedPreferences.edit().putString("isContributorDate", "null")
+                                        .apply()
 
                                     Log.d("DATABASE", "ENTRY NOT FOUND")
 
@@ -230,17 +263,13 @@ class MainActivity : ComponentActivity() {
 
                             override fun onCancelled(databaseError: DatabaseError) {
                                 // Handle any errors here
-                                sharedPreferences.edit().putBoolean("isContibutor", false).apply()
+                                sharedPreferences.edit().putBoolean("isContributor", false).apply()
                                 Log.d("DATABASE", "ENTRY SEARCH FAILED")
-
                             }
                         })
-
-
                     }
                 } else {
                     splashScreen.setKeepOnScreenCondition { false }
-
                     OnBoardingPage(sharedPreferences, context)
                 }
 
@@ -320,67 +349,84 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                OutlinedButton(shape = CircleShape,colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface), onClick = {
-                    coroutineScope.launch {
+                OutlinedButton(shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+                    onClick = {
+                        coroutineScope.launch {
 
-                        if (pagerState.currentPage == 0) {
-                            sharedPreferences.edit().putBoolean("onBoardingCompleted", true).apply()
-                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-                            finish()
-                            startActivity(intent)
-                        } else {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            if (pagerState.currentPage == 0) {
+                                SH.run("su")
+                                sharedPreferences.edit().putBoolean("onBoardingCompleted", true)
+                                    .apply()
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                finish()
+                                startActivity(intent)
+                            } else {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
                         }
-                    }
-                }) {
+                    }) {
                     when (pagerState.currentPage) {
                         0 -> {
-                            androidx.compose.material3.Text(text = "Skip")
+                            androidx.compose.material3.Text(
+                                text = "Skip", color = MaterialTheme.colors.textcol
+                            )
 
                         }
 
                         else -> {
-                            androidx.compose.material3.Text(text = "Back")
+                            androidx.compose.material3.Text(
+                                text = "Back", color = MaterialTheme.colors.textcol
+                            )
                         }
                     }
                 }
                 // Spacer(modifier = Modifier.fillMaxWidth())
-                OutlinedButton(shape = CircleShape,colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface), onClick = {
-                    coroutineScope.launch {
-                        if (pagerState.currentPage == 1) {
+                OutlinedButton(shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+                    onClick = {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage == 1) {
 
-                            val root = SH.run("su -c whoami").stdout()
 
+                                if ("root" !in whoami) {
+                                    Toast.makeText(
+                                        context,
+                                        getString(R.string.no_root_access),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
-                            if ("root" !in root) {
-                                Toast.makeText(
-                                    context, getString(R.string.no_root_access), Toast.LENGTH_SHORT
-                                ).show()
                             }
-
+                            if (pagerState.currentPage == pageCount - 1) {
+                                sharedPreferences.edit().putBoolean("onBoardingCompleted", true)
+                                    .apply()
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                finish()
+                                startActivity(intent)
+                            }
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
-                        if (pagerState.currentPage == pageCount - 1) {
-                            sharedPreferences.edit().putBoolean("onBoardingCompleted", true).apply()
-                            val intent = Intent(this@MainActivity, MainActivity::class.java)
-                            finish()
-                            startActivity(intent)
-                        }
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }) {
+                    }) {
                     when (pagerState.currentPage) {
                         pageCount - 1 -> {
-                            androidx.compose.material3.Text(text = "Get started")
+                            androidx.compose.material3.Text(
+                                text = "Get started", color = MaterialTheme.colors.textcol
+                            )
 
                         }
 
                         1 -> {
-                            androidx.compose.material3.Text(text = "Grant access")
+                            androidx.compose.material3.Text(
+                                text = "Grant access", color = MaterialTheme.colors.textcol
+                            )
 
                         }
 
                         else -> {
-                            androidx.compose.material3.Text(text = "Next")
+                            androidx.compose.material3.Text(
+                                text = "Next", color = MaterialTheme.colors.textcol
+                            )
                         }
                     }
                 }
@@ -424,15 +470,6 @@ fun OnBoarding(image: Int, text: String) {
 
 }
 
-@Composable
-fun getOverlay(): String {
-    val overlay = rememberSaveable {
-        mutableStateOf(SH.run("su -c cmd overlay").stdout())
-    }
-
-    return overlay.value
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -446,24 +483,30 @@ fun Main() {
 
         Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
             topBar = { TopAppBar() },
-            bottomBar = { if (getOverlayList().overlayList.isNotEmpty()) { BottomNavigationBar(navController) }}) {
+            bottomBar = {
+                if (getOverlayList().overlayList.isNotEmpty()) {
+                    BottomNavigationBar(navController)
+                }
+            }) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (getOverlayList().overlayList.isEmpty()) {
-                    Text(textAlign = TextAlign.Center,text = "Themed overlays are missing\nTry installing module from about screen")
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = "Themed overlays are missing\nTry installing module from about screen"
+                    )
 
                 } else {
-                PaddingValues(bottom = 200.dp)
-                Navigation(navController)
-            }}
+                    PaddingValues(bottom = 200.dp)
+                    pro.themed.manager.utils.Navigation(navController)
+                }
+            }
         }
         //ColorsTab()
     }
 }
 
 
-private operator fun Navigation.invoke() {
 
-}
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -511,26 +554,7 @@ fun BottomNavigationBar(navController: NavController) {
 
 }
 
-@ExperimentalMaterial3Api
-@Composable
-fun Navigation(navController: NavHostController) {
 
-    NavHost(navController, startDestination = NavigationItems.ColorsTab.route) {
-
-        composable(NavigationItems.ColorsTab.route) {
-            ColorsTab()
-        }
-        composable(NavigationItems.IconsTab.route) {
-            IconsTab()
-        }/*composable(NavigationItems.FontsTab.route) {
-            AppsTab()
-        }*/
-        composable(NavigationItems.MiscTab.route) {
-            MiscTab()
-        }
-    }
-
-}
 
 
 //@Preview()
@@ -569,34 +593,37 @@ fun TopAppBar() {
 
 
 fun overlayEnable(overlayname: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val overlay = SU.run("su -c cmd overlay").stdout()
 
-    val overlay = SU.run("su -c cmd overlay").stdout()
+        if ("exclusive" in overlay) {
+            SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
 
-    if ("exclusive" in overlay) {
-        SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
+        } else {
+            SU.run("su -c cmd overlay enable themed.$overlayname")
+        }
 
-    } else {
-        SU.run("su -c cmd overlay enable themed.$overlayname")
+
+        val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
+        val restart_system_ui: Boolean = sharedPreferences.getBoolean("restart_system_ui", false)
+
+        if (restart_system_ui) {
+            SU.run("su -c killall com.android.systemui")
+        }
+
+        Firebase.analytics.logEvent("Overlay_Selected") {
+            param("Overlay_Name", overlayname)
+        }
     }
-
-
-    val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
-    val restart_system_ui: Boolean = sharedPreferences.getBoolean("restart_system_ui", false)
-
-    if (restart_system_ui) {
-        SU.run("su -c killall com.android.systemui")
-    }
-
-    Firebase.analytics.logEvent("Overlay_Selected") {
-        param("Overlay_Name", overlayname)
-    }
-
 
 }
 
 fun buildOverlay() {
-    SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
-    SU.run("""zipsigner unsigned.apk signed.apk""")
-    SU.run("""pm install signed.apk""")
+    CoroutineScope(Dispatchers.IO).launch {
+        SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
+        SU.run("""zipsigner unsigned.apk signed.apk""")
+        SU.run("""pm install signed.apk""")
+
+    }
 }
 

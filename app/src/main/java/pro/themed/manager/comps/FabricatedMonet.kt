@@ -381,7 +381,7 @@ fun FabricatedMonet(
     val C_800 = hsl(hue, saturation / 100, 0.20f + lightness / 100)
     val C_900 = hsl(hue, saturation / 100, 0.10f + lightness / 100)
 
-    val isDark = if (sharedPreferences.getBoolean("acccents_dark", false)) "-night" else ""
+    val isDark = if (sharedPreferences.getBoolean("accents_dark", false)) "-night" else ""
 
     Card(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.cardcol),
@@ -1215,13 +1215,13 @@ fun FabricatedMonet(
                     HeaderRow(
                         header = "Override colors for dark theme",
                         showSwitch = true,
-                        isChecked = sharedPreferences.getBoolean("acccents_dark", false),
+                        isChecked = sharedPreferences.getBoolean("accents_dark", false),
                         onCheckedChange = {
                             if (it) {
-                                editor.putBoolean("acccents_dark", true)
+                                editor.putBoolean("accents_dark", true)
                                 editor.apply()
                             } else {
-                                editor.putBoolean("acccents_dark", false)
+                                editor.putBoolean("accents_dark", false)
                                 editor.apply()
 
                             }

@@ -1,10 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class,
-    ExperimentalPagerApi::class,
-    ExperimentalPagerApi::class,
-    ExperimentalPagerApi::class,
-    ExperimentalPagerApi::class,
-    ExperimentalLayoutApi::class
+    ExperimentalMaterialApi::class
 ) @file:Suppress("DEPRECATION")
 
 package pro.themed.manager.comps
@@ -74,8 +69,6 @@ fun IconsTab() {
 
 }
 
-
-@OptIn(ExperimentalPagerApi::class)
 
 //@Preview
 @Composable

@@ -42,7 +42,7 @@
     <string name="clears_cache_of_all_apps_data_is_safe">Clears cache of all apps (data is safe)</string>
     <string name="clear_all">Clear all</string>
     <string name="dex2oat">Dex2oat</string>
-    <string name="dex2oat_subheader">Pre-compiles code of all installed apps as well as it\'s layouts to reduce lag ans stutter</string>
+    <string name="dex2oat_subheader">Pre-compiles code of all installed apps as well as it\'s layouts to reduce lag and stutter</string>
     <string name="downscale">Downscale</string>
     <string name="downscale_subheader">Changes resolution and density. Please click custom first</string>
     <string name="enter_your_custom_resolution">Enter your custom resolution</string>
@@ -58,6 +58,6 @@
     <string name="onboarding1">This app requires Root access in order to apply overlays</string>
     <string name="onboarding2">Don\'t forget to install bootloop protector module</string>
     <string name="onboarding3">You can get support and request compatibility fixes in the Telegram group</string>
-    <string name="onboarding4">You\'re free to contribute on Localazy if translations aren\'t up to your standarts</string>
+    <string name="onboarding4">You\'re free to contribute on Localazy if translations aren\'t up to your standards</string>
     <string name="FakeMonetUpdate">↑ Click color tile to change one color from palette or button to change whole palette.  Once you pick your colors click ↓ button to build and update overlay.</string>
 </resources>

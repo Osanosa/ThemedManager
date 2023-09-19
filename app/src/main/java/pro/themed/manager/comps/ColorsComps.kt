@@ -2,17 +2,12 @@
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class,
-    ExperimentalFoundationApi::class
+    ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager.comps
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +27,6 @@ import pro.themed.manager.ui.theme.cardcol
 
 //@Preview
 @SuppressLint("NewApi")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ColorsTab() {
     Surface(
@@ -48,8 +42,6 @@ fun ColorsTab() {
         ) {
             val context = LocalContext.current
             AdmobBanner()
-            val sharedPreferences: SharedPreferences =
-                context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
 
             AccentsAAPT()
 

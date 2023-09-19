@@ -33,7 +33,7 @@ fun loadInterstitial(context: Context) {
 fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
     val activity = context.findActivity()
 
-    if (mInterstitialAd != null && activity != null && !SharedPreferencesManager.getSharedPreferences().getBoolean("isContibutor", false)) {
+    if (mInterstitialAd != null && activity != null && !SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
         mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdFailedToShowFullScreenContent(e: com.google.android.gms.ads.AdError) {
                 mInterstitialAd = null
@@ -47,7 +47,6 @@ fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
             }
         }
         mInterstitialAd?.show(activity)
-
     }
 }
 

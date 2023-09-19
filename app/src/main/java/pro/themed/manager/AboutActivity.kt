@@ -36,7 +36,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -104,7 +104,6 @@ class AboutActivity : ComponentActivity() {
                     text = stringResource(R.string.app_version, versionName),
                     textAlign = TextAlign.Center
                 )
-                Text(text = GlobalVariables.isdownloaded.toString())
                 val path =
                     Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS + "/ThemedProject.zip"
 
@@ -126,13 +125,14 @@ class AboutActivity : ComponentActivity() {
                     onClick = {
 
                         Toast.makeText(
-                            context, getString(R.string.process_started_now_wait), Toast.LENGTH_SHORT
+                            context,
+                            getString(R.string.process_started_now_wait),
+                            Toast.LENGTH_SHORT
                         ).show()
 
                         Shell.SU.run("rm $path")
 
                         AndroidDownloader(this@AboutActivity).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
-
 
 
                     },
@@ -146,15 +146,18 @@ class AboutActivity : ComponentActivity() {
                         Text(text = stringResource(R.string.install_latest_module))
                     }
                 }
-LaunchedEffect(GlobalVariables.isdownloaded){if (GlobalVariables.isdownloaded) {Toast.makeText(
-    context, getString(R.string.installing), Toast.LENGTH_SHORT
-).show()
-    val test = Shell.SU.run(
-        """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
-    ).stdout()
-    showBigTextMessage(context, test)
-    GlobalVariables.isdownloaded = false
-}}
+                LaunchedEffect(GlobalVariables.isdownloaded) {
+                    if (GlobalVariables.isdownloaded) {
+                        Toast.makeText(
+                            context, getString(R.string.installing), Toast.LENGTH_SHORT
+                        ).show()
+                        val test = Shell.SU.run(
+                            """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
+                        ).stdout()
+                        showBigTextMessage(context, test)
+                        GlobalVariables.isdownloaded = false
+                    }
+                }
 
                 AnimatedVisibility(easteregg, modifier = Modifier.padding(8.dp)) {
                     Column {
@@ -187,7 +190,7 @@ LaunchedEffect(GlobalVariables.isdownloaded){if (GlobalVariables.isdownloaded) {
                     navController.navigateUp()
                     finish()
                 }) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
                 }
             },
 
