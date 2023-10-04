@@ -10,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,12 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
@@ -104,7 +103,7 @@ fun NavbarCard() {
                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.navbar' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset), contentDescription = null
+                          imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null
                     )
                 }
             }
@@ -197,13 +196,13 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
                 }
                 .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Image(
-                painter = painterResource(back), contentDescription = null, Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = back), contentDescription = null, Modifier.size(testdp.dp)
             )
             Image(
-                painter = painterResource(home), contentDescription = null, Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = home), contentDescription = null, Modifier.size(testdp.dp)
             )
             Image(
-                painter = painterResource(recent),
+                imageVector = ImageVector.vectorResource(id = recent),
                 contentDescription = null,
                 Modifier.size(testdp.dp)
             )
@@ -247,7 +246,7 @@ fun IconPackCard() {
                     Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.iconpack' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset), contentDescription = null
+                        imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null
                     )
                 }
             }
@@ -270,32 +269,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Archeous", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_archerus_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -318,32 +317,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Circular   ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_circular_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -366,32 +365,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Filled       ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_filled_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -413,32 +412,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Kai           ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_kai_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -460,32 +459,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Outline    ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_outline_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -507,32 +506,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "OOS         ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_oos_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -554,32 +553,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "PUI           ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_pui_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -603,32 +602,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Rounded ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_rounded_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -652,32 +651,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Sam         ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_sam_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -699,32 +698,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Victor      ", fontSize = 18.sp)
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_wifi_signal_3),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_bluetooth_transient_animation),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_dnd),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_flashlight),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_auto_rotate),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                    painter = painterResource(R.drawable.iconpack_victor_airplane),
+                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )

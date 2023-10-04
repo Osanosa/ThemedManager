@@ -1,13 +1,10 @@
 package pro.themed.manager.utils
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import pro.themed.manager.comps.ColorsTab
-import pro.themed.manager.comps.IconsTab
-import pro.themed.manager.comps.MiscTab
+import androidx.navigation.*
+import androidx.navigation.compose.*
+import pro.themed.manager.comps.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -16,16 +13,28 @@ fun Navigation(navController: NavHostController) {
     NavHost(navController, startDestination = NavigationItems.ColorsTab.route) {
 
         composable(NavigationItems.ColorsTab.route) {
-            ColorsTab()
+            FabricatedMonet()
         }
         composable(NavigationItems.IconsTab.route) {
             IconsTab()
-        }/*composable(NavigationItems.FontsTab.route) {
+        }
+        /*composable(NavigationItems.FontsTab.route) {
             AppsTab()
         }*/
         composable(NavigationItems.MiscTab.route) {
             MiscTab()
         }
+
+        composable(NavigationItems.About.route) {
+            AboutPage()
+        }
+        composable(NavigationItems.Settings.route) {
+            SettingsPage()
+        }
+        composable(NavigationItems.Toolbox.route) {
+            ToolboxPage()
+        }
+
     }
 
 }

@@ -1,96 +1,58 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package pro.themed.manager
 
-import android.annotation.SuppressLint
-import android.app.ActivityManager
-import android.app.Application
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ButtonDefaults
+import android.annotation.*
+import android.app.*
+import android.content.*
+import android.os.*
+import android.util.*
+import android.widget.*
+import androidx.activity.*
+import androidx.activity.compose.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material.*
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.tooling.preview.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.viewinterop.*
+import androidx.core.graphics.*
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.ktx.Firebase
+import androidx.navigation.*
+import androidx.navigation.compose.*
+import com.android.apksigner.*
+import com.google.android.gms.ads.*
+import com.google.firebase.analytics.ktx.*
+import com.google.firebase.crashlytics.ktx.*
+import com.google.firebase.database.*
+import com.google.firebase.ktx.*
+import com.jaredrummler.ktsh.*
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import pro.themed.manager.ui.theme.ThemedManagerTheme
-import pro.themed.manager.ui.theme.cardcol
-import pro.themed.manager.ui.theme.textcol
+import kotlinx.coroutines.*
+import log
+import pro.themed.manager.comps.*
+import pro.themed.manager.ui.theme.*
+import pro.themed.manager.utils.*
 import pro.themed.manager.utils.GlobalVariables.magiskVersion
 import pro.themed.manager.utils.GlobalVariables.themedId
 import pro.themed.manager.utils.GlobalVariables.whoami
-import pro.themed.manager.utils.MyForegroundService
-import pro.themed.manager.utils.NavigationItems
-import pro.themed.manager.utils.loadInterstitial
-import pro.themed.manager.utils.removeInterstitial
 
 
 class MyApplication : Application() {
@@ -114,7 +76,7 @@ data class OverlayListData(
     val disabledOverlays: List<String>,
 )
 
-@Preview
+
 @Composable
 fun AdmobBanner(modifier: Modifier = Modifier) {
     if (!MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
@@ -481,30 +443,52 @@ fun Main() {
 
         val navController = rememberNavController()
 
-        Scaffold(backgroundColor = MaterialTheme.colors.cardcol,
-            topBar = { TopAppBar() },
-            bottomBar = {
-                if (getOverlayList().overlayList.isNotEmpty()) {
-                    BottomNavigationBar(navController)
-                }
-            }) {
+        Scaffold(
+            backgroundColor = MaterialTheme.colors.cardcol,
+            //topBar = { TopAppBar() },
+
+        ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (getOverlayList().overlayList.isEmpty()) {
                     Text(
                         textAlign = TextAlign.Center,
                         text = "Themed overlays are missing\nTry installing module from about screen"
                     )
-
                 } else {
-                    PaddingValues(bottom = 200.dp)
-                    pro.themed.manager.utils.Navigation(navController)
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                           Navigation(navController)
+                        }
+                        NavigationRailSample(navController)}
                 }
             }
         }
-        //ColorsTab()
     }
 }
+@Composable
+fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
+
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+fun getContrastColor(background: Int): Color {
+    // Determine a threshold value for choosing white or black text
+    val threshold = 129
+
+    val luminance = (0.299 * background.red + 0.587 * background.green + 0.114 * background.blue)
+    return if (luminance > threshold) Color.Black else Color.White
+}
+
+@Preview
+@Preview
+@Composable
+fun ColorReferencesEditor() {
+
+}
 
 
 
@@ -523,10 +507,11 @@ fun BottomNavigationBar(navController: NavController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+
         items.forEach { items ->
             BottomNavigationItem(icon = {
                 Icon(
-                    painter = painterResource(id = items.icon),
+                      imageVector = ImageVector.vectorResource(id = items.icon),
                     contentDescription = items.title,
                     modifier = Modifier.size(24.dp)
                 )
@@ -620,6 +605,8 @@ fun overlayEnable(overlayname: String) {
 
 fun buildOverlay() {
     CoroutineScope(Dispatchers.IO).launch {
+ApkSignerTool.main(arrayOf("help",))
+        var path = Shell.SU.run("pwd").stdout().log()
         SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
         SU.run("""zipsigner unsigned.apk signed.apk""")
         SU.run("""pm install signed.apk""")

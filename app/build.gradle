@@ -121,8 +121,8 @@ dependencies {
     implementation "androidx.compose.material:material:$compose_ui_version"
     implementation 'androidx.browser:browser:1.6.0'
 
-    implementation 'com.google.android.gms:play-services-ads-lite:22.3.0'
-    implementation 'com.google.android.gms:play-services-ads:22.3.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:22.4.0'
+    implementation 'com.google.android.gms:play-services-ads:22.4.0'
 
 
     implementation 'com.google.firebase:firebase-perf-ktx:20.4.1'
@@ -131,22 +131,19 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.3'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.5'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.2.1'
-    implementation platform('androidx.compose:compose-bom:2023.09.00')
     implementation "androidx.compose.ui:ui-graphics:$compose_ui_version"
-    implementation platform('androidx.compose:compose-bom:2023.09.00')
+    implementation platform('androidx.compose:compose-bom:2023.09.02')
+    implementation files('src/main/java/pro/themed/manager/apksigner.jar')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
-    androidTestImplementation platform('androidx.compose:compose-bom:2023.09.00')
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'androidx.navigation:navigation-compose:2.7.2'
-    implementation platform('com.google.firebase:firebase-bom:32.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.32.0'
     implementation 'com.google.firebase:firebase-perf:20.4.1'
@@ -156,7 +153,7 @@ dependencies {
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.7.2')
+    implementation('androidx.navigation:navigation-compose:2.7.3')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.32.0'
@@ -175,7 +172,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.1'
 
 
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha07'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha08'
 
     implementation "androidx.compose.ui:ui-util:$compose_ui_version"
 
@@ -185,10 +182,9 @@ dependencies {
 
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation(platform('com.google.firebase:firebase-bom:32.3.1'))
 
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
-
 
 }

@@ -3,13 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission android:name="android.permission.BIND_QUICK_SETTINGS_TILE" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Access storage for compilation of APKs in .iconify folder -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Read storage to be able to see what the compilation created -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -20,19 +27,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager.Starting"
         tools:targetApi="33">
-        <service android:name=".utils.MyForegroundService" android:foregroundServiceType="specialUse"/>
+        <service
+            android:name=".utils.MyForegroundService"
+            android:foregroundServiceType="specialUse" />
         <service
             android:name=".utils.MyTileService"
-            android:label="AutoRefreshRate"
+            android:exported="true"
             android:icon="@drawable/palette_48px"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true">
+            android:label="AutoRefreshRate"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
 
-        <receiver android:name=".utils.MyBroadcastReceiver"
+        <receiver
+            android:name=".utils.MyBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -46,6 +56,7 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/palette_48px" />

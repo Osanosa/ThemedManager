@@ -40,9 +40,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -121,7 +123,7 @@ fun Slideritem(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .size(24.dp),
-                            painter = painterResource(R.drawable.reset),
+                              imageVector = ImageVector.vectorResource(id = R.drawable.reset),
                             contentDescription = null,
                         )
                     }
@@ -142,7 +144,7 @@ fun Slideritem(
                                 overlayEnable("$overlayName$intvalue")
 
                             },
-                        painter = painterResource(R.drawable.remove_48px),
+                          imageVector = ImageVector.vectorResource(id = R.drawable.remove_48px),
                         contentDescription = null,
                     )
 
@@ -160,7 +162,7 @@ fun Slideritem(
                         steps = sliderSteps,
                         thumb = {
                             Image(
-                                painter = painterResource(R.drawable.fiber_manual_record_48px),
+                                  imageVector = ImageVector.vectorResource(id = R.drawable.fiber_manual_record_48px),
                                 contentDescription = null,
                             )
 
@@ -176,7 +178,7 @@ fun Slideritem(
                                     .show()
                                 overlayEnable("$overlayName$intvalue")
                             },
-                        painter = painterResource(R.drawable.add_48px),
+                          imageVector = ImageVector.vectorResource(id = R.drawable.add_48px),
                         contentDescription = null,
                     )
 

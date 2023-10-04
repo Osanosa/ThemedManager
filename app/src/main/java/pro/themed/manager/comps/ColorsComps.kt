@@ -31,14 +31,11 @@ import pro.themed.manager.ui.theme.cardcol
 fun ColorsTab() {
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 56.dp),
+            .fillMaxSize(),
         color = MaterialTheme.colors.cardcol
     ) {
         Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp)
+
         ) {
             val context = LocalContext.current
             AdmobBanner()

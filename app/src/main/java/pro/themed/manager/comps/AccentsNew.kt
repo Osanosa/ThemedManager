@@ -28,8 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +71,7 @@ fun AccentsAAPT() {
                     Shell.SU.run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
                 }) {
                     Image(
-                        painter = painterResource(R.drawable.reset),
+                          imageVector = ImageVector.vectorResource(R.drawable.reset),
                         contentDescription = null,
                     )
                 }
@@ -100,7 +101,7 @@ fun AccentsAAPT() {
                 steps = 0,
                 thumb = {
                     Image(
-                        painter = painterResource(R.drawable.fiber_manual_record_48px),
+                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
                         contentDescription = null,
                     )
 
@@ -118,7 +119,7 @@ fun AccentsAAPT() {
                 steps = 0,
                 thumb = {
                     Image(
-                        painter = painterResource(R.drawable.fiber_manual_record_48px),
+                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
                         contentDescription = null,
                     )
                 })
@@ -135,7 +136,7 @@ fun AccentsAAPT() {
                 steps = 0,
                 thumb = {
                     Image(
-                        painter = painterResource(R.drawable.fiber_manual_record_48px),
+                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
                         contentDescription = null,
                     )
                 })
@@ -179,7 +180,7 @@ fun AccentsAAPT() {
                     Text(text = "Build and update, $hex")
                     Icon(
                         modifier = Modifier.height(24.dp),
-                        painter = painterResource(id = R.drawable.arrow_right_alt_48px),
+                          imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px),
                         contentDescription = ""
                     )
 
