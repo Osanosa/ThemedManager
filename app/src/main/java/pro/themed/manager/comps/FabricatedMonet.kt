@@ -3,16 +3,11 @@ package pro.themed.manager.comps
 import android.content.*
 import android.widget.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material.*
-import androidx.compose.material.Button
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.*
@@ -23,6 +18,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.hsl
 import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
@@ -30,19 +26,15 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import com.jaredrummler.ktsh.*
-import log
 import pro.themed.manager.*
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.*
 import pro.themed.manager.utils.*
 
 annotation class Composable
 
 @Preview
 @OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class
 )
 @Composable
 fun FabricatedMonet(
@@ -56,8 +48,8 @@ fun FabricatedMonet(
     var selectedColorReference by remember { mutableStateOf("") }
     var selectedMonetColor by remember { mutableStateOf("") }
 
-    var isDark by rememberSaveable {
-        mutableStateOf("")
+    var isDark by remember {
+        mutableStateOf(sharedPreferences.getString("isDark", ""))
     }
 
     var isColorReferenceDropdownExpanded by remember { mutableStateOf(false) }
@@ -65,19 +57,24 @@ fun FabricatedMonet(
 
     val scope = rememberCoroutineScope()
     var colorsXmlContent by remember { mutableStateOf(Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
+    LaunchedEffect(isDark) {
+        colorsXmlContent =
+            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
+
+    }
 
     val atReferences =
         colorsXmlContent.filter { it.contains("<color name=") && it.contains("@") }.mapNotNull {
-                val matchResult = Regex("""<color name="([^"]+)">([^<]+)</color>""").find(it)
-                matchResult?.groupValues?.get(1)
-            }
+            val matchResult = Regex("""<color name="([^"]+)">([^<]+)</color>""").find(it)
+            matchResult?.groupValues?.get(1)
+        }
 
     val hashtagReferences =
         colorsXmlContent.filter { it.contains("<color name=") && it.contains("#") }.mapNotNull {
-                val matchResult = Regex("""<color name="([^"]+)">([^<]+)</color>""").find(it)
-                matchResult?.groupValues?.get(1)
-            }
+            val matchResult = Regex("""<color name="([^"]+)">([^<]+)</color>""").find(it)
+            matchResult?.groupValues?.get(1)
+        }
 
 
 // First launched effect for selectedColorReference
@@ -94,8 +91,9 @@ fun FabricatedMonet(
         val sedCommand = """
     sed -i 's|<color name="$selectedColorReference">@color/[^<]*</color>|<color name="$selectedColorReference">@color/$selectedMonetColor</color>|' /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml
 """.trimIndent()
-
-        Shell.SU.run(sedCommand).log()
+        if (selectedMonetColor.isNotBlank()) {
+            Shell.SU.run(sedCommand).log()
+        }
     }
 
 
@@ -169,16 +167,56 @@ fun FabricatedMonet(
     val sa3_900: Int? = getColorValue("system_accent3_900")
 
 
-    var hue by rememberSaveable { mutableFloatStateOf(0f) }
-    var saturation by rememberSaveable { mutableFloatStateOf(100f) }
-    var lightness by rememberSaveable { mutableFloatStateOf(0f) }
-
-    if (hue == 360f) {
-        hue = 0f
+    var stringhue by remember {
+        mutableStateOf(
+            sharedPreferences.getString(
+                "hue", "0"
+            ).toString()
+        )
     }
-    if (saturation == 0f) {
-        hue = 0f
+    val hue = stringhue.toFloatOrNull()?.let {
+        if (it >= 360) {
+            0f.also { newValue ->
+                stringhue = newValue.toString()
+                editor.putString("hue", newValue.toString()).apply()
+            }
+        } else it
+    } ?: 0f
+    var stringsaturation by rememberSaveable {
+        mutableStateOf(
+            sharedPreferences.getString(
+                "saturation", "100"
+            ).toString()
+        )
     }
+    val saturation = stringsaturation.toFloatOrNull()?.let {
+        if (it > 100) {
+            100f.also { newValue ->
+                stringsaturation = newValue.toString()
+                editor.putString("saturation", newValue.toString()).apply()
+            }
+        } else it
+    } ?: 100f
+    var stringlightness by rememberSaveable {
+        mutableStateOf(
+            sharedPreferences.getString(
+                "lightness", "0"
+            ).toString()
+        )
+    }
+    val lightness = stringlightness.toFloatOrNull()?.let {
+        if (it >= 10) {
+            10f.also { newValue ->
+                stringlightness = newValue.toString()
+                editor.putString("lightness", newValue.toString()).apply()
+            }
+        } else if (it <= -10) {
+            (-10f).also { newValue ->
+                stringlightness = newValue.toString()
+                editor.putString("lightness", newValue.toString()).apply()
+            }
+        } else it
+    } ?: 0f
 
 
     val C_10 = hsl(hue, saturation / 100, 0.99f + lightness / 100 / 10)
@@ -194,370 +232,348 @@ fun FabricatedMonet(
     val C_900 = hsl(hue, saturation / 100, 0.10f + lightness / 100)
 
 
-    Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.cardcol),
+
+    Column(
         modifier = Modifier
-            .wrapContentWidth()
-            .wrapContentHeight(),
-        elevation = (0.dp),
-        shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
+            .verticalScroll(rememberScrollState())
+            .padding(start = 8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .padding(start = 8.dp),
-                    text = "FakeMonet",
-                    fontSize = 24.sp
-                )
-
-                IconButton(modifier = Modifier, onClick = {
-                    Shell.SU.run("cmd overlay disable themed.fakemonet.generic ; pm uninstall themed.fakemonet.generic")
-                }) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.reset),
-                        contentDescription = null,
-                    )
-                }
-            }
-            val tilesize = (((LocalConfiguration.current.smallestScreenWidthDp - 16 - 64) / 5)).dp
-
-
-            listOf(
-                "10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900"
+            Text(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .padding(start = 8.dp),
+                text = "FakeMonet",
+                fontSize = 24.sp
             )
 
-            Surface {
+            IconButton(modifier = Modifier, onClick = {
+                Shell.SU.run("cmd overlay disable themed.fakemonet.generic ; pm uninstall themed.fakemonet.generic")
+            }) {
+                Image(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.reset),
+                    contentDescription = null,
+                )
+            }
+        }
+        val tilesize = (((LocalConfiguration.current.screenWidthDp - 8 - 64) / 5)).dp
+        tilesize.log()
+
+        listOf(
+            "10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900"
+        )
+
+        Surface {
 
 
-                Column {
+            Column(modifier = Modifier.imePadding()){
+
+                @Stable
+                @Composable
+                fun M3Tile(color: Int?, colorName: String, themedColor: Color) {
+                    color?.let { Color(it) }?.let {
+                        Surface(
+                            modifier = Modifier
+                                .width(tilesize)
+                                .aspectRatio(2f)
+                                .combinedClickable(onClick = {
+                                    val fullName = colorName
+                                        .replace("sn", "system_neutral")
+                                        .replace("sa", "system_accent")
 
 
-                    @Composable
-                    fun M3Tile(color: Int?, colorName: String, themedColor: Color) {
-                        color?.let { Color(it) }?.let {
-                            Surface(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .aspectRatio(2f)
-                                    .combinedClickable(onClick = {
-                                        val fullName = colorName
-                                            .replace("sn", "system_neutral")
-                                            .replace("sa", "system_accent")
+                                    val hex = "%08x".format(themedColor.toArgb())
 
+                                    Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
 
-                                        val hex = "%08x".format(themedColor.toArgb())
-
-                                        Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-
-                                        Shell.SU.run(
-                                            """sed -i '/$fullName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml"""
-                                        )
-                                        colorsXmlContent =
-                                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-
-                                    }, onLongClick = {
-                                        Toast
-                                            .makeText(
-                                                MyApplication.appContext, "", Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                    }), color = it
-                            ) {
-                                val textColor = getContrastColor(color)
-
-                                Box(contentAlignment = Alignment.Center) {
-
-                                    Text(
-                                        text = colorName.substringAfter("_"),
-                                        color = textColor,
-                                        fontSize = 14.sp
+                                    Shell.SU.run(
+                                        """sed -i '/$fullName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml"""
                                     )
-                                }
+                                    colorsXmlContent =
+                                        Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+
+
+                                }, onLongClick = {
+                                    Toast
+                                        .makeText(
+                                            MyApplication.appContext, "", Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }), color = it
+                        ) {
+                            val textColor = getContrastColor(color)
+
+                            Box(contentAlignment = Alignment.Center) {
+
+                                Text(
+                                    text = colorName.substringAfter("_"),
+                                    color = textColor,
+                                    fontSize = 14.sp
+                                )
                             }
                         }
                     }
+                }
 
 
-                    Row(
-                        Modifier
-                            .wrapContentWidth(unbounded = true)
-                            .clip(RoundedCornerShape(12.dp))
-                    ) {
-                        Column(horizontalAlignment = CenterHorizontally) {
-                            Text(
-                                text = "N1",
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                            M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
-                            M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
-                            M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
-                            M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
-                            M3Tile(color = sn1_300, colorName = "sn1_300", themedColor = C_300)
-                            M3Tile(color = sn1_400, colorName = "sn1_400", themedColor = C_400)
-                            M3Tile(color = sn1_500, colorName = "sn1_500", themedColor = C_500)
-                            M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
-                            M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
-                            M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
-                            M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
-
-                        }
-
-                        Column(horizontalAlignment = CenterHorizontally) {
-                            Text(
-                                text = "N2",
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                            M3Tile(color = sn2_10, colorName = "sn2_10", themedColor = C_10)
-                            M3Tile(color = sn2_50, colorName = "sn2_50", themedColor = C_50)
-                            M3Tile(color = sn2_100, colorName = "sn2_100", themedColor = C_100)
-                            M3Tile(color = sn2_200, colorName = "sn2_200", themedColor = C_200)
-                            M3Tile(color = sn2_300, colorName = "sn2_300", themedColor = C_300)
-                            M3Tile(color = sn2_400, colorName = "sn2_400", themedColor = C_400)
-                            M3Tile(color = sn2_500, colorName = "sn2_500", themedColor = C_500)
-                            M3Tile(color = sn2_600, colorName = "sn2_600", themedColor = C_600)
-                            M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
-                            M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
-                            M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
-
-                        }
-
-                        Column(horizontalAlignment = CenterHorizontally) {
-                            Text(
-                                text = "A1",
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                            M3Tile(color = sa1_10, colorName = "sa1_10", themedColor = C_10)
-                            M3Tile(color = sa1_50, colorName = "sa1_50", themedColor = C_50)
-                            M3Tile(color = sa1_100, colorName = "sa1_100", themedColor = C_100)
-                            M3Tile(color = sa1_200, colorName = "sa1_200", themedColor = C_200)
-                            M3Tile(color = sa1_300, colorName = "sa1_300", themedColor = C_300)
-                            M3Tile(color = sa1_400, colorName = "sa1_400", themedColor = C_400)
-                            M3Tile(color = sa1_500, colorName = "sa1_500", themedColor = C_500)
-                            M3Tile(color = sa1_600, colorName = "sa1_600", themedColor = C_600)
-                            M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
-                            M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
-                            M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
-
-                        }
-
-                        Column(horizontalAlignment = CenterHorizontally) {
-                            Text(
-                                text = "A2",
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                            M3Tile(color = sa2_10, colorName = "sa2_10", themedColor = C_10)
-                            M3Tile(color = sa2_50, colorName = "sa2_50", themedColor = C_50)
-                            M3Tile(color = sa2_100, colorName = "sa2_100", themedColor = C_100)
-                            M3Tile(color = sa2_200, colorName = "sa2_200", themedColor = C_200)
-                            M3Tile(color = sa2_300, colorName = "sa2_300", themedColor = C_300)
-                            M3Tile(color = sa2_400, colorName = "sa2_400", themedColor = C_400)
-                            M3Tile(color = sa2_500, colorName = "sa2_500", themedColor = C_500)
-                            M3Tile(color = sa2_600, colorName = "sa2_600", themedColor = C_600)
-                            M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
-                            M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
-                            M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
-
-                        }
-
-                        Column(horizontalAlignment = CenterHorizontally) {
-                            Text(
-                                text = "A3",
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                            M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
-                            M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
-                            M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
-                            M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
-                            M3Tile(color = sa3_300, colorName = "sa3_300", themedColor = C_300)
-                            M3Tile(color = sa3_400, colorName = "sa3_400", themedColor = C_400)
-                            M3Tile(color = sa3_500, colorName = "sa3_500", themedColor = C_500)
-                            M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
-                            M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
-                            M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
-                            M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
-
-                        }
-
-                    }
-
-                    fun updateColor(colorName: String, colorValue: Int?) {
-                        Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                        Shell.SU.run(
-                            """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
-                                "%08x".format(
-                                    colorValue ?: 0
-                                )
-                            }</g' res/values$isDark/colors.xml"""
+                Row(
+                    Modifier
+                        .wrapContentWidth(unbounded = true)
+                        .clip(RoundedCornerShape(12.dp))
+                ) {
+                    Column(horizontalAlignment = CenterHorizontally) {
+                        Text(
+                            text = "N1",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(4.dp)
                         )
-
-
-                    }
-
-                    Row(modifier = Modifier.padding(horizontal = 1.dp)) {
-                        OutlinedButton(modifier = Modifier.weight(1f),
-                            shape = CircleShape,
-                            onClick = {
-                                updateColor("system_neutral1_10", C_10.toArgb())
-                                updateColor("system_neutral1_50", C_50.toArgb())
-                                updateColor("system_neutral1_100", C_100.toArgb())
-                                updateColor("system_neutral1_200", C_200.toArgb())
-                                updateColor("system_neutral1_300", C_300.toArgb())
-                                updateColor("system_neutral1_400", C_400.toArgb())
-                                updateColor("system_neutral1_500", C_500.toArgb())
-                                updateColor("system_neutral1_600", C_600.toArgb())
-                                updateColor("system_neutral1_700", C_700.toArgb())
-                                updateColor("system_neutral1_800", C_800.toArgb())
-                                updateColor("system_neutral1_900", C_900.toArgb())
-                                colorsXmlContent =
-                                    Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                            }) {
-                            Text(text = "N1")
-
-                        }
-                        Spacer(modifier = Modifier.width(2.dp))
-
-                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                            updateColor("system_neutral2_10", C_10.toArgb())
-                            updateColor("system_neutral2_50", C_50.toArgb())
-                            updateColor("system_neutral2_100", C_100.toArgb())
-                            updateColor("system_neutral2_200", C_200.toArgb())
-                            updateColor("system_neutral2_300", C_300.toArgb())
-                            updateColor("system_neutral2_400", C_400.toArgb())
-                            updateColor("system_neutral2_500", C_500.toArgb())
-                            updateColor("system_neutral2_600", C_600.toArgb())
-                            updateColor("system_neutral2_700", C_700.toArgb())
-                            updateColor("system_neutral2_800", C_800.toArgb())
-                            updateColor("system_neutral2_900", C_900.toArgb())
-                            colorsXmlContent =
-                                Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                        }) {
-                            Text(text = "N2")
-                        }
-                        Spacer(modifier = Modifier.width(2.dp))
-
-
-                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                            updateColor("system_accent1_10", C_10.toArgb())
-                            updateColor("system_accent1_50", C_50.toArgb())
-                            updateColor("system_accent1_100", C_100.toArgb())
-                            updateColor("system_accent1_200", C_200.toArgb())
-                            updateColor("system_accent1_300", C_300.toArgb())
-                            updateColor("system_accent1_400", C_400.toArgb())
-                            updateColor("system_accent1_500", C_500.toArgb())
-                            updateColor("system_accent1_600", C_600.toArgb())
-                            updateColor("system_accent1_700", C_700.toArgb())
-                            updateColor("system_accent1_800", C_800.toArgb())
-                            updateColor("system_accent1_900", C_900.toArgb())
-                            colorsXmlContent =
-                                Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                        }) {
-                            Text(text = "A1")
-                        }
-                        Spacer(modifier = Modifier.width(2.dp))
-
-                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                            updateColor("system_accent2_10", C_10.toArgb())
-                            updateColor("system_accent2_50", C_50.toArgb())
-                            updateColor("system_accent2_100", C_100.toArgb())
-                            updateColor("system_accent2_200", C_200.toArgb())
-                            updateColor("system_accent2_300", C_300.toArgb())
-                            updateColor("system_accent2_400", C_400.toArgb())
-                            updateColor("system_accent2_500", C_500.toArgb())
-                            updateColor("system_accent2_600", C_600.toArgb())
-                            updateColor("system_accent2_700", C_700.toArgb())
-                            updateColor("system_accent2_800", C_800.toArgb())
-                            updateColor("system_accent2_900", C_900.toArgb())
-                            colorsXmlContent =
-                                Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                        }) {
-                            Text(text = "A2")
-                        }
-                        Spacer(modifier = Modifier.width(2.dp))
-
-                        Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                            updateColor("system_accent3_10", C_10.toArgb())
-                            updateColor("system_accent3_50", C_50.toArgb())
-                            updateColor("system_accent3_100", C_100.toArgb())
-                            updateColor("system_accent3_200", C_200.toArgb())
-                            updateColor("system_accent3_300", C_300.toArgb())
-                            updateColor("system_accent3_400", C_400.toArgb())
-                            updateColor("system_accent3_500", C_500.toArgb())
-                            updateColor("system_accent3_600", C_600.toArgb())
-                            updateColor("system_accent3_700", C_700.toArgb())
-                            updateColor("system_accent3_800", C_800.toArgb())
-                            updateColor("system_accent3_900", C_900.toArgb())
-                            colorsXmlContent =
-                                Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                        }) {
-                            Text(text = "A3")
-                        }
-
-                    }
-                    Row {
-                        OutlinedTextField(modifier = Modifier.weight(1f),
-                            value = hue.toString(),
-                            singleLine = true,
-                            onValueChange = {
-                                val parsedValue = it.toFloatOrNull()
-                                if (parsedValue != null) {
-                                    // Clamp the value within the range [0, 360]
-                                    hue = parsedValue.coerceIn(0f, 360f)
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("H") })
-                        Spacer(Modifier.width(8.dp))
-
-                        OutlinedTextField(modifier = Modifier.weight(1f),
-                            value = saturation.toString(),
-                            singleLine = true,
-                            onValueChange = {
-                                val parsedValue = it.toFloatOrNull()
-                                if (parsedValue != null) {
-                                    // Clamp the value within the range [0, 360]
-                                    saturation = parsedValue.coerceIn(0f, 100f)
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("S") })
-                        Spacer(Modifier.width(8.dp))
-
-                        OutlinedTextField(modifier = Modifier.weight(1f),
-                            value = lightness.toString(),
-                            singleLine = true,
-                            onValueChange = {
-                                val parsedValue = it.toFloatOrNull()
-                                if (parsedValue != null) {
-                                    // Clamp the value within the range [0, 360]
-                                    lightness = parsedValue.coerceIn(-10f, 10f)
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("L") })
+                        M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
+                        M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
+                        M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
+                        M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
+                        M3Tile(color = sn1_300, colorName = "sn1_300", themedColor = C_300)
+                        M3Tile(color = sn1_400, colorName = "sn1_400", themedColor = C_400)
+                        M3Tile(color = sn1_500, colorName = "sn1_500", themedColor = C_500)
+                        M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
+                        M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
+                        M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
+                        M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
 
                     }
 
+                    Column(horizontalAlignment = CenterHorizontally) {
+                        Text(
+                            text = "N2",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                        M3Tile(color = sn2_10, colorName = "sn2_10", themedColor = C_10)
+                        M3Tile(color = sn2_50, colorName = "sn2_50", themedColor = C_50)
+                        M3Tile(color = sn2_100, colorName = "sn2_100", themedColor = C_100)
+                        M3Tile(color = sn2_200, colorName = "sn2_200", themedColor = C_200)
+                        M3Tile(color = sn2_300, colorName = "sn2_300", themedColor = C_300)
+                        M3Tile(color = sn2_400, colorName = "sn2_400", themedColor = C_400)
+                        M3Tile(color = sn2_500, colorName = "sn2_500", themedColor = C_500)
+                        M3Tile(color = sn2_600, colorName = "sn2_600", themedColor = C_600)
+                        M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
+                        M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
+                        M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
+
+                    }
+
+                    Column(horizontalAlignment = CenterHorizontally) {
+                        Text(
+                            text = "A1",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                        M3Tile(color = sa1_10, colorName = "sa1_10", themedColor = C_10)
+                        M3Tile(color = sa1_50, colorName = "sa1_50", themedColor = C_50)
+                        M3Tile(color = sa1_100, colorName = "sa1_100", themedColor = C_100)
+                        M3Tile(color = sa1_200, colorName = "sa1_200", themedColor = C_200)
+                        M3Tile(color = sa1_300, colorName = "sa1_300", themedColor = C_300)
+                        M3Tile(color = sa1_400, colorName = "sa1_400", themedColor = C_400)
+                        M3Tile(color = sa1_500, colorName = "sa1_500", themedColor = C_500)
+                        M3Tile(color = sa1_600, colorName = "sa1_600", themedColor = C_600)
+                        M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
+                        M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
+                        M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
+
+                    }
+
+                    Column(horizontalAlignment = CenterHorizontally) {
+                        Text(
+                            text = "A2",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                        M3Tile(color = sa2_10, colorName = "sa2_10", themedColor = C_10)
+                        M3Tile(color = sa2_50, colorName = "sa2_50", themedColor = C_50)
+                        M3Tile(color = sa2_100, colorName = "sa2_100", themedColor = C_100)
+                        M3Tile(color = sa2_200, colorName = "sa2_200", themedColor = C_200)
+                        M3Tile(color = sa2_300, colorName = "sa2_300", themedColor = C_300)
+                        M3Tile(color = sa2_400, colorName = "sa2_400", themedColor = C_400)
+                        M3Tile(color = sa2_500, colorName = "sa2_500", themedColor = C_500)
+                        M3Tile(color = sa2_600, colorName = "sa2_600", themedColor = C_600)
+                        M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
+                        M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
+                        M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
+
+                    }
+
+                    Column(horizontalAlignment = CenterHorizontally) {
+                        Text(
+                            text = "A3",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                        M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
+                        M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
+                        M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
+                        M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
+                        M3Tile(color = sa3_300, colorName = "sa3_300", themedColor = C_300)
+                        M3Tile(color = sa3_400, colorName = "sa3_400", themedColor = C_400)
+                        M3Tile(color = sa3_500, colorName = "sa3_500", themedColor = C_500)
+                        M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
+                        M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
+                        M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
+                        M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
+
+                    }
+
+                }
+
+                fun updateColor(colorName: String, colorValue: Int?) {
+                    Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
+                    Shell.SU.run(
+                        """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                            "%08x".format(
+                                colorValue ?: 0
+                            )
+                        }</g' res/values$isDark/colors.xml"""
+                    )
+
+
+                }
+
+                Row(modifier = Modifier.padding(horizontal = 1.dp)) {
+                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                        updateColor("system_neutral1_10", C_10.toArgb())
+                        updateColor("system_neutral1_50", C_50.toArgb())
+                        updateColor("system_neutral1_100", C_100.toArgb())
+                        updateColor("system_neutral1_200", C_200.toArgb())
+                        updateColor("system_neutral1_300", C_300.toArgb())
+                        updateColor("system_neutral1_400", C_400.toArgb())
+                        updateColor("system_neutral1_500", C_500.toArgb())
+                        updateColor("system_neutral1_600", C_600.toArgb())
+                        updateColor("system_neutral1_700", C_700.toArgb())
+                        updateColor("system_neutral1_800", C_800.toArgb())
+                        updateColor("system_neutral1_900", C_900.toArgb())
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                    }) {
+                        Text(text = "N1")
+
+                    }
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                        updateColor("system_neutral2_10", C_10.toArgb())
+                        updateColor("system_neutral2_50", C_50.toArgb())
+                        updateColor("system_neutral2_100", C_100.toArgb())
+                        updateColor("system_neutral2_200", C_200.toArgb())
+                        updateColor("system_neutral2_300", C_300.toArgb())
+                        updateColor("system_neutral2_400", C_400.toArgb())
+                        updateColor("system_neutral2_500", C_500.toArgb())
+                        updateColor("system_neutral2_600", C_600.toArgb())
+                        updateColor("system_neutral2_700", C_700.toArgb())
+                        updateColor("system_neutral2_800", C_800.toArgb())
+                        updateColor("system_neutral2_900", C_900.toArgb())
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+
+                    }) {
+                        Text(text = "N2")
+                    }
+                    Spacer(modifier = Modifier.width(2.dp))
+
+
+                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                        updateColor("system_accent1_10", C_10.toArgb())
+                        updateColor("system_accent1_50", C_50.toArgb())
+                        updateColor("system_accent1_100", C_100.toArgb())
+                        updateColor("system_accent1_200", C_200.toArgb())
+                        updateColor("system_accent1_300", C_300.toArgb())
+                        updateColor("system_accent1_400", C_400.toArgb())
+                        updateColor("system_accent1_500", C_500.toArgb())
+                        updateColor("system_accent1_600", C_600.toArgb())
+                        updateColor("system_accent1_700", C_700.toArgb())
+                        updateColor("system_accent1_800", C_800.toArgb())
+                        updateColor("system_accent1_900", C_900.toArgb())
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+
+                    }) {
+                        Text(text = "A1")
+                    }
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                        updateColor("system_accent2_10", C_10.toArgb())
+                        updateColor("system_accent2_50", C_50.toArgb())
+                        updateColor("system_accent2_100", C_100.toArgb())
+                        updateColor("system_accent2_200", C_200.toArgb())
+                        updateColor("system_accent2_300", C_300.toArgb())
+                        updateColor("system_accent2_400", C_400.toArgb())
+                        updateColor("system_accent2_500", C_500.toArgb())
+                        updateColor("system_accent2_600", C_600.toArgb())
+                        updateColor("system_accent2_700", C_700.toArgb())
+                        updateColor("system_accent2_800", C_800.toArgb())
+                        updateColor("system_accent2_900", C_900.toArgb())
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+
+                    }) {
+                        Text(text = "A2")
+                    }
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
+                        updateColor("system_accent3_10", C_10.toArgb())
+                        updateColor("system_accent3_50", C_50.toArgb())
+                        updateColor("system_accent3_100", C_100.toArgb())
+                        updateColor("system_accent3_200", C_200.toArgb())
+                        updateColor("system_accent3_300", C_300.toArgb())
+                        updateColor("system_accent3_400", C_400.toArgb())
+                        updateColor("system_accent3_500", C_500.toArgb())
+                        updateColor("system_accent3_600", C_600.toArgb())
+                        updateColor("system_accent3_700", C_700.toArgb())
+                        updateColor("system_accent3_800", C_800.toArgb())
+                        updateColor("system_accent3_900", C_900.toArgb())
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+
+                    }) {
+                        Text(text = "A3")
+                    }
+
+                }
+                Row {
+                    OutlinedTextField(modifier = Modifier.weight(1f),
+                        value = stringhue,
+                        singleLine = true,
+                        onValueChange = {
+                            stringhue = it; editor.putString("hue", it).apply()
+
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        label = { Text("H") })
+                    Spacer(Modifier.width(8.dp))
+
+                    OutlinedTextField(modifier = Modifier.weight(1f),
+                        value = stringsaturation,
+                        singleLine = true,
+                        onValueChange = {
+                            stringsaturation = it; editor.putString("saturation", it).apply()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        label = { Text("S") })
+                    Spacer(Modifier.width(8.dp))
+
+                    OutlinedTextField(modifier = Modifier.weight(1f),
+                        value = stringlightness,
+                        singleLine = true,
+                        onValueChange = {
+                            stringlightness = it; editor.putString("lightness", it).apply()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        label = { Text("L") })
+
+                }
 
 
                     Column(
@@ -572,10 +588,10 @@ fun FabricatedMonet(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth() .pointerInput(Unit) { detectTapGestures {} },
                                 value = selectedColorReference,
                                 onValueChange = { selectedColorReference = it },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                                 label = { Text("Select Color Reference") },
                                 singleLine = true
                             )
@@ -604,10 +620,10 @@ fun FabricatedMonet(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth() .pointerInput(Unit) { detectTapGestures {} },
                                 value = selectedMonetColor,
                                 onValueChange = { selectedMonetColor = it },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                                 label = { Text("Select Monet Color") },
                                 singleLine = true
                             )
@@ -630,71 +646,73 @@ fun FabricatedMonet(
                     }
 
 
-                    HeaderRow(
-                        header = "Disable Monet",
-                        subHeader = "Ye you need to enable this first, duh",
-                        isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
-                        onCheckedChange = {
-                            if (it) {
-                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
-                                Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
-                                overlayEnable("misc.flagmonet")
+                HeaderRow(
+                    header = "Disable Monet",
+                    subHeader = "Ye you need to enable this first, duh",
+                    isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
+                    onCheckedChange = {
+                        if (it) {
+                            Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
+                            Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
+                            overlayEnable("misc.flagmonet")
 
-                            } else {
-                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
-                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
-                                Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
-
-                            }
-                        },
-                        showSwitch = true
-                    )
-
-                    HeaderRow(
-                        header = "Override colors for dark theme",
-                        showSwitch = true,
-                        isChecked = sharedPreferences.getBoolean("accents_dark", false),
-                        onCheckedChange = {
-                            if (it) {
-                                isDark = "-night"
-                            } else {
-                                isDark = ""
-                            }
-                            colorsXmlContent =
-                                Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                        },
-                    )
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(), onClick = {
-                            Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                            buildOverlay()
-                            Shell.SU.run("""cmd overlay enable themed.fakemonet.generic""")
-                            showInterstitial(context) {}
-
-
-                        }, colors = ButtonDefaults.buttonColors(
-                            backgroundColor = C_500, contentColor = if (lightness > 50f) {
-                                Color.Black
-                            } else {
-                                Color.White
-                            }
-                        ), shape = CircleShape
-                    ) {
-                        Row(verticalAlignment = CenterVertically) {
-
-                            Text(text = "Build and update")
-                            Icon(
-                                modifier = Modifier.height(24.dp),
-                                imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px),
-                                contentDescription = ""
-                            )
+                        } else {
+                            Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
+                            Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                            Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
 
                         }
+                    },
+                    showSwitch = true
+                )
+
+                HeaderRow(
+                    header = "Override colors for dark theme",
+                    showSwitch = true,
+                    isChecked = sharedPreferences.getString("isDark", "") == "-night",
+                    onCheckedChange = {
+                        if (it) {
+                            editor.putString("isDark", "-night").apply()
+
+                        } else {
+                            editor.putString("isDark", "").apply()
+                        }
+                        colorsXmlContent =
+                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                        isDark = sharedPreferences.getString("isDark", "")
+                    },
+                )
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(), onClick = {
+                        Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
+                        buildOverlay()
+                        Shell.SU.run("""cmd overlay enable themed.fakemonet.generic""")
+                        showInterstitial(context) {}
+
+
+                    }, colors = ButtonDefaults.buttonColors(
+                        backgroundColor = C_500, contentColor = if (lightness > 50f) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    ), shape = CircleShape
+                ) {
+                    Row(verticalAlignment = CenterVertically) {
+
+                        Text(text = "Build and update")
+                        Icon(
+                            modifier = Modifier.height(24.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px),
+                            contentDescription = ""
+                        )
+
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+
+
             }
         }
     }

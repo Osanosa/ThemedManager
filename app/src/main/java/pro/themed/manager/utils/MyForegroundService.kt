@@ -1,30 +1,24 @@
 package pro.themed.manager.utils
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import pro.themed.manager.MyApplication
+import android.app.*
+import android.content.*
+import android.os.*
+import androidx.core.app.*
+import com.google.firebase.crashlytics.ktx.*
+import com.google.firebase.ktx.*
+import com.jaredrummler.ktsh.*
+import kotlinx.coroutines.*
+import pro.themed.manager.log
+import pro.themed.manager.*
 import pro.themed.manager.R
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 class MyForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
     private var countdown = 3 // Initial countdown value
     private var isMaxRate = false // Flag to track the rate state
-    private val shell2 = Shell.SU
+    private val shell1 = Shell("su")
+    private val shell2 = Shell("su")
     private var isCountdownRunning = false // Flag to ensure countdown runs only once
     private val sharedPreferences: SharedPreferences =
         MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
@@ -34,11 +28,11 @@ class MyForegroundService : Service() {
         val actualIntent = intent ?: Intent() // Use an empty intent if it's null
 
         Thread {}.start()
-        Shell.SH.run("su -c getevent | grep 0003") {
+       shell1.run("getevent | grep 0003") {
             onStdOut = {
                 countdown = 3 // Reset countdown to the initial value
                 CoroutineScope(Dispatchers.IO).launch {
-
+it.log()
 
                     if (!isCountdownRunning) {
                         isCountdownRunning = true // Set flag to indicate countdown is running

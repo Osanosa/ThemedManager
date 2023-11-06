@@ -1,59 +1,31 @@
 @file:OptIn(
     ExperimentalMaterialApi::class
-) @file:Suppress("DEPRECATION")
+)
 
 package pro.themed.manager.comps
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.AdmobBanner
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.unit.*
+import com.jaredrummler.ktsh.*
+import pro.themed.manager.*
 import pro.themed.manager.R
-import pro.themed.manager.getOverlayList
-import pro.themed.manager.overlayEnable
-import pro.themed.manager.ui.theme.bordercol
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.*
 
 @Composable
 fun IconsTab() {
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 56.dp),
+            .fillMaxSize(),
         color = MaterialTheme.colors.cardcol
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 8.dp)) {
@@ -183,7 +155,7 @@ fun NavbarCard() {
         }
     }
 }
-
+@Stable
 @Composable
 private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String) {
     val context = LocalContext.current
@@ -210,7 +182,7 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
     }
 }
 
-//@Preview
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IconPackCard() {

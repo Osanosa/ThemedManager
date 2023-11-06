@@ -18,7 +18,6 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.*
 import com.jaredrummler.ktsh.*
 import com.jaredrummler.ktsh.Shell.Companion.SU
-import log
 import pro.themed.manager.*
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.*
@@ -51,15 +50,15 @@ import java.util.concurrent.*
                         HeaderRow(stringResource(R.string.disable_overlays),
                             stringResource(R.string.disable_overlays_header),
                             button1text = stringResource(R.string.all),
-                            button1onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
+                            button1onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
                             button2text = stringResource(R.string.stock),
                             button2onClick = {
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
                             },
                             button3text = stringResource(R.string.themed),
-                            button3onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '^.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
+                            button3onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
                         HeaderRow(
                             stringResource(R.string.restart_systemui),
                             stringResource(R.string.systemui_restart_header),
@@ -267,10 +266,10 @@ import java.util.concurrent.*
                             button1text = "Stop",
                             button2text = "Start",
                             button2onClick = {
-                                Shell.SU.run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
+                                SU.run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
                             },
                             button1onClick = {
-                                Shell.SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
+                                SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
                             },
                             showSwitch = true,
                             switchDescription = "Start on boot",
@@ -322,7 +321,7 @@ import java.util.concurrent.*
                     }
 
                 }
-                androidx.compose.animation.AnimatedVisibility(
+                AnimatedVisibility(
                     visible = progress,
                     Modifier
                         .align(
@@ -330,7 +329,7 @@ import java.util.concurrent.*
                         )
                         .padding(16.dp), enter = scaleIn()
                 ) {
-                    androidx.compose.material.Card(
+                    Card(
                         Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState()),

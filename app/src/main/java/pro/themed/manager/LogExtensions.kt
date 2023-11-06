@@ -1,4 +1,4 @@
-// Create a LogExtensions.kt file or add this code to an existing Kotlin file.
+package pro.themed.manager// Create a LogExtensions.kt file or add this code to an existing Kotlin file.
 
 import android.util.Log
 

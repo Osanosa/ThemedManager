@@ -1,12 +1,9 @@
 package pro.themed.manager.utils
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.MyApplication
+import android.content.*
+import androidx.compose.runtime.*
+import com.jaredrummler.ktsh.*
+import pro.themed.manager.*
 
 
 object GlobalVariables {
@@ -26,6 +23,15 @@ object GlobalVariables {
     }
 
     val themedId by lazy {
-        Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""").stdout()
+        Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
+            .stdout()
     }
+
+    val onDemandCompilerShell by lazy {
+        Shell.SU
+    }
+    val AutoRefreshRateServiceShell by lazy {
+        Shell.SU
+    }
+
 }

@@ -2,8 +2,10 @@ package pro.themed.manager.utils
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.style.*
 import androidx.navigation.*
 import androidx.navigation.compose.*
+import pro.themed.manager.*
 import pro.themed.manager.comps.*
 
 @ExperimentalMaterial3Api
@@ -13,16 +15,34 @@ fun Navigation(navController: NavHostController) {
     NavHost(navController, startDestination = NavigationItems.ColorsTab.route) {
 
         composable(NavigationItems.ColorsTab.route) {
-            FabricatedMonet()
+            if (getOverlayList().overlayList.isEmpty()) {
+                androidx.compose.material.Text(
+                    textAlign = TextAlign.Center,
+                    text = "Themed overlays are missing\nTry installing module from about screen"
+                )
+            } else {
+            FabricatedMonet()}
         }
         composable(NavigationItems.IconsTab.route) {
-            IconsTab()
+            if (getOverlayList().overlayList.isEmpty()) {
+                androidx.compose.material.Text(
+                    textAlign = TextAlign.Center,
+                    text = "Themed overlays are missing\nTry installing module from about screen"
+                )
+            } else {
+            IconsTab()}
         }
         /*composable(NavigationItems.FontsTab.route) {
             AppsTab()
         }*/
         composable(NavigationItems.MiscTab.route) {
-            MiscTab()
+            if (getOverlayList().overlayList.isEmpty()) {
+                androidx.compose.material.Text(
+                    textAlign = TextAlign.Center,
+                    text = "Themed overlays are missing\nTry installing module from about screen"
+                )
+            } else {
+            MiscTab()}
         }
 
         composable(NavigationItems.About.route) {

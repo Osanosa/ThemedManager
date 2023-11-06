@@ -34,8 +34,8 @@ import kotlin.math.*
 @Composable
 fun QSTileCard() {
     val context = LocalContext.current
-    val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 6
-
+    val testdp = (LocalConfiguration.current.screenWidthDp - 64 -16) / 5
+@Stable
     @Composable
     fun MyIconButton(overlayname: String, contentdescription: String, iconname: Int) {
 

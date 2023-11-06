@@ -3,4 +3,4 @@
     android:width="40.0dip"
     android:height="40.0dip"
     android:viewportWidth="2.2"
-    android:viewportHeight="2.2"></vector>
+    android:viewportHeight="2.2" />

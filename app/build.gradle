@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 import java.text.SimpleDateFormat
 
 static def computeVersionCode() {
@@ -98,7 +96,7 @@ android {
         buildConfig true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.2'
+        kotlinCompilerExtensionVersion '1.5.3'
     }
     packagingOptions {
         resources {
@@ -106,37 +104,34 @@ android {
         }
     }
 
-    tasks.withType(KotlinCompile).configureEach {
 
-    }
 }
 
 dependencies {
-    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.9.10'))
+    implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.9.20'))
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.activity:activity-compose:1.8.0'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation "androidx.compose.material:material:$compose_ui_version"
     implementation 'androidx.browser:browser:1.6.0'
 
-    implementation 'com.google.android.gms:play-services-ads-lite:22.4.0'
-    implementation 'com.google.android.gms:play-services-ads:22.4.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:22.5.0'
+    implementation 'com.google.android.gms:play-services-ads:22.5.0'
 
 
-    implementation 'com.google.firebase:firebase-perf-ktx:20.4.1'
-    implementation 'com.google.firebase:firebase-messaging-ktx:23.2.1'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.5.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.3.1'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.3.5'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx:20.4.0'
     implementation "androidx.compose.material:material-icons-core:$compose_ui_version"
     implementation 'androidx.paging:paging-common-ktx:3.2.1'
     implementation "androidx.compose.ui:ui-graphics:$compose_ui_version"
-    implementation platform('androidx.compose:compose-bom:2023.09.02')
-    implementation files('src/main/java/pro/themed/manager/apksigner.jar')
+    implementation platform('androidx.compose:compose-bom:2023.10.01')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -144,16 +139,16 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
     implementation 'com.jaredrummler:ktsh:1.0.0'
-    implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.5.0'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.32.0'
-    implementation 'com.google.firebase:firebase-perf:20.4.1'
+    implementation 'com.google.firebase:firebase-perf:20.5.0'
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
 
     // Splash API
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Navigation Compose
-    implementation('androidx.navigation:navigation-compose:2.7.3')
+    implementation('androidx.navigation:navigation-compose:2.7.5')
 
     // Pager and Indicators - Accompanist
     implementation 'com.google.accompanist:accompanist-pager:0.32.0'
@@ -163,16 +158,16 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Dagger - Hilt
-    implementation 'com.google.dagger:hilt-android:2.48'
-    kapt 'com.google.dagger:hilt-android-compiler:2.48'
-    kapt 'androidx.hilt:hilt-compiler:1.0.0'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+    implementation 'com.google.dagger:hilt-android:2.48.1'
+    kapt 'com.google.dagger:hilt-android-compiler:2.48.1'
+    kapt 'androidx.hilt:hilt-compiler:1.1.0'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
 
 
     implementation 'androidx.preference:preference-ktx:1.2.1'
 
 
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha08'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha10'
 
     implementation "androidx.compose.ui:ui-util:$compose_ui_version"
 
@@ -180,11 +175,19 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
 
-    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
 
-    implementation(platform('com.google.firebase:firebase-bom:32.3.1'))
+    implementation(platform('com.google.firebase:firebase-bom:32.5.0'))
 
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
 
+// https://mvnrepository.com/artifact/org.apktool/apktool-lib
+    //  implementation("org.apktool:apktool-lib:2.9.0")
+
+// https://mvnrepository.com/artifact/com.android.tools.build/apksig
+    //   implementation('com.android.tools.build:apksig:8.1.2')
+
+//    implementation "androidx.compose.ui:ui-window:1.5.0"
+implementation("junit:junit:4.13.2")
 }

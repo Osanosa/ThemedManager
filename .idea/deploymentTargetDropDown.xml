@@ -13,12 +13,12 @@
               <deviceKey>
                 <Key>
                   <type value="SERIAL_NUMBER" />
-                  <value value="adb-BV9200NEU0002161-IAbqf8._adb-tls-connect._tcp" />
+                  <value value="adb-BV9200NEU0002161-IbHv71._adb-tls-connect._tcp" />
                 </Key>
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-10-04T21:50:01.115715500Z" />
+          <timeTargetWasSelectedWithDropDown value="2023-11-01T17:27:25.480305700Z" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />

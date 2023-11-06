@@ -1,7 +1,3 @@
-@file:OptIn(
-    ExperimentalFoundationApi::class
-)
-
 package pro.themed.manager
 
 import android.content.*

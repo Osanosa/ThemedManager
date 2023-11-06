@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package pro.themed.manager
 
 import android.annotation.*
@@ -15,38 +13,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.vector.*
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.viewinterop.*
 import androidx.core.graphics.*
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.*
 import androidx.navigation.compose.*
-import com.android.apksigner.*
 import com.google.android.gms.ads.*
 import com.google.firebase.analytics.ktx.*
 import com.google.firebase.crashlytics.ktx.*
 import com.google.firebase.database.*
 import com.google.firebase.ktx.*
-import com.jaredrummler.ktsh.*
 import com.jaredrummler.ktsh.Shell.Companion.SH
 import com.jaredrummler.ktsh.Shell.Companion.SU
 import kotlinx.coroutines.*
-import log
 import pro.themed.manager.comps.*
 import pro.themed.manager.ui.theme.*
 import pro.themed.manager.utils.*
@@ -78,7 +68,7 @@ data class OverlayListData(
 
 
 @Composable
-fun AdmobBanner(modifier: Modifier = Modifier) {
+fun AdmobBanner() {
     if (!MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
             .getBoolean("isContributor", false)
     ) {
@@ -142,7 +132,19 @@ object SharedPreferencesManager {
     }
 }
 
-
+/*fun requestStoragePermission(context: Context) {
+    val intent = Intent()
+    intent.setAction(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+    intent.setData(Uri.fromParts("package", BuildConfig.APPLICATION_ID, null))
+    (context as Activity).startActivityForResult(intent, 0)
+    ActivityCompat.requestPermissions(
+        context, arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE
+        ), 0
+    )
+}*/
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -166,9 +168,8 @@ class MainActivity : ComponentActivity() {
         }
 
         if (foregroundServiceRunning()) {
-            Log.d("service", "attempting to stop")
-            SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
             SU.run("killall pro.themed.manager")
+            Log.d("service", "attempting to stop")
 
         }
         setContent {
@@ -176,13 +177,14 @@ class MainActivity : ComponentActivity() {
             ThemedManagerTheme {
                 val context = MyApplication.appContext
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
-                if ("root" !in whoami) {
-                    Toast.makeText(
-                        context, getString(R.string.no_root_access), Toast.LENGTH_LONG
-                    ).show()
-                }
+
                 if (sharedPreferences.getBoolean("onBoardingCompleted", false)) {
                     splashScreen.setKeepOnScreenCondition { true }
+                    if ("root" !in whoami) {
+                        Toast.makeText(
+                            context, getString(R.string.no_root_access), Toast.LENGTH_LONG
+                        ).show()
+                    }
                     getOverlayList()
                     Main()
                     LaunchedEffect(Unit) {
@@ -449,26 +451,23 @@ fun Main() {
 
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                if (getOverlayList().overlayList.isEmpty()) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = "Themed overlays are missing\nTry installing module from about screen"
-                    )
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
+
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Box(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                           Navigation(navController)
-                        }
-                        NavigationRailSample(navController)}
+                        Navigation(navController)
+                    }
+                    NavigationRailSample(navController)
                 }
+
             }
         }
     }
 }
+
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
@@ -481,99 +480,6 @@ fun getContrastColor(background: Int): Color {
 
     val luminance = (0.299 * background.red + 0.587 * background.green + 0.114 * background.blue)
     return if (luminance > threshold) Color.Black else Color.White
-}
-
-@Preview
-@Preview
-@Composable
-fun ColorReferencesEditor() {
-
-}
-
-
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    val items = listOf(
-        NavigationItems.ColorsTab, NavigationItems.IconsTab,
-        //  NavigationItems.FontsTab,
-        NavigationItems.MiscTab
-    )
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colors.cardcol,
-        contentColor = MaterialTheme.colors.textcol,
-        elevation = 0.dp
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
-
-        items.forEach { items ->
-            BottomNavigationItem(icon = {
-                Icon(
-                      imageVector = ImageVector.vectorResource(id = items.icon),
-                    contentDescription = items.title,
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-                label = { Text(text = items.title) },
-                selectedContentColor = MaterialTheme.colors.textcol,
-                unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
-                alwaysShowLabel = true,
-                selected = currentRoute == items.route,
-                onClick = {
-                    navController.navigate(items.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route = route) {
-                                saveState = true
-                            }
-                        }
-
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-
-                })
-        }
-    }
-
-}
-
-
-
-
-//@Preview()
-@Composable
-fun TopAppBar() {
-    val context = LocalContext.current
-
-    TopAppBar(elevation = 0.dp,
-        title = { Text(stringResource(R.string.app_name)) },
-        backgroundColor = MaterialTheme.colors.cardcol,
-        actions = {
-            IconButton(onClick = {
-                context.startActivity(Intent(context, ToolboxActivity::class.java))
-
-            }) {
-                Icon(painterResource(id = R.drawable.toolbox), contentDescription = "Settings")
-            }
-
-            IconButton(onClick = {
-                context.startActivity(Intent(context, SettingsActivity::class.java))
-
-            }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
-            }
-
-            IconButton(onClick = {
-                context.startActivity(Intent(context, AboutActivity::class.java))
-            }) {
-                Icon(Icons.Default.Info, contentDescription = "list")
-            }
-
-
-        })
-
 }
 
 
@@ -605,8 +511,37 @@ fun overlayEnable(overlayname: String) {
 
 fun buildOverlay() {
     CoroutineScope(Dispatchers.IO).launch {
-ApkSignerTool.main(arrayOf("help",))
-        var path = Shell.SU.run("pwd").stdout().log()
+
+    /*    val signerConfig = ApkSigner.SignerConfig.Builder("overlay", privateKey, certs).build()
+        val signerConfigs: MutableList<ApkSigner.SignerConfig> = ArrayList()
+        signerConfigs.add(signerConfig)
+        val source = "$modulePath/onDemandCompiler/unsigned.apk"
+        val signedOverlayAPKPath = "$modulePath/onDemandCompiler/signed.apk"
+
+        ApkSigner.Builder(signerConfigs)
+            .setV1SigningEnabled(false)
+            .setV2SigningEnabled(true)
+            .setInputApk(File(source))
+            .setOutputApk(File(signedOverlayAPKPath))
+            .setMinSdkVersion(Build.VERSION.SDK_INT)
+            .build()
+            .sign()
+
+        com.android.apksigner.ApkSignerTool.main(
+            arrayOf(
+                "sign",
+                "--key",
+                "$modulePath/onDemandCompiler/testkey.pk8",
+                "--cert",
+                "$modulePath/onDemandCompiler/testkey.x509.pem",
+                "--out",
+                "signed.apk",
+                "unsigned.apk"
+            )
+        )
+*/
+
+        SU.run("pwd").stdout().log()
         SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
         SU.run("""zipsigner unsigned.apk signed.apk""")
         SU.run("""pm install signed.apk""")
