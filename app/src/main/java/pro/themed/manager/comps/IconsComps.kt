@@ -9,6 +9,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
@@ -20,7 +24,7 @@ import com.jaredrummler.ktsh.*
 import pro.themed.manager.*
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.*
-
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun IconsTab() {
     Surface(

@@ -2,10 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="NavigationRailSample">
-        <State />
-      </entry>
-      <entry key="app">
+      <entry key="FontsTab">
         <State>
           <runningDeviceTargetSelectedWithDropDown>
             <Target>
@@ -18,18 +15,23 @@
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-11-01T17:27:25.480305700Z" />
-          <runningDeviceTargetsSelectedWithDialog>
+          <timeTargetWasSelectedWithDropDown value="2023-11-08T14:59:31.352637500Z" />
+        </State>
+      </entry>
+      <entry key="app">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
                   <type value="SERIAL_NUMBER" />
-                  <value value="adb-BV9200NEU0002161-IAbqf8._adb-tls-connect._tcp" />
+                  <value value="adb-BV6800Pro054240-m0vQY6._adb-tls-connect._tcp" />
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetsSelectedWithDialog>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2023-11-08T22:12:39.707734900Z" />
         </State>
       </entry>
     </value>

@@ -12,9 +12,9 @@
       "filters": [],
       "attributes": [],
       "minSdkVersionForDexing": 26,
-      "versionCode": 231105,
-      "versionName": "23.11.05",
-      "outputFile": "ThemedManager-v23.11.05-release.apk"
+      "versionCode": 231107,
+      "versionName": "23.11.07",
+      "outputFile": "ThemedManager-v23.11.07-release.apk"
     }
   ],
   "elementType": "File"

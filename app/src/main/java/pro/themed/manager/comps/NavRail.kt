@@ -23,7 +23,7 @@ fun NavigationRailSample(
 
     val itemsbottom = listOf(
         NavigationItems.ColorsTab, NavigationItems.IconsTab,
-        // NavigationItems.FontsTab,
+         NavigationItems.FontsTab,
         NavigationItems.MiscTab
     )
     val itemstop = listOf(
@@ -69,14 +69,7 @@ fun NavigationRailSample(
                         onClick = {
                             if (!isSelected) {
                                 navController.navigate(item.route) {
-                                    navController.graph.startDestinationRoute?.let { route ->
-                                        popUpTo(route = route) {
-                                            saveState = true
-                                        }
-                                    }
 
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
                         })
@@ -104,14 +97,7 @@ fun NavigationRailSample(
                         onClick = {
                             if (!isSelected) {
                                 navController.navigate(item.route) {
-                                    navController.graph.startDestinationRoute?.let { route ->
-                                        popUpTo(route = route) {
-                                            saveState = true
-                                        }
-                                    }
 
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
                         })

@@ -27,7 +27,7 @@ import pro.themed.manager.*
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.*
 import kotlin.math.*
-
+@Stable
 @ExperimentalMaterial3Api
 @Composable
 fun Slideritem(
@@ -158,7 +158,7 @@ fun Slideritem(
     }
 }
 
-
+@Stable
 @Preview
 @Composable
 fun HeaderRow(
