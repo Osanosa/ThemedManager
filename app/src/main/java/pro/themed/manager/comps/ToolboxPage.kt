@@ -1,29 +1,55 @@
 package pro.themed.manager.comps
 
-import android.content.*
-import android.os.*
-import android.widget.*
-import androidx.compose.animation.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.foundation.text.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.unit.*
-import com.jaredrummler.ktsh.*
-import com.jaredrummler.ktsh.Shell.Companion.SU
-import pro.themed.manager.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.*
-import pro.themed.manager.utils.*
-import java.text.*
-import java.util.concurrent.*
+import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.log
+import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables
+import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 
 @Composable
     fun ToolboxPage() {
@@ -31,7 +57,7 @@ import java.util.concurrent.*
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
         ) {
-            var progress by remember {
+            var progress by rememberSaveable {
                 mutableStateOf(false)
             }
             var progresstext by remember { mutableStateOf("Waiting to start") }
@@ -50,34 +76,34 @@ import java.util.concurrent.*
                         HeaderRow(stringResource(R.string.disable_overlays),
                             stringResource(R.string.disable_overlays_header),
                             button1text = stringResource(R.string.all),
-                            button1onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
+                            button1onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
                             button2text = stringResource(R.string.stock),
                             button2onClick = {
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                SU.run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
                             },
                             button3text = stringResource(R.string.themed),
-                            button3onClick = { SU.run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
+                            button3onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
                         HeaderRow(
                             stringResource(R.string.restart_systemui),
                             stringResource(R.string.systemui_restart_header),
                             button1text = stringResource(R.string.restart_now),
-                            button1onClick = { SU.run("su -c killall com.android.systemui") },
+                            button1onClick = { Shell("su").run("su -c killall com.android.systemui") },
                         )
                         HeaderRow(stringResource(R.string.change_system_theme),
                             stringResource(R.string.change_a_theme_of_your_device),
                             button1text = stringResource(R.string.light),
                             button1onClick = {
-                                SU.run("cmd uimode night no")
+                                Shell("su").run("cmd uimode night no")
                             },
                             button2text = stringResource(R.string.dark),
                             button2onClick = {
-                                SU.run("cmd uimode night yes")
+                                Shell("su").run("cmd uimode night yes")
                             },
                             button3text = stringResource(R.string.auto),
                             button3onClick = {
-                                SU.run("cmd uimode night auto")
+                                Shell("su").run("cmd uimode night auto")
                             })
                         HeaderRow(
                             stringResource(R.string.clear_app_caches),
@@ -85,11 +111,11 @@ import java.util.concurrent.*
                             button1text = stringResource(R.string.clear_all),
                             button1onClick = {
                                 val freebefore =
-                                    SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
                                         .replace(Regex("[^0-9]"), "").toLong()
-                                SU.run("pm trim-caches 100000g")
+                                Shell("su").run("pm trim-caches 100000g")
                                 val freeafter =
-                                    SU.run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
                                         .replace(Regex("[^0-9]"), "").toLong()
                                 val difference: Float = freeafter.toFloat() - freebefore.toFloat()
                                 val toast = when {
@@ -126,13 +152,13 @@ import java.util.concurrent.*
                             button1text = "Everything",
                             button1onClick = {
                                 progress = true
-                                SU.run("cmd package compile -m everything -a$forcedex2oat") {
+                                Shell("su").run("cmd package compile -m everything -a$forcedex2oat") {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
                                     timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                                 }
-                                SU.run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
+                                Shell("su").run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
@@ -144,7 +170,7 @@ import java.util.concurrent.*
                             button2text = "Layouts",
                             button2onClick = {
                                 progress = true
-                                SU.run("cmd package compile --compile-layouts -a$forcedex2oat") {
+                                Shell("su").run("cmd package compile --compile-layouts -a$forcedex2oat") {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
@@ -155,7 +181,7 @@ import java.util.concurrent.*
                             button3text = "Reset",
                             button3onClick = {
                                 progress = true
-                                SU.run("cmd package compile --reset -a") {
+                                Shell("su").run("cmd package compile --reset -a") {
                                     onStdOut = { line: String ->
                                         progresstext = line
                                     }
@@ -197,7 +223,7 @@ import java.util.concurrent.*
                                                 onClick = {
 
                                                     downscalebynumber(width = customres)
-                                                    SU.run("sleep 10 ; wm size reset ; wm density reset")
+                                                    Shell("su").run("sleep 10 ; wm size reset ; wm density reset")
                                                 }) { Text(text = stringResource(R.string.test)) }
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Button(
@@ -227,7 +253,7 @@ import java.util.concurrent.*
                                 downscalebydivisor("2")
                                 if (sharedPreferences.getBoolean("resetwm", false)) {
                                     Thread.sleep(10000)
-                                    SU.run("wm size reset ; wm density reset")
+                                    Shell("su").run("wm size reset ; wm density reset")
                                 }
 
                             },
@@ -236,7 +262,7 @@ import java.util.concurrent.*
                                 downscalebydivisor("3")
                                 if (sharedPreferences.getBoolean("resetwm", false)) {
                                     Thread.sleep(10000)
-                                    SU.run("wm size reset ; wm density reset")
+                                    Shell("su").run("wm size reset ; wm density reset")
                                 }
 
                             },
@@ -249,7 +275,7 @@ import java.util.concurrent.*
                             },
                             button4text = "Reset",
                             button4onClick = {
-                                SU.run("wm size reset ; wm density reset")
+                                Shell("su").run("wm size reset ; wm density reset")
 
                             },
                             showSwitch = true,
@@ -266,10 +292,10 @@ import java.util.concurrent.*
                             button1text = "Stop",
                             button2text = "Start",
                             button2onClick = {
-                                SU.run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
+                                Shell("su").run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
                             },
                             button1onClick = {
-                                SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
+                                Shell("su").run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
                             },
                             showSwitch = true,
                             switchDescription = "Start on boot",
@@ -360,7 +386,7 @@ import java.util.concurrent.*
 
     private fun downscalebydivisor(divisor: String) {
 
-        SU.run(
+        Shell("su").run(
             command = """
                 # Set the number of division
                 divisor=$divisor
@@ -398,7 +424,7 @@ import java.util.concurrent.*
     }
 
     private fun downscalebynumber(width: String) {
-        SU.run(
+        Shell("su").run(
             command = """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')

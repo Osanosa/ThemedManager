@@ -1,34 +1,78 @@
 package pro.themed.manager.comps
 
-import android.content.*
-import android.widget.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.foundation.text.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import android.content.Context
+import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.*
-import androidx.compose.ui.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.hsl
-import androidx.compose.ui.graphics.vector.*
-import androidx.compose.ui.input.pointer.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.tooling.preview.*
-import androidx.compose.ui.unit.*
-import com.jaredrummler.ktsh.*
-import pro.themed.manager.*
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.jaredrummler.ktsh.Shell
+import pro.themed.manager.MyApplication
 import pro.themed.manager.R
-import pro.themed.manager.utils.*
+import pro.themed.manager.buildOverlay
+import pro.themed.manager.getContrastColor
+import pro.themed.manager.getOverlayList
+import pro.themed.manager.log
+import pro.themed.manager.overlayEnable
+import pro.themed.manager.utils.GlobalVariables
+import pro.themed.manager.utils.showInterstitial
 
 annotation class Composable
 
@@ -40,7 +84,9 @@ annotation class Composable
 fun FabricatedMonet(
 ) {
     val context = LocalContext.current
-
+    val colorsPath = """${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet"""
+    val colorsShell = Shell("su")
+    colorsShell.run("cd $colorsPath")
     val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
     val editor: SharedPreferences.Editor = sharedPreferences.edit()
@@ -56,10 +102,10 @@ fun FabricatedMonet(
     var isMonetDropdownExpanded by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    var colorsXmlContent by remember { mutableStateOf(Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
+    var colorsXmlContent by remember { mutableStateOf(colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
     LaunchedEffect(isDark) {
         colorsXmlContent =
-            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
 
     }
@@ -92,7 +138,7 @@ fun FabricatedMonet(
     sed -i 's|<color name="$selectedColorReference">@color/[^<]*</color>|<color name="$selectedColorReference">@color/$selectedMonetColor</color>|' /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml
 """.trimIndent()
         if (selectedMonetColor.isNotBlank()) {
-            Shell.SU.run(sedCommand).log()
+            colorsShell.run(sedCommand).log()
         }
     }
 
@@ -252,7 +298,7 @@ fun FabricatedMonet(
             )
 
             IconButton(modifier = Modifier, onClick = {
-                Shell.SU.run("cmd overlay disable themed.fakemonet.generic ; pm uninstall themed.fakemonet.generic")
+                colorsShell.run("cmd overlay disable themed.fakemonet.generic ; pm uninstall themed.fakemonet.generic")
             }) {
                 Image(
                     imageVector = ImageVector.vectorResource(id = R.drawable.reset),
@@ -260,17 +306,21 @@ fun FabricatedMonet(
                 )
             }
         }
-        val tilesize = (((LocalConfiguration.current.screenWidthDp - 8 - 64) / 5)).dp
+        val configuration = LocalConfiguration.current
+        val divisor = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            5
+        } else {
+            11
+        }
+        val tilesize = (((configuration.screenWidthDp - 8 - 64) / divisor)).dp
         tilesize.log()
 
-        listOf(
-            "10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900"
-        )
+
 
         Surface {
 
 
-            Column(modifier = Modifier.imePadding()){
+            Column(modifier = Modifier.imePadding()) {
 
                 @Stable
                 @Composable
@@ -288,13 +338,13 @@ fun FabricatedMonet(
 
                                     val hex = "%08x".format(themedColor.toArgb())
 
-                                    Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
+                                    colorsShell.run("cd $colorsPath")
 
-                                    Shell.SU.run(
+                                    colorsShell.run(
                                         """sed -i '/$fullName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml"""
                                     )
                                     colorsXmlContent =
-                                        Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
 
                                 }, onLongClick = {
@@ -319,123 +369,213 @@ fun FabricatedMonet(
                     }
                 }
 
+                val configuration = LocalConfiguration.current
+                if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    Row(
+                        Modifier
+                            .wrapContentWidth(unbounded = true)
+                            .clip(RoundedCornerShape(12.dp))
+                    ) {
+                        Column(horizontalAlignment = CenterHorizontally) {
+                            Text(
+                                text = "N1",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
+                            M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
+                            M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
+                            M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
+                            M3Tile(color = sn1_300, colorName = "sn1_300", themedColor = C_300)
+                            M3Tile(color = sn1_400, colorName = "sn1_400", themedColor = C_400)
+                            M3Tile(color = sn1_500, colorName = "sn1_500", themedColor = C_500)
+                            M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
+                            M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
+                            M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
+                            M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
 
-                Row(
-                    Modifier
-                        .wrapContentWidth(unbounded = true)
-                        .clip(RoundedCornerShape(12.dp))
-                ) {
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Text(
-                            text = "N1",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                        M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
-                        M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
-                        M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
-                        M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
-                        M3Tile(color = sn1_300, colorName = "sn1_300", themedColor = C_300)
-                        M3Tile(color = sn1_400, colorName = "sn1_400", themedColor = C_400)
-                        M3Tile(color = sn1_500, colorName = "sn1_500", themedColor = C_500)
-                        M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
-                        M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
-                        M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
-                        M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
+                        }
+
+                        Column(horizontalAlignment = CenterHorizontally) {
+                            Text(
+                                text = "N2",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            M3Tile(color = sn2_10, colorName = "sn2_10", themedColor = C_10)
+                            M3Tile(color = sn2_50, colorName = "sn2_50", themedColor = C_50)
+                            M3Tile(color = sn2_100, colorName = "sn2_100", themedColor = C_100)
+                            M3Tile(color = sn2_200, colorName = "sn2_200", themedColor = C_200)
+                            M3Tile(color = sn2_300, colorName = "sn2_300", themedColor = C_300)
+                            M3Tile(color = sn2_400, colorName = "sn2_400", themedColor = C_400)
+                            M3Tile(color = sn2_500, colorName = "sn2_500", themedColor = C_500)
+                            M3Tile(color = sn2_600, colorName = "sn2_600", themedColor = C_600)
+                            M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
+                            M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
+                            M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
+
+                        }
+
+                        Column(horizontalAlignment = CenterHorizontally) {
+                            Text(
+                                text = "A1",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            M3Tile(color = sa1_10, colorName = "sa1_10", themedColor = C_10)
+                            M3Tile(color = sa1_50, colorName = "sa1_50", themedColor = C_50)
+                            M3Tile(color = sa1_100, colorName = "sa1_100", themedColor = C_100)
+                            M3Tile(color = sa1_200, colorName = "sa1_200", themedColor = C_200)
+                            M3Tile(color = sa1_300, colorName = "sa1_300", themedColor = C_300)
+                            M3Tile(color = sa1_400, colorName = "sa1_400", themedColor = C_400)
+                            M3Tile(color = sa1_500, colorName = "sa1_500", themedColor = C_500)
+                            M3Tile(color = sa1_600, colorName = "sa1_600", themedColor = C_600)
+                            M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
+                            M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
+                            M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
+
+                        }
+
+                        Column(horizontalAlignment = CenterHorizontally) {
+                            Text(
+                                text = "A2",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            M3Tile(color = sa2_10, colorName = "sa2_10", themedColor = C_10)
+                            M3Tile(color = sa2_50, colorName = "sa2_50", themedColor = C_50)
+                            M3Tile(color = sa2_100, colorName = "sa2_100", themedColor = C_100)
+                            M3Tile(color = sa2_200, colorName = "sa2_200", themedColor = C_200)
+                            M3Tile(color = sa2_300, colorName = "sa2_300", themedColor = C_300)
+                            M3Tile(color = sa2_400, colorName = "sa2_400", themedColor = C_400)
+                            M3Tile(color = sa2_500, colorName = "sa2_500", themedColor = C_500)
+                            M3Tile(color = sa2_600, colorName = "sa2_600", themedColor = C_600)
+                            M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
+                            M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
+                            M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
+
+                        }
+
+                        Column(horizontalAlignment = CenterHorizontally) {
+                            Text(
+                                text = "A3",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
+                            M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
+                            M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
+                            M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
+                            M3Tile(color = sa3_300, colorName = "sa3_300", themedColor = C_300)
+                            M3Tile(color = sa3_400, colorName = "sa3_400", themedColor = C_400)
+                            M3Tile(color = sa3_500, colorName = "sa3_500", themedColor = C_500)
+                            M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
+                            M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
+                            M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
+                            M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
+
+                        }
 
                     }
 
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Text(
-                            text = "N2",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                        M3Tile(color = sn2_10, colorName = "sn2_10", themedColor = C_10)
-                        M3Tile(color = sn2_50, colorName = "sn2_50", themedColor = C_50)
-                        M3Tile(color = sn2_100, colorName = "sn2_100", themedColor = C_100)
-                        M3Tile(color = sn2_200, colorName = "sn2_200", themedColor = C_200)
-                        M3Tile(color = sn2_300, colorName = "sn2_300", themedColor = C_300)
-                        M3Tile(color = sn2_400, colorName = "sn2_400", themedColor = C_400)
-                        M3Tile(color = sn2_500, colorName = "sn2_500", themedColor = C_500)
-                        M3Tile(color = sn2_600, colorName = "sn2_600", themedColor = C_600)
-                        M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
-                        M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
-                        M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
+                } else {
+                    Column(
+                        Modifier
+                            .wrapContentWidth(unbounded = true)
+                            .clip(RoundedCornerShape(12.dp))
+                    ) {
+                        Row {
 
+                            M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
+                            M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
+                            M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
+                            M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
+                            M3Tile(color = sn1_300, colorName = "sn1_300", themedColor = C_300)
+                            M3Tile(color = sn1_400, colorName = "sn1_400", themedColor = C_400)
+                            M3Tile(color = sn1_500, colorName = "sn1_500", themedColor = C_500)
+                            M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
+                            M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
+                            M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
+                            M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
+
+                        }
+
+                        Row {
+
+                            M3Tile(color = sn2_10, colorName = "sn2_10", themedColor = C_10)
+                            M3Tile(color = sn2_50, colorName = "sn2_50", themedColor = C_50)
+                            M3Tile(color = sn2_100, colorName = "sn2_100", themedColor = C_100)
+                            M3Tile(color = sn2_200, colorName = "sn2_200", themedColor = C_200)
+                            M3Tile(color = sn2_300, colorName = "sn2_300", themedColor = C_300)
+                            M3Tile(color = sn2_400, colorName = "sn2_400", themedColor = C_400)
+                            M3Tile(color = sn2_500, colorName = "sn2_500", themedColor = C_500)
+                            M3Tile(color = sn2_600, colorName = "sn2_600", themedColor = C_600)
+                            M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
+                            M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
+                            M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
+
+                        }
+
+                        Row {
+
+                            M3Tile(color = sa1_10, colorName = "sa1_10", themedColor = C_10)
+                            M3Tile(color = sa1_50, colorName = "sa1_50", themedColor = C_50)
+                            M3Tile(color = sa1_100, colorName = "sa1_100", themedColor = C_100)
+                            M3Tile(color = sa1_200, colorName = "sa1_200", themedColor = C_200)
+                            M3Tile(color = sa1_300, colorName = "sa1_300", themedColor = C_300)
+                            M3Tile(color = sa1_400, colorName = "sa1_400", themedColor = C_400)
+                            M3Tile(color = sa1_500, colorName = "sa1_500", themedColor = C_500)
+                            M3Tile(color = sa1_600, colorName = "sa1_600", themedColor = C_600)
+                            M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
+                            M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
+                            M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
+
+                        }
+
+                        Row {
+
+                            M3Tile(color = sa2_10, colorName = "sa2_10", themedColor = C_10)
+                            M3Tile(color = sa2_50, colorName = "sa2_50", themedColor = C_50)
+                            M3Tile(color = sa2_100, colorName = "sa2_100", themedColor = C_100)
+                            M3Tile(color = sa2_200, colorName = "sa2_200", themedColor = C_200)
+                            M3Tile(color = sa2_300, colorName = "sa2_300", themedColor = C_300)
+                            M3Tile(color = sa2_400, colorName = "sa2_400", themedColor = C_400)
+                            M3Tile(color = sa2_500, colorName = "sa2_500", themedColor = C_500)
+                            M3Tile(color = sa2_600, colorName = "sa2_600", themedColor = C_600)
+                            M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
+                            M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
+                            M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
+
+                        }
+
+                        Row {
+
+                            M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
+                            M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
+                            M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
+                            M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
+                            M3Tile(color = sa3_300, colorName = "sa3_300", themedColor = C_300)
+                            M3Tile(color = sa3_400, colorName = "sa3_400", themedColor = C_400)
+                            M3Tile(color = sa3_500, colorName = "sa3_500", themedColor = C_500)
+                            M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
+                            M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
+                            M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
+                            M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
+
+                        }
                     }
-
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Text(
-                            text = "A1",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                        M3Tile(color = sa1_10, colorName = "sa1_10", themedColor = C_10)
-                        M3Tile(color = sa1_50, colorName = "sa1_50", themedColor = C_50)
-                        M3Tile(color = sa1_100, colorName = "sa1_100", themedColor = C_100)
-                        M3Tile(color = sa1_200, colorName = "sa1_200", themedColor = C_200)
-                        M3Tile(color = sa1_300, colorName = "sa1_300", themedColor = C_300)
-                        M3Tile(color = sa1_400, colorName = "sa1_400", themedColor = C_400)
-                        M3Tile(color = sa1_500, colorName = "sa1_500", themedColor = C_500)
-                        M3Tile(color = sa1_600, colorName = "sa1_600", themedColor = C_600)
-                        M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
-                        M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
-                        M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
-
-                    }
-
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Text(
-                            text = "A2",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                        M3Tile(color = sa2_10, colorName = "sa2_10", themedColor = C_10)
-                        M3Tile(color = sa2_50, colorName = "sa2_50", themedColor = C_50)
-                        M3Tile(color = sa2_100, colorName = "sa2_100", themedColor = C_100)
-                        M3Tile(color = sa2_200, colorName = "sa2_200", themedColor = C_200)
-                        M3Tile(color = sa2_300, colorName = "sa2_300", themedColor = C_300)
-                        M3Tile(color = sa2_400, colorName = "sa2_400", themedColor = C_400)
-                        M3Tile(color = sa2_500, colorName = "sa2_500", themedColor = C_500)
-                        M3Tile(color = sa2_600, colorName = "sa2_600", themedColor = C_600)
-                        M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
-                        M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
-                        M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
-
-                    }
-
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        Text(
-                            text = "A3",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                        M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
-                        M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
-                        M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
-                        M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
-                        M3Tile(color = sa3_300, colorName = "sa3_300", themedColor = C_300)
-                        M3Tile(color = sa3_400, colorName = "sa3_400", themedColor = C_400)
-                        M3Tile(color = sa3_500, colorName = "sa3_500", themedColor = C_500)
-                        M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
-                        M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
-                        M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
-                        M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
-
-                    }
-
                 }
 
+
                 fun updateColor(colorName: String, colorValue: Int?) {
-                    Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                    Shell.SU.run(
+                    colorsShell.run("cd $colorsPath")
+                    colorsShell.run(
                         """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
                             "%08x".format(
                                 colorValue ?: 0
                             )
                         }</g' res/values$isDark/colors.xml"""
-                    )
+                    ).log()
 
 
                 }
@@ -454,7 +594,7 @@ fun FabricatedMonet(
                         updateColor("system_neutral1_800", C_800.toArgb())
                         updateColor("system_neutral1_900", C_900.toArgb())
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
                     }) {
                         Text(text = "N1")
 
@@ -474,7 +614,7 @@ fun FabricatedMonet(
                         updateColor("system_neutral2_800", C_800.toArgb())
                         updateColor("system_neutral2_900", C_900.toArgb())
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
                     }) {
                         Text(text = "N2")
@@ -495,7 +635,7 @@ fun FabricatedMonet(
                         updateColor("system_accent1_800", C_800.toArgb())
                         updateColor("system_accent1_900", C_900.toArgb())
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
                     }) {
                         Text(text = "A1")
@@ -515,7 +655,7 @@ fun FabricatedMonet(
                         updateColor("system_accent2_800", C_800.toArgb())
                         updateColor("system_accent2_900", C_900.toArgb())
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
                     }) {
                         Text(text = "A2")
@@ -535,7 +675,7 @@ fun FabricatedMonet(
                         updateColor("system_accent3_800", C_800.toArgb())
                         updateColor("system_accent3_900", C_900.toArgb())
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
                     }) {
                         Text(text = "A3")
@@ -576,74 +716,77 @@ fun FabricatedMonet(
                 }
 
 
-                    Column(
-                        modifier = Modifier.padding(0.dp)
+                Column(
+                    modifier = Modifier.padding(0.dp)
+                ) {
+                    // ExposedDropdownMenu for selecting color reference
+                    ExposedDropdownMenuBox(
+                        expanded = isColorReferenceDropdownExpanded,
+                        onExpandedChange = {
+                            isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded
+                        },
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        // ExposedDropdownMenu for selecting color reference
-                        ExposedDropdownMenuBox(
-                            expanded = isColorReferenceDropdownExpanded,
-                            onExpandedChange = {
-                                isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth() .pointerInput(Unit) { detectTapGestures {} },
-                                value = selectedColorReference,
-                                onValueChange = { selectedColorReference = it },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                                label = { Text("Select Color Reference") },
-                                singleLine = true
-                            )
-                            ExposedDropdownMenu(expanded = isColorReferenceDropdownExpanded,
-                                onDismissRequest = {
-                                    // Dismiss the menu if needed
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerInput(Unit) { detectTapGestures {} },
+                            value = selectedColorReference,
+                            onValueChange = { selectedColorReference = it },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                            label = { Text("Select Color Reference") },
+                            singleLine = true
+                        )
+                        ExposedDropdownMenu(expanded = isColorReferenceDropdownExpanded,
+                            onDismissRequest = {
+                                // Dismiss the menu if needed
+                                isColorReferenceDropdownExpanded = false
+                            }) {
+                            atReferences.forEach { reference ->
+                                DropdownMenuItem(onClick = {
+                                    selectedColorReference = reference
                                     isColorReferenceDropdownExpanded = false
+
                                 }) {
-                                atReferences.forEach { reference ->
-                                    DropdownMenuItem(onClick = {
-                                        selectedColorReference = reference
-                                        isColorReferenceDropdownExpanded = false
-
-                                    }) {
-                                        Text(text = reference)
-                                    }
-                                }
-                            }
-                        }
-
-                        ExposedDropdownMenuBox(
-                            expanded = isMonetDropdownExpanded,
-                            onExpandedChange = {
-                                isMonetDropdownExpanded = !isMonetDropdownExpanded
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth() .pointerInput(Unit) { detectTapGestures {} },
-                                value = selectedMonetColor,
-                                onValueChange = { selectedMonetColor = it },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                                label = { Text("Select Monet Color") },
-                                singleLine = true
-                            )
-                            ExposedDropdownMenu(expanded = isMonetDropdownExpanded,
-                                onDismissRequest = {
-                                    // Dismiss the menu if needed
-                                    isMonetDropdownExpanded = false
-                                }) {
-                                hashtagReferences.forEach { color ->
-                                    DropdownMenuItem(onClick = {
-                                        selectedMonetColor = color
-                                        isMonetDropdownExpanded = false
-
-                                    }) {
-                                        Text(text = color)
-                                    }
+                                    Text(text = reference)
                                 }
                             }
                         }
                     }
+
+                    ExposedDropdownMenuBox(
+                        expanded = isMonetDropdownExpanded,
+                        onExpandedChange = {
+                            isMonetDropdownExpanded = !isMonetDropdownExpanded
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerInput(Unit) { detectTapGestures {} },
+                            value = selectedMonetColor,
+                            onValueChange = { selectedMonetColor = it },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                            label = { Text("Select Monet Color") },
+                            singleLine = true
+                        )
+                        ExposedDropdownMenu(expanded = isMonetDropdownExpanded, onDismissRequest = {
+                            // Dismiss the menu if needed
+                            isMonetDropdownExpanded = false
+                        }) {
+                            hashtagReferences.forEach { color ->
+                                DropdownMenuItem(onClick = {
+                                    selectedMonetColor = color
+                                    isMonetDropdownExpanded = false
+
+                                }) {
+                                    Text(text = color)
+                                }
+                            }
+                        }
+                    }
+                }
 
 
                 HeaderRow(
@@ -678,16 +821,15 @@ fun FabricatedMonet(
                             editor.putString("isDark", "").apply()
                         }
                         colorsXmlContent =
-                            Shell.SU.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
                         isDark = sharedPreferences.getString("isDark", "")
                     },
                 )
 
                 Button(
                     modifier = Modifier.fillMaxWidth(), onClick = {
-                        Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet")
-                        buildOverlay()
-                        Shell.SU.run("""cmd overlay enable themed.fakemonet.generic""")
+                        buildOverlay(colorsPath)
+                        colorsShell.run("""cmd overlay enable themed.fakemonet.generic""")
                         showInterstitial(context) {}
 
 

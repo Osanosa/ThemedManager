@@ -11,11 +11,27 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "minSdkVersionForDexing": 26,
-      "versionCode": 231107,
-      "versionName": "23.11.07",
-      "outputFile": "ThemedManager-v23.11.07-release.apk"
+      "versionCode": 231117,
+      "versionName": "23.11.17",
+      "outputFile": "ThemedManager-v23.11.17-release.apk"
     }
   ],
-  "elementType": "File"
+  "elementType": "File",
+  "baselineProfiles": [
+    {
+      "minApi": 28,
+      "maxApi": 30,
+      "baselineProfiles": [
+        "baselineProfiles/1/ThemedManager-v23.11.17-release.dm"
+      ]
+    },
+    {
+      "minApi": 2147483647,
+      "maxApi": 31,
+      "baselineProfiles": [
+        "baselineProfiles/0/ThemedManager-v23.11.17-release.dm"
+      ]
+    }
+  ],
+  "minSdkVersionForDexing": 26
 }

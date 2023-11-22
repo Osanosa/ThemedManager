@@ -52,7 +52,7 @@ fun SettingsPage() {
                     Toast.makeText(
                         context, R.string.process_started_now_wait, Toast.LENGTH_SHORT
                     ).show()
-                    Shell.SU.run(
+                    Shell("su").run(
                         """cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
                                              path=${'$'}(cmd package path "${'$'}ol" | awk -F':' '{print ${'$'}2}')
                                              rm_path="/data/adb/modules/ThemedProject/system${'$'}(echo "${'$'}path" | sed 's/^package://')"

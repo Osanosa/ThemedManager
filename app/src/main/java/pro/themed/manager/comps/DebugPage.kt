@@ -81,12 +81,12 @@ fun DebugPage() {
                 OutlinedButton(
                     onClick = {
 
-                        Shell.SU.run("rm /sdcard/themeddebug/logs")
-                        Shell.SU.run("mkdir /sdcard/themeddebug")
-                        Shell.SU.run("mkdir /sdcard/themeddebug/logs")
+                        Shell("su").run("rm /sdcard/themeddebug/logs")
+                        Shell("su").run("mkdir /sdcard/themeddebug")
+                        Shell("su").run("mkdir /sdcard/themeddebug/logs")
 
-                        Shell.SU.run("cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt")
-                        Shell.SU.run("ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt")
+                        Shell("su").run("cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt")
+                        Shell("su").run("ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt")
 
                         Toast.makeText(context, context.getString(R.string.done), Toast.LENGTH_SHORT).show()
 
@@ -104,12 +104,12 @@ fun DebugPage() {
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(
                     onClick = {
-                        Shell.SU.run("rm -r /sdcard/themeddebug/files")
-                        Shell.SU.run("mkdir /sdcard/themeddebug/")
-                        Shell.SU.run("mkdir /sdcard/themeddebug/files")
+                        Shell("su").run("rm -r /sdcard/themeddebug/files")
+                        Shell("su").run("mkdir /sdcard/themeddebug/")
+                        Shell("su").run("mkdir /sdcard/themeddebug/files")
 
-                        Shell.SU.run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files")
-                        Shell.SU.run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files")
+                        Shell("su").run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files")
+                        Shell("su").run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files")
 
                         Toast.makeText(context, context.getString(R.string.done), Toast.LENGTH_SHORT).show()
 
@@ -135,7 +135,7 @@ fun DebugPage() {
                 getOverlayList().unsupportedOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname = overlay
-                        dialogtext = Shell.SU.run(
+                        dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
                                     .removePrefix("--- ")
@@ -153,7 +153,7 @@ fun DebugPage() {
                 getOverlayList().enabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname = overlay
-                        dialogtext = Shell.SU.run(
+                        dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
                                     .removePrefix("--- ")
@@ -170,7 +170,7 @@ fun DebugPage() {
                 getOverlayList().disabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname = overlay
-                        dialogtext = Shell.SU.run(
+                        dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
                                     .removePrefix("--- ")

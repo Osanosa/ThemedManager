@@ -68,7 +68,7 @@ fun AccentsAAPT() {
                 )
 
                 IconButton(modifier = Modifier, onClick = {
-                    Shell.SU.run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
+                    Shell("su").run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
                 }) {
                     Image(
                           imageVector = ImageVector.vectorResource(R.drawable.reset),
@@ -160,10 +160,10 @@ fun AccentsAAPT() {
 
             androidx.compose.material.Button(
                 modifier = Modifier.fillMaxWidth(), onClick = {
-                    Shell.SU.run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
-                    Shell.SU.run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
+                    Shell("su").run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
+                    Shell("su").run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
                     buildOverlay()
-                    Shell.SU.run("""cmd overlay enable themed.accent.generic""")
+                    Shell("su").run("""cmd overlay enable themed.accent.generic""")
                     showInterstitial(context) {}
 
 

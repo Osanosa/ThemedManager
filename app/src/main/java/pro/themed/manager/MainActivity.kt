@@ -1,48 +1,88 @@
 package pro.themed.manager
 
-import android.annotation.*
-import android.app.*
-import android.content.*
-import android.os.*
-import android.util.*
-import android.widget.*
-import androidx.activity.*
-import androidx.activity.compose.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.*
+import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.layout.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.viewinterop.*
-import androidx.core.graphics.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.*
-import com.google.android.gms.ads.*
-import com.google.firebase.analytics.ktx.*
-import com.google.firebase.crashlytics.ktx.*
-import com.google.firebase.database.*
-import com.google.firebase.ktx.*
+import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
 import com.jaredrummler.ktsh.Shell.Companion.SH
-import com.jaredrummler.ktsh.Shell.Companion.SU
-import kotlinx.coroutines.*
-import pro.themed.manager.comps.*
-import pro.themed.manager.ui.theme.*
-import pro.themed.manager.utils.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import pro.themed.manager.comps.NavigationRailSample
+import pro.themed.manager.ui.theme.ThemedManagerTheme
+import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.GlobalVariables.magiskVersion
 import pro.themed.manager.utils.GlobalVariables.themedId
 import pro.themed.manager.utils.GlobalVariables.whoami
+import pro.themed.manager.utils.MyForegroundService
+import pro.themed.manager.utils.Navigation
+import pro.themed.manager.utils.loadInterstitial
+import pro.themed.manager.utils.removeInterstitial
 
 
 class MyApplication : Application() {
@@ -109,7 +149,7 @@ fun getOverlayList(): OverlayListData {
 
 private fun fetchOverlayList(): OverlayListData {
 
-    val result = SU.run("cmd overlay list").stdout()
+    val result = Shell("su").run("cmd overlay list").stdout()
     val overlayList = result.lines().filter { it.contains("themed") }.sorted()
 
     val unsupportedOverlays = overlayList.filter { it.contains("---") }
@@ -168,7 +208,7 @@ class MainActivity : ComponentActivity() {
         }
 
         if (foregroundServiceRunning()) {
-            SU.run("killall pro.themed.manager")
+            Shell("su").run("killall pro.themed.manager")
             Log.d("service", "attempting to stop")
 
         }
@@ -485,13 +525,13 @@ fun getContrastColor(background: Int): Color {
 
 fun overlayEnable(overlayname: String) {
     CoroutineScope(Dispatchers.IO).launch {
-        val overlay = SU.run("su -c cmd overlay").stdout()
+        val overlay = Shell("su").run("su -c cmd overlay").stdout()
 
         if ("exclusive" in overlay) {
             SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
 
         } else {
-            SU.run("su -c cmd overlay enable themed.$overlayname")
+            Shell("su").run("su -c cmd overlay enable themed.$overlayname")
         }
 
 
@@ -499,7 +539,7 @@ fun overlayEnable(overlayname: String) {
         val restart_system_ui: Boolean = sharedPreferences.getBoolean("restart_system_ui", false)
 
         if (restart_system_ui) {
-            SU.run("su -c killall com.android.systemui")
+            Shell("su").run("su -c killall com.android.systemui")
         }
 
         Firebase.analytics.logEvent("Overlay_Selected") {
@@ -509,7 +549,7 @@ fun overlayEnable(overlayname: String) {
 
 }
 
-fun buildOverlay() {
+fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
 
     /*    val signerConfig = ApkSigner.SignerConfig.Builder("overlay", privateKey, certs).build()
@@ -540,11 +580,12 @@ fun buildOverlay() {
             )
         )
 */
-
-        SU.run("pwd").stdout().log()
-        SU.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""")
-        SU.run("""zipsigner unsigned.apk signed.apk""")
-        SU.run("""pm install signed.apk""")
+val compileShell = Shell("su")
+        compileShell.run("cd $path")
+        compileShell.run("pwd")
+        compileShell.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""").stderr.log()
+        compileShell.run("""zipsigner unsigned.apk signed.apk""").log()
+        compileShell.run("""pm install signed.apk""").log()
 
     }
 }

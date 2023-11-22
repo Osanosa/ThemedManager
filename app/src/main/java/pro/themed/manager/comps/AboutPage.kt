@@ -103,7 +103,7 @@ import pro.themed.manager.utils.GlobalVariables
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        Shell.SU.run("rm $path")
+                        Shell("su").run("rm $path")
 
                         AndroidDownloader(MyApplication.appContext).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
@@ -124,7 +124,7 @@ import pro.themed.manager.utils.GlobalVariables
                         Toast.makeText(
                             context, MyApplication.appContext.getString(R.string.installing), Toast.LENGTH_SHORT
                         ).show()
-                        val test = Shell.SU.run(
+                        val test = Shell("su").run(
                             """path=$path ; while : ; do [[  -f "${'$'}path" ]] && break ; sleep 1 ; echo "fuck" ; done ;  su -c magisk --install-module $path"""
                         ).stdout()
                         showBigTextMessage(context, test)

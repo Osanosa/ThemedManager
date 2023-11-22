@@ -17,10 +17,10 @@ class MyTileService : TileService() {
                 tile.state = Tile.STATE_INACTIVE
                 tile.updateTile()
 
-                Shell.SU.run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
-                Shell.SU.run("killall pro.themed.manager")
+                Shell("su").run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                Shell("su").run("killall pro.themed.manager")
             } else {
-                Shell.SU.run("am start-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                Shell("su").run("am start-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
                 // Tile is inactive, activate it
                 tile.state = Tile.STATE_ACTIVE
                 tile.updateTile()

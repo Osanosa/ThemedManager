@@ -85,7 +85,7 @@ fun Slideritem(
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(modifier = Modifier, onClick = {
                         intvalue = 0; sliderPosition = intvalue.toFloat()
-                        Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
+                        Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
                     }) {
                         Image(
                             modifier = Modifier

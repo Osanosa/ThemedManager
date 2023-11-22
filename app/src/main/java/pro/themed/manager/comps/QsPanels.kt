@@ -1,49 +1,96 @@
 package pro.themed.manager.comps
 
-import android.widget.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.*
-import androidx.compose.ui.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.tooling.preview.*
-import androidx.compose.ui.unit.*
-import com.jaredrummler.ktsh.*
-import pro.themed.manager.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.*
-import pro.themed.manager.utils.*
-import kotlin.math.*
+import pro.themed.manager.buildOverlay
+import pro.themed.manager.log
+import pro.themed.manager.ui.theme.Purple
+import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables
+import pro.themed.manager.utils.showInterstitial
+
+@Composable
+fun QsPanel() {
+    Column(modifier = Modifier.padding(start = 8.dp).verticalScroll(ScrollState(0))) {
+        QSTileCard()
+    }
+}
 
 @OptIn(
-    ExperimentalLayoutApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
 )
 @Preview
 @Composable
 fun QSTileCard() {
     val context = LocalContext.current
-    val testdp = (LocalConfiguration.current.screenWidthDp - 64 -16) / 5
-@Stable
+    val testdp = (LocalConfiguration.current.smallestScreenWidthDp - 64 - 16) / 4
+    val qsPath = "${GlobalVariables.modulePath}/onDemandCompiler/QsPanel"
+    val qsShell = Shell("su")
+    qsShell.run("cd $qsPath")
+    @Stable
     @Composable
     fun MyIconButton(overlayname: String, contentdescription: String, iconname: Int) {
 
 
         IconButton(
             onClick = {
-                Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/QsPanel")
-                Shell.SU.run("""sed -i 's/@drawable\/[^"]*/@drawable\/$overlayname/g' "res/drawable/ic_qs_circle.xml"""")
+                qsShell.run("sed -i 's/@drawable\\/[^\"]*/@drawable\\/$overlayname/g' \"res/drawable/ic_qs_circle.xml\"")
+                    .log()
+                qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
+
             }, modifier = Modifier
                 .size(testdp.dp)
                 .background(color = MaterialTheme.colors.cardcol)
@@ -74,7 +121,7 @@ fun QSTileCard() {
                 fontSize = 24.sp
             )
             IconButton(onClick = {
-                Shell.SU.run("for ol in \$(cmd overlay list | grep -E 'themed.qspanel' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
+                qsShell.run("for ol in \$(cmd overlay list | grep -E 'themed.qspanel' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
             }) {
                 Image(
                     painter = painterResource(R.drawable.reset), contentDescription = null
@@ -87,12 +134,17 @@ fun QSTileCard() {
             Text(text = "Style:")
             Spacer(modifier = Modifier.width(8.dp))
 
-            var style by remember { mutableStateOf("default") }
+            var style by remember { mutableStateOf("") }
+            LaunchedEffect(Unit) {
+                style =
+                    qsShell.run("""awk -F'bg_' '/<item android:drawable="@drawable\/bg_/ {print $2}' $qsPath/res/drawable/themed_qspanel.xml | sed 's/\" \/>//g'""")
+                        .stdout()
+            }
             LaunchedEffect(style) {
-                Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/QsPanel")
-                Shell.SU.run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$style/g' "res/drawable/themed_qspanel.xml"""")
+                qsShell.run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$style/g' "$qsPath/res/drawable/themed_qspanel.xml"""")
+                    .log()
 
-                Shell.SU.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
+                qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
 
 
             }
@@ -262,42 +314,138 @@ fun QSTileCard() {
                 }
             }
         }
+        var qs_label_container_margin by remember { mutableStateOf("") }
+        var qs_tile_start_padding by remember { mutableStateOf("") }
+        var columnsPortrait by remember { mutableStateOf("") }
+        var rowsPortrait by remember { mutableStateOf("") }
+        var columsLandscape by remember { mutableStateOf("") }
+        var rowsLandscape by remember { mutableStateOf("") }
 
-        var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
-        var intvalue by rememberSaveable { mutableIntStateOf(sliderPosition.roundToInt()) }
-        val minSliderValue by rememberSaveable { mutableFloatStateOf(0f) }
-        val maxSliderValue by rememberSaveable { mutableFloatStateOf(60f) }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Rounded corners: $intvalue")
-        Spacer(modifier = Modifier.height(8.dp))
+        LaunchedEffect(Unit) {
+            qs_label_container_margin =
+                qsShell.run("""awk -F'[<>]' '/<dimen name="qs_label_container_margin">/ {print $3}' $qsPath/res/values/dimens.xml | sed 's/dip//g'""")
+                    .stdout()
+            qs_tile_start_padding =
+                qsShell.run("""awk -F'[<>]' '/<dimen name="qs_tile_start_padding">/ {print $3}' $qsPath/res/values/dimens.xml | sed 's/dip//g'""")
+                    .stdout()
+            columnsPortrait =
+                qsShell.run("""awk -F'[<>]' '/<integer name="quick_settings_num_columns">/ {print $3}' $qsPath/res/values/integers.xml""")
+                    .stdout()
+            rowsPortrait =
+                qsShell.run("""awk -F'[<>]' '/<integer name="quick_settings_max_rows">/ {print $3}' $qsPath/res/values/integers.xml""")
+                    .stdout()
+            columsLandscape =
+                qsShell.run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' $qsPath/res/values/integers.xml""")
+                    .stdout()
+            rowsLandscape =
+                qsShell.run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' $qsPath/res/values/integers.xml""")
+                    .stdout()
+        }
+        Row {
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = qs_label_container_margin,
+                singleLine = true,
+                onValueChange = {
+                    qs_label_container_margin = it
+                    qsShell.run("""sed -i 's/<dimen name="qs_label_container_margin">[^<]*/<dimen name="qs_label_container_margin">${it}dip/g' $qsPath/res/values/dimens.xml""")
 
-        androidx.compose.material3.Slider(modifier = Modifier
-            .height(16.dp)
-            .weight(1f)
-            .padding(0.dp),
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it ; intvalue = it.roundToInt()},
-            valueRange = minSliderValue..maxSliderValue,
-            onValueChangeFinished = {
-                Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
-                Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/QsPanel")
-                Shell.SU.run("""sed -i '/corners/s/[0-9][0-9]*\.0/$intvalue.0/g' "res/drawable/bg_default.xml"""")
-            },
-            steps = 29,
-            thumb = {
-                Image(
-                    painter = painterResource(R.drawable.fiber_manual_record_48px),
-                    contentDescription = null,
-                )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = "qs_label_container_margin", Modifier.basicMarquee()
+                    )
+                })
 
-            })
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = qs_tile_start_padding,
+                singleLine = true,
+                onValueChange = {
+                    qs_tile_start_padding = it
+                    qsShell.run("""sed -i 's/<dimen name="qs_tile_start_padding">[^<]*/<dimen name="qs_tile_start_padding">${it}dip/g' $qsPath/res/values/dimens.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("qs_tile_start_padding", Modifier.basicMarquee()) })
+
+        }
+
+
+        Row {
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = columnsPortrait,
+                singleLine = true,
+                onValueChange = {
+                    columnsPortrait = it
+                    qsShell.run("""sed -i 's/<integer name="quick_settings_num_columns">[^<]*/<integer name="quick_settings_num_columns">${it}/g' $qsPath/res/values/integers.xml""")
+                    qsShell.run("""sed -i 's/<integer name="config_qs_columns_portrait">[^<]*/<integer name="config_qs_columns_portrait">${it}/g' $qsPath/res/values/integers.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = "columnsPortrait", Modifier.basicMarquee()
+                    )
+                })
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = rowsPortrait,
+                singleLine = true,
+                onValueChange = {
+                    rowsPortrait = it
+                    qsShell.run("""sed -i 's/<integer name="config_qs_rows_portrait">[^<]*/<integer name="config_qs_rows_portrait">${it}/g' $qsPath/res/values/integers.xml""")
+                    qsShell.run("""sed -i 's/<integer name="quick_settings_max_rows">[^<]*/<integer name="quick_settings_max_rows">${it}/g' $qsPath/res/values/integers.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("rowsPortrait", Modifier.basicMarquee()) })
+
+        }
+
+
+        Row {
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = columsLandscape,
+                singleLine = true,
+                onValueChange = {
+                    columsLandscape = it
+                    qsShell.run("""sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' $qsPath/res/values/integers.xml""")
+                    qsShell.run("""sed -i 's/<integer name="quick_settings_num_columns">[^<]*/<integer name="quick_settings_num_columns">${it}/g' $qsPath/res/values-land/integers.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = "columnsLandscape", Modifier.basicMarquee()
+                    )
+                })
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = rowsLandscape,
+                singleLine = true,
+                onValueChange = {
+                    rowsLandscape = it
+                    qsShell.run("""sed -i 's/<integer name="config_qs_rows_landscape">[^<]*/<integer name="config_qs_rows_landscape">${it}/g' $qsPath/res/values/integers.xml""")
+                    qsShell.run("""sed -i 's/<integer name="quick_settings_max_rows">[^<]*/<integer name="quick_settings_max_rows">${it}/g' $qsPath/res/values-land/integers.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("rowsLandscape", Modifier.basicMarquee()) })
+
+        }
+
+
 
         Button(
             modifier = Modifier.fillMaxWidth(), onClick = {
-                Shell.SU.run("cd ${GlobalVariables.modulePath}/onDemandCompiler/QsPanel")
-                buildOverlay()
-                Shell.SU.run("""cmd overlay enable themed.qspanel.generic""")
+                buildOverlay(qsPath)
+                qsShell.run("""cmd overlay enable themed.qspanel.generic""")
                 showInterstitial(context) {}
 
 
