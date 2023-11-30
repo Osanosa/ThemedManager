@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -18,11 +19,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -40,7 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,6 +85,7 @@ import pro.themed.manager.utils.GlobalVariables.whoami
 import pro.themed.manager.utils.MyForegroundService
 import pro.themed.manager.utils.Navigation
 import pro.themed.manager.utils.loadInterstitial
+import pro.themed.manager.utils.loadRewarded
 import pro.themed.manager.utils.removeInterstitial
 
 
@@ -193,9 +197,8 @@ class MainActivity : ComponentActivity() {
         Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
-            loadInterstitial(this)
-        }
+
+
         fun foregroundServiceRunning(): Boolean {
             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
@@ -213,6 +216,11 @@ class MainActivity : ComponentActivity() {
 
         }
         setContent {
+            LaunchedEffect(Unit) {
+                if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
+                    loadInterstitial(MyApplication.appContext)
+                    loadRewarded(MyApplication.appContext)
+                }}
 
             ThemedManagerTheme {
                 val context = MyApplication.appContext
@@ -284,10 +292,10 @@ class MainActivity : ComponentActivity() {
     @Composable
     @OptIn(ExperimentalFoundationApi::class)
     private fun OnBoardingPage(
-        sharedPreferences: SharedPreferences, context: Context
+        sharedPreferences: SharedPreferences, context: Context,
     ) {
-        Box(
-            Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+        Column(
+            Modifier.fillMaxSize(),
             //                        verticalArrangement = Arrangement.SpaceBetween,
         ) {
             val pageCount = 5
@@ -295,7 +303,7 @@ class MainActivity : ComponentActivity() {
                 pageCount
             }
             HorizontalPager(
-                state = pagerState, Modifier.fillMaxHeight(0.8f),
+                state = pagerState, Modifier.weight(1f),
             ) {
 
                     index ->
@@ -346,9 +354,8 @@ class MainActivity : ComponentActivity() {
 
             Row(
                 Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(32.dp),
+                    .padding(horizontal = 32.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -447,33 +454,60 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OnBoarding(image: Int, text: String) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.smallestScreenWidthDp.dp
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-
+    if (isLandscape) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically 
         ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = null,
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 80.dp),
-            contentScale = ContentScale.FillWidth
-        )
-        Spacer(modifier = Modifier.height(60.dp))
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(screenWidth)
+            )
 
-        androidx.compose.material3.Text(
-            text = text, Modifier.padding(horizontal = 30.dp), textAlign = TextAlign.Center,
-            // fontWeight = FontWeight.Bold,
-            fontSize = 16.sp, color = MaterialTheme.colors.textcol
-        )
-
+            androidx.compose.material3.Text(
+                text = text,
+                modifier = Modifier
+                    .padding(horizontal = 30.dp)
+                  ,
+                textAlign = TextAlign.Start,
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.textcol
+            )
+        }
+    } else {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 80.dp)
+                    .aspectRatio(1f)
+                    .weight(0.8f)
+                    .fillMaxSize()
+            )
+            androidx.compose.material3.Text(
+                text = text,
+                modifier = Modifier
+                    .padding(horizontal = 30.dp)
+                    .weight(0.2f),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.textcol
+            )
+        }
     }
-
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -552,35 +586,35 @@ fun overlayEnable(overlayname: String) {
 fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
 
-    /*    val signerConfig = ApkSigner.SignerConfig.Builder("overlay", privateKey, certs).build()
-        val signerConfigs: MutableList<ApkSigner.SignerConfig> = ArrayList()
-        signerConfigs.add(signerConfig)
-        val source = "$modulePath/onDemandCompiler/unsigned.apk"
-        val signedOverlayAPKPath = "$modulePath/onDemandCompiler/signed.apk"
+        /*    val signerConfig = ApkSigner.SignerConfig.Builder("overlay", privateKey, certs).build()
+            val signerConfigs: MutableList<ApkSigner.SignerConfig> = ArrayList()
+            signerConfigs.add(signerConfig)
+            val source = "$modulePath/onDemandCompiler/unsigned.apk"
+            val signedOverlayAPKPath = "$modulePath/onDemandCompiler/signed.apk"
 
-        ApkSigner.Builder(signerConfigs)
-            .setV1SigningEnabled(false)
-            .setV2SigningEnabled(true)
-            .setInputApk(File(source))
-            .setOutputApk(File(signedOverlayAPKPath))
-            .setMinSdkVersion(Build.VERSION.SDK_INT)
-            .build()
-            .sign()
+            ApkSigner.Builder(signerConfigs)
+                .setV1SigningEnabled(false)
+                .setV2SigningEnabled(true)
+                .setInputApk(File(source))
+                .setOutputApk(File(signedOverlayAPKPath))
+                .setMinSdkVersion(Build.VERSION.SDK_INT)
+                .build()
+                .sign()
 
-        com.android.apksigner.ApkSignerTool.main(
-            arrayOf(
-                "sign",
-                "--key",
-                "$modulePath/onDemandCompiler/testkey.pk8",
-                "--cert",
-                "$modulePath/onDemandCompiler/testkey.x509.pem",
-                "--out",
-                "signed.apk",
-                "unsigned.apk"
+            com.android.apksigner.ApkSignerTool.main(
+                arrayOf(
+                    "sign",
+                    "--key",
+                    "$modulePath/onDemandCompiler/testkey.pk8",
+                    "--cert",
+                    "$modulePath/onDemandCompiler/testkey.x509.pem",
+                    "--out",
+                    "signed.apk",
+                    "unsigned.apk"
+                )
             )
-        )
-*/
-val compileShell = Shell("su")
+    */
+        val compileShell = Shell("su")
         compileShell.run("cd $path")
         compileShell.run("pwd")
         compileShell.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""").stderr.log()

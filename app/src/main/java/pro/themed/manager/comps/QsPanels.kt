@@ -61,7 +61,11 @@ import pro.themed.manager.utils.showInterstitial
 
 @Composable
 fun QsPanel() {
-    Column(modifier = Modifier.padding(start = 8.dp).verticalScroll(ScrollState(0))) {
+    Column(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .verticalScroll(ScrollState(0))
+    ) {
         QSTileCard()
     }
 }
@@ -76,7 +80,7 @@ fun QsPanel() {
 @Composable
 fun QSTileCard() {
     val context = LocalContext.current
-    val testdp = (LocalConfiguration.current.smallestScreenWidthDp - 64 - 16) / 4
+    val testdp = (LocalConfiguration.current.smallestScreenWidthDp - 64 - 16) / 5
     val qsPath = "${GlobalVariables.modulePath}/onDemandCompiler/QsPanel"
     val qsShell = Shell("su")
     qsShell.run("cd $qsPath")
@@ -88,7 +92,6 @@ fun QSTileCard() {
         IconButton(
             onClick = {
                 qsShell.run("sed -i 's/@drawable\\/[^\"]*/@drawable\\/$overlayname/g' \"res/drawable/ic_qs_circle.xml\"")
-                    .log()
                 qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
 
             }, modifier = Modifier
@@ -98,7 +101,7 @@ fun QSTileCard() {
             Image(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp),
+                    .padding(4.dp),
                 painter = painterResource(iconname),
                 contentDescription = contentdescription,
             )
@@ -318,8 +321,10 @@ fun QSTileCard() {
         var qs_tile_start_padding by remember { mutableStateOf("") }
         var columnsPortrait by remember { mutableStateOf("") }
         var rowsPortrait by remember { mutableStateOf("") }
-        var columsLandscape by remember { mutableStateOf("") }
+        var columnsLandscape by remember { mutableStateOf("") }
         var rowsLandscape by remember { mutableStateOf("") }
+        var qsQuickTileSize by remember { mutableStateOf("") }
+        var qsTileHeight by remember { mutableStateOf("") }
 
         LaunchedEffect(Unit) {
             qs_label_container_margin =
@@ -334,12 +339,19 @@ fun QSTileCard() {
             rowsPortrait =
                 qsShell.run("""awk -F'[<>]' '/<integer name="quick_settings_max_rows">/ {print $3}' $qsPath/res/values/integers.xml""")
                     .stdout()
-            columsLandscape =
+            columnsLandscape =
                 qsShell.run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' $qsPath/res/values/integers.xml""")
                     .stdout()
             rowsLandscape =
                 qsShell.run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' $qsPath/res/values/integers.xml""")
                     .stdout()
+            qsQuickTileSize =
+                qsShell.run("""awk -F'[<>]' '/<dimen name="qs_quick_tile_size">/ {print $3}' $qsPath/res/values/dimens.xml | sed 's/dip//g'""")
+                    .stdout()
+            qsTileHeight =
+                qsShell.run("""awk -F'[<>]' '/<dimen name="qs_tile_height">/ {print $3}' $qsPath/res/values/dimens.xml | sed 's/dip//g'""")
+                    .stdout()
+
         }
         Row {
             androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
@@ -409,10 +421,10 @@ fun QSTileCard() {
 
         Row {
             androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
-                value = columsLandscape,
+                value = columnsLandscape,
                 singleLine = true,
                 onValueChange = {
-                    columsLandscape = it
+                    columnsLandscape = it
                     qsShell.run("""sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' $qsPath/res/values/integers.xml""")
                     qsShell.run("""sed -i 's/<integer name="quick_settings_num_columns">[^<]*/<integer name="quick_settings_num_columns">${it}/g' $qsPath/res/values-land/integers.xml""")
 
@@ -438,6 +450,36 @@ fun QSTileCard() {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = { Text("rowsLandscape", Modifier.basicMarquee()) })
 
+        }
+
+        Row {
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = qsQuickTileSize,
+                singleLine = true,
+                onValueChange = {
+                    qsQuickTileSize = it
+                    qsShell.run("""sed -i 's/<dimen name="qs_quick_tile_size">[^<]*/<dimen name="qs_quick_tile_size">${it}dip/g' $qsPath/res/values/dimens.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = "qsQuickTileSize", Modifier.basicMarquee()
+                    )
+                })
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+                value = qsTileHeight,
+                singleLine = true,
+                onValueChange = {
+                    qsTileHeight = it
+                    qsShell.run("""sed -i 's/<dimen name="qs_tile_height">[^<]*/<dimen name="qs_tile_height">${it}dip/g' $qsPath/res/values/dimens.xml""")
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("qsTileHeight", Modifier.basicMarquee()) })
         }
 
 

@@ -14,6 +14,7 @@ import androidx.compose.material.NavigationRail
 import androidx.compose.material.NavigationRailItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
 
+@Stable
 @Composable
 fun NavigationRailSample(
     navController: NavController,
@@ -38,7 +40,7 @@ fun NavigationRailSample(
 
     val itemsbottom = listOf(
         NavigationItems.ColorsTab,
-            NavigationItems.QsPanel,
+        NavigationItems.QsPanel,
         NavigationItems.FontsTab,
         NavigationItems.IconsTab,
         NavigationItems.MiscTab
@@ -70,27 +72,19 @@ fun NavigationRailSample(
         Column(modifier = Modifier.onGloballyPositioned { layoutInfo ->
             topColumnHeight = layoutInfo.size.height
         }, verticalArrangement = Arrangement.Top) {
-            itemstop.forEachIndexed { _, item ->
-                val isSelected = currentRoute == item.route
-                NavigationRailItem(selectedContentColor = MaterialTheme.colors.textcol,
-                    unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
-                    icon = {
-                        Icon(
-                            painterResource(id = item.icon),
-                            contentDescription = item.title,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = { Text(item.title) },
-                    selected = isSelected,
-                    onClick = {
-                        if (!isSelected) {
-                            navController.navigate(item.route) {
-
-                            }
-                        }
-                    })
+           itemstop.forEachIndexed { _, item ->
+    val isSelected = currentRoute == item.route
+    CustomNavigationRailItem(
+        isSelected = isSelected,
+        onClick = {
+            if (!isSelected) {
+                navController.navigate(item.route)
             }
+        },
+        iconResource = item.icon,
+        itemTitle = item.title
+    )
+}
         }
         Spacer(modifier = Modifier.weight(1f))
         Column(modifier = Modifier
@@ -100,25 +94,40 @@ fun NavigationRailSample(
             }) {
             itemsbottom.forEachIndexed { _, item ->
                 val isSelected = currentRoute == item.route
-                NavigationRailItem(selectedContentColor = MaterialTheme.colors.textcol,
-                    unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
-                    icon = {
-                        Icon(
-                            painterResource(id = item.icon),
-                            contentDescription = item.title,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = { Text(item.title) },
-                    selected = isSelected,
+                CustomNavigationRailItem(
+                    isSelected = isSelected,
                     onClick = {
                         if (!isSelected) {
-                            navController.navigate(item.route) {
-
-                            }
+                            navController.navigate(item.route)
                         }
-                    })
+                    },
+                    iconResource = item.icon,
+                    itemTitle = item.title
+                )
             }
         }
     }
+}
+@Stable
+@Composable
+fun CustomNavigationRailItem(
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    iconResource: Int,
+    itemTitle: String
+) {
+    NavigationRailItem(
+        selectedContentColor = MaterialTheme.colors.textcol,
+        unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
+        icon = {
+            Icon(
+                painterResource(id = iconResource),
+                contentDescription = itemTitle,
+                modifier = Modifier.size(24.dp)
+            )
+        },
+        label = { Text(itemTitle) },
+        selected = isSelected,
+        onClick = onClick
+    )
 }

@@ -1,23 +1,46 @@
 package pro.themed.manager.comps
 
-import android.widget.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.*
-import androidx.compose.ui.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
-import com.jaredrummler.ktsh.*
-import pro.themed.manager.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.*
+import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.getOverlayList
+import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables.themedId
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -43,18 +66,15 @@ fun DebugPage() {
                 Dialog(
                     onDismissRequest = {
                         showDialog = false
-                    },
+                    }, properties = DialogProperties(usePlatformDefaultWidth = false)
                 ) {
                     Card {
 
                         Column(modifier = Modifier.padding(16.dp)) {
-
-
                             Column(
                                 Modifier
 
-                                    .fillMaxHeight(0.5f).verticalScroll(scroll)
-
+                                    .verticalScroll(scroll)
                             ) {
                                 Text(dialogtext)
                             }
@@ -88,11 +108,15 @@ fun DebugPage() {
                         Shell("su").run("cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt")
                         Shell("su").run("ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt")
 
-                        Toast.makeText(context, context.getString(R.string.done), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context, context.getString(R.string.done), Toast.LENGTH_SHORT
+                        ).show()
 
 
                     },
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.colors.cardcol,
@@ -111,11 +135,15 @@ fun DebugPage() {
                         Shell("su").run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files")
                         Shell("su").run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files")
 
-                        Toast.makeText(context, context.getString(R.string.done), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context, context.getString(R.string.done), Toast.LENGTH_SHORT
+                        ).show()
 
 
                     },
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.colors.cardcol,

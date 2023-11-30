@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -60,6 +61,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,30 +86,26 @@ annotation class Composable
 fun FabricatedMonet(
 ) {
     val context = LocalContext.current
-    val colorsPath = """${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet"""
-    val colorsShell = Shell("su")
-    colorsShell.run("cd $colorsPath")
     val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
     val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
     var selectedColorReference by remember { mutableStateOf("") }
     var selectedMonetColor by remember { mutableStateOf("") }
-
-    var isDark by remember {
-        mutableStateOf(sharedPreferences.getString("isDark", ""))
-    }
-
+    var isDark by remember { mutableStateOf(sharedPreferences.getString("isDark", "")) }
     var isColorReferenceDropdownExpanded by remember { mutableStateOf(false) }
     var isMonetDropdownExpanded by remember { mutableStateOf(false) }
 
+    val colorsPath = """${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet"""
+    val colorsShell = Shell("su")
+    colorsShell.run("cd $colorsPath")
+
     val scope = rememberCoroutineScope()
     var colorsXmlContent by remember { mutableStateOf(colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
+
     LaunchedEffect(isDark) {
         colorsXmlContent =
             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-
     }
 
     val atReferences =
@@ -122,28 +120,21 @@ fun FabricatedMonet(
             matchResult?.groupValues?.get(1)
         }
 
-
-// First launched effect for selectedColorReference
     LaunchedEffect(selectedColorReference) {
         val colorValue =
             colorsXmlContent.find { it.contains("<color name=\"$selectedColorReference\">") }
                 ?.substringAfter("@color/")?.substringBefore("</color>") ?: ""
-
         selectedMonetColor = colorValue
     }
 
-// Second launched effect for selectedMonetColor
     LaunchedEffect(selectedMonetColor) {
         val sedCommand = """
-    sed -i 's|<color name="$selectedColorReference">@color/[^<]*</color>|<color name="$selectedColorReference">@color/$selectedMonetColor</color>|' /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml
-""".trimIndent()
+        sed -i 's|<color name="$selectedColorReference">@color/[^<]*</color>|<color name="$selectedColorReference">@color/$selectedMonetColor</color>|' /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml
+    """.trimIndent()
         if (selectedMonetColor.isNotBlank()) {
             colorsShell.run(sedCommand).log()
         }
     }
-
-
-
 
     fun getColorValue(colorName: String): Int? {
         return colorsXmlContent.find { it.contains("<color name=\"$colorName\">") }
@@ -151,6 +142,18 @@ fun FabricatedMonet(
             ?.let { android.graphics.Color.parseColor("#$it") }
     }
 
+    fun updateColor(colorName: String, colorValue: Int?) {
+        colorsShell.run("cd $colorsPath")
+        colorsShell.run(
+            """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+                "%08x".format(
+                    colorValue ?: 0
+                )
+            }</g' res/values$isDark/colors.xml"""
+        ).log()
+
+
+    }
 
     val sn1_10: Int? = getColorValue("system_neutral1_10")
     val sn1_50: Int? = getColorValue("system_neutral1_50")
@@ -310,7 +313,7 @@ fun FabricatedMonet(
         val divisor = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             5
         } else {
-            11
+            12
         }
         val tilesize = (((configuration.screenWidthDp - 8 - 64) / divisor)).dp
         tilesize.log()
@@ -330,6 +333,7 @@ fun FabricatedMonet(
                             modifier = Modifier
                                 .width(tilesize)
                                 .aspectRatio(2f)
+
                                 .combinedClickable(onClick = {
                                     val fullName = colorName
                                         .replace("sn", "system_neutral")
@@ -393,7 +397,28 @@ fun FabricatedMonet(
                             M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
                             M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
                             M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
-
+                            Button(
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp),
+                                shape = CircleShape,
+                                onClick = {
+                                    updateColor("system_neutral1_10", C_10.toArgb())
+                                    updateColor("system_neutral1_50", C_50.toArgb())
+                                    updateColor("system_neutral1_100", C_100.toArgb())
+                                    updateColor("system_neutral1_200", C_200.toArgb())
+                                    updateColor("system_neutral1_300", C_300.toArgb())
+                                    updateColor("system_neutral1_400", C_400.toArgb())
+                                    updateColor("system_neutral1_500", C_500.toArgb())
+                                    updateColor("system_neutral1_600", C_600.toArgb())
+                                    updateColor("system_neutral1_700", C_700.toArgb())
+                                    updateColor("system_neutral1_800", C_800.toArgb())
+                                    updateColor("system_neutral1_900", C_900.toArgb())
+                                    colorsXmlContent =
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                }) {
+                                Text(text = "N1")
+                            }
                         }
 
                         Column(horizontalAlignment = CenterHorizontally) {
@@ -413,7 +438,29 @@ fun FabricatedMonet(
                             M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
                             M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
                             M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
+                            Button(
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp),
+                                shape = CircleShape,
+                                onClick = {
+                                    updateColor("system_neutral2_10", C_10.toArgb())
+                                    updateColor("system_neutral2_50", C_50.toArgb())
+                                    updateColor("system_neutral2_100", C_100.toArgb())
+                                    updateColor("system_neutral2_200", C_200.toArgb())
+                                    updateColor("system_neutral2_300", C_300.toArgb())
+                                    updateColor("system_neutral2_400", C_400.toArgb())
+                                    updateColor("system_neutral2_500", C_500.toArgb())
+                                    updateColor("system_neutral2_600", C_600.toArgb())
+                                    updateColor("system_neutral2_700", C_700.toArgb())
+                                    updateColor("system_neutral2_800", C_800.toArgb())
+                                    updateColor("system_neutral2_900", C_900.toArgb())
+                                    colorsXmlContent =
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
+                                }) {
+                                Text(text = "N2")
+                            }
                         }
 
                         Column(horizontalAlignment = CenterHorizontally) {
@@ -433,7 +480,29 @@ fun FabricatedMonet(
                             M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
                             M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
                             M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
+                            Button(
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp),
+                                shape = CircleShape,
+                                onClick = {
+                                    updateColor("system_accent1_10", C_10.toArgb())
+                                    updateColor("system_accent1_50", C_50.toArgb())
+                                    updateColor("system_accent1_100", C_100.toArgb())
+                                    updateColor("system_accent1_200", C_200.toArgb())
+                                    updateColor("system_accent1_300", C_300.toArgb())
+                                    updateColor("system_accent1_400", C_400.toArgb())
+                                    updateColor("system_accent1_500", C_500.toArgb())
+                                    updateColor("system_accent1_600", C_600.toArgb())
+                                    updateColor("system_accent1_700", C_700.toArgb())
+                                    updateColor("system_accent1_800", C_800.toArgb())
+                                    updateColor("system_accent1_900", C_900.toArgb())
+                                    colorsXmlContent =
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
+                                }) {
+                                Text(text = "A1")
+                            }
                         }
 
                         Column(horizontalAlignment = CenterHorizontally) {
@@ -453,7 +522,29 @@ fun FabricatedMonet(
                             M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
                             M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
                             M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
+                            Button(
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp),
+                                shape = CircleShape,
+                                onClick = {
+                                    updateColor("system_accent2_10", C_10.toArgb())
+                                    updateColor("system_accent2_50", C_50.toArgb())
+                                    updateColor("system_accent2_100", C_100.toArgb())
+                                    updateColor("system_accent2_200", C_200.toArgb())
+                                    updateColor("system_accent2_300", C_300.toArgb())
+                                    updateColor("system_accent2_400", C_400.toArgb())
+                                    updateColor("system_accent2_500", C_500.toArgb())
+                                    updateColor("system_accent2_600", C_600.toArgb())
+                                    updateColor("system_accent2_700", C_700.toArgb())
+                                    updateColor("system_accent2_800", C_800.toArgb())
+                                    updateColor("system_accent2_900", C_900.toArgb())
+                                    colorsXmlContent =
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
+                                }) {
+                                Text(text = "A2")
+                            }
                         }
 
                         Column(horizontalAlignment = CenterHorizontally) {
@@ -473,7 +564,29 @@ fun FabricatedMonet(
                             M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
                             M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
                             M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
+                            Button(
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp),
+                                shape = CircleShape,
+                                onClick = {
+                                    updateColor("system_accent3_10", C_10.toArgb())
+                                    updateColor("system_accent3_50", C_50.toArgb())
+                                    updateColor("system_accent3_100", C_100.toArgb())
+                                    updateColor("system_accent3_200", C_200.toArgb())
+                                    updateColor("system_accent3_300", C_300.toArgb())
+                                    updateColor("system_accent3_400", C_400.toArgb())
+                                    updateColor("system_accent3_500", C_500.toArgb())
+                                    updateColor("system_accent3_600", C_600.toArgb())
+                                    updateColor("system_accent3_700", C_700.toArgb())
+                                    updateColor("system_accent3_800", C_800.toArgb())
+                                    updateColor("system_accent3_900", C_900.toArgb())
+                                    colorsXmlContent =
+                                        colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
 
+                                }) {
+                                Text(text = "A3")
+                            }
                         }
 
                     }
@@ -497,6 +610,28 @@ fun FabricatedMonet(
                             M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
                             M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
                             M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
+                            Text(textAlign = TextAlign.Center,
+                                text = "N1",
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp)
+                                    .clickable {
+                                        updateColor("system_neutral1_10", C_10.toArgb())
+                                        updateColor("system_neutral1_50", C_50.toArgb())
+                                        updateColor("system_neutral1_100", C_100.toArgb())
+                                        updateColor("system_neutral1_200", C_200.toArgb())
+                                        updateColor("system_neutral1_300", C_300.toArgb())
+                                        updateColor("system_neutral1_400", C_400.toArgb())
+                                        updateColor("system_neutral1_500", C_500.toArgb())
+                                        updateColor("system_neutral1_600", C_600.toArgb())
+                                        updateColor("system_neutral1_700", C_700.toArgb())
+                                        updateColor("system_neutral1_800", C_800.toArgb())
+                                        updateColor("system_neutral1_900", C_900.toArgb())
+                                        colorsXmlContent =
+                                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                    }
+                            )
+
 
                         }
 
@@ -513,7 +648,27 @@ fun FabricatedMonet(
                             M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
                             M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
                             M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
-
+                            Text(textAlign = TextAlign.Center,
+                                text = "N2",
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp)
+                                    .clickable {
+                                        updateColor("system_neutral2_10", C_10.toArgb())
+                                        updateColor("system_neutral2_50", C_50.toArgb())
+                                        updateColor("system_neutral2_100", C_100.toArgb())
+                                        updateColor("system_neutral2_200", C_200.toArgb())
+                                        updateColor("system_neutral2_300", C_300.toArgb())
+                                        updateColor("system_neutral2_400", C_400.toArgb())
+                                        updateColor("system_neutral2_500", C_500.toArgb())
+                                        updateColor("system_neutral2_600", C_600.toArgb())
+                                        updateColor("system_neutral2_700", C_700.toArgb())
+                                        updateColor("system_neutral2_800", C_800.toArgb())
+                                        updateColor("system_neutral2_900", C_900.toArgb())
+                                        colorsXmlContent =
+                                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                    }
+                            )
                         }
 
                         Row {
@@ -529,7 +684,27 @@ fun FabricatedMonet(
                             M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
                             M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
                             M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
-
+                            Text(textAlign = TextAlign.Center,
+                                text = "A1",
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp)
+                                    .clickable {
+                                        updateColor("system_accent1_10", C_10.toArgb())
+                                        updateColor("system_accent1_50", C_50.toArgb())
+                                        updateColor("system_accent1_100", C_100.toArgb())
+                                        updateColor("system_accent1_200", C_200.toArgb())
+                                        updateColor("system_accent1_300", C_300.toArgb())
+                                        updateColor("system_accent1_400", C_400.toArgb())
+                                        updateColor("system_accent1_500", C_500.toArgb())
+                                        updateColor("system_accent1_600", C_600.toArgb())
+                                        updateColor("system_accent1_700", C_700.toArgb())
+                                        updateColor("system_accent1_800", C_800.toArgb())
+                                        updateColor("system_accent1_900", C_900.toArgb())
+                                        colorsXmlContent =
+                                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                    }
+                            )
                         }
 
                         Row {
@@ -545,7 +720,27 @@ fun FabricatedMonet(
                             M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
                             M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
                             M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
-
+                            Text(textAlign = TextAlign.Center,
+                                text = "A2",
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp)
+                                    .clickable {
+                                        updateColor("system_accent2_10", C_10.toArgb())
+                                        updateColor("system_accent2_50", C_50.toArgb())
+                                        updateColor("system_accent2_100", C_100.toArgb())
+                                        updateColor("system_accent2_200", C_200.toArgb())
+                                        updateColor("system_accent2_300", C_300.toArgb())
+                                        updateColor("system_accent2_400", C_400.toArgb())
+                                        updateColor("system_accent2_500", C_500.toArgb())
+                                        updateColor("system_accent2_600", C_600.toArgb())
+                                        updateColor("system_accent2_700", C_700.toArgb())
+                                        updateColor("system_accent2_800", C_800.toArgb())
+                                        updateColor("system_accent2_900", C_900.toArgb())
+                                        colorsXmlContent =
+                                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                    }
+                            )
                         }
 
                         Row {
@@ -561,127 +756,33 @@ fun FabricatedMonet(
                             M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
                             M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
                             M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
-
+                            Text(textAlign = TextAlign.Center,
+                                text = "A3",
+                                modifier = Modifier
+                                    .width(tilesize)
+                                    .padding(2.dp)
+                                    .clickable {
+                                        updateColor("system_accent3_10", C_10.toArgb())
+                                        updateColor("system_accent3_50", C_50.toArgb())
+                                        updateColor("system_accent3_100", C_100.toArgb())
+                                        updateColor("system_accent3_200", C_200.toArgb())
+                                        updateColor("system_accent3_300", C_300.toArgb())
+                                        updateColor("system_accent3_400", C_400.toArgb())
+                                        updateColor("system_accent3_500", C_500.toArgb())
+                                        updateColor("system_accent3_600", C_600.toArgb())
+                                        updateColor("system_accent3_700", C_700.toArgb())
+                                        updateColor("system_accent3_800", C_800.toArgb())
+                                        updateColor("system_accent3_900", C_900.toArgb())
+                                        colorsXmlContent =
+                                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+                                    }
+                            )
                         }
                     }
                 }
 
 
-                fun updateColor(colorName: String, colorValue: Int?) {
-                    colorsShell.run("cd $colorsPath")
-                    colorsShell.run(
-                        """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
-                            "%08x".format(
-                                colorValue ?: 0
-                            )
-                        }</g' res/values$isDark/colors.xml"""
-                    ).log()
 
-
-                }
-
-                Row(modifier = Modifier.padding(horizontal = 1.dp)) {
-                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                        updateColor("system_neutral1_10", C_10.toArgb())
-                        updateColor("system_neutral1_50", C_50.toArgb())
-                        updateColor("system_neutral1_100", C_100.toArgb())
-                        updateColor("system_neutral1_200", C_200.toArgb())
-                        updateColor("system_neutral1_300", C_300.toArgb())
-                        updateColor("system_neutral1_400", C_400.toArgb())
-                        updateColor("system_neutral1_500", C_500.toArgb())
-                        updateColor("system_neutral1_600", C_600.toArgb())
-                        updateColor("system_neutral1_700", C_700.toArgb())
-                        updateColor("system_neutral1_800", C_800.toArgb())
-                        updateColor("system_neutral1_900", C_900.toArgb())
-                        colorsXmlContent =
-                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                    }) {
-                        Text(text = "N1")
-
-                    }
-                    Spacer(modifier = Modifier.width(2.dp))
-
-                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                        updateColor("system_neutral2_10", C_10.toArgb())
-                        updateColor("system_neutral2_50", C_50.toArgb())
-                        updateColor("system_neutral2_100", C_100.toArgb())
-                        updateColor("system_neutral2_200", C_200.toArgb())
-                        updateColor("system_neutral2_300", C_300.toArgb())
-                        updateColor("system_neutral2_400", C_400.toArgb())
-                        updateColor("system_neutral2_500", C_500.toArgb())
-                        updateColor("system_neutral2_600", C_600.toArgb())
-                        updateColor("system_neutral2_700", C_700.toArgb())
-                        updateColor("system_neutral2_800", C_800.toArgb())
-                        updateColor("system_neutral2_900", C_900.toArgb())
-                        colorsXmlContent =
-                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                    }) {
-                        Text(text = "N2")
-                    }
-                    Spacer(modifier = Modifier.width(2.dp))
-
-
-                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                        updateColor("system_accent1_10", C_10.toArgb())
-                        updateColor("system_accent1_50", C_50.toArgb())
-                        updateColor("system_accent1_100", C_100.toArgb())
-                        updateColor("system_accent1_200", C_200.toArgb())
-                        updateColor("system_accent1_300", C_300.toArgb())
-                        updateColor("system_accent1_400", C_400.toArgb())
-                        updateColor("system_accent1_500", C_500.toArgb())
-                        updateColor("system_accent1_600", C_600.toArgb())
-                        updateColor("system_accent1_700", C_700.toArgb())
-                        updateColor("system_accent1_800", C_800.toArgb())
-                        updateColor("system_accent1_900", C_900.toArgb())
-                        colorsXmlContent =
-                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                    }) {
-                        Text(text = "A1")
-                    }
-                    Spacer(modifier = Modifier.width(2.dp))
-
-                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                        updateColor("system_accent2_10", C_10.toArgb())
-                        updateColor("system_accent2_50", C_50.toArgb())
-                        updateColor("system_accent2_100", C_100.toArgb())
-                        updateColor("system_accent2_200", C_200.toArgb())
-                        updateColor("system_accent2_300", C_300.toArgb())
-                        updateColor("system_accent2_400", C_400.toArgb())
-                        updateColor("system_accent2_500", C_500.toArgb())
-                        updateColor("system_accent2_600", C_600.toArgb())
-                        updateColor("system_accent2_700", C_700.toArgb())
-                        updateColor("system_accent2_800", C_800.toArgb())
-                        updateColor("system_accent2_900", C_900.toArgb())
-                        colorsXmlContent =
-                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                    }) {
-                        Text(text = "A2")
-                    }
-                    Spacer(modifier = Modifier.width(2.dp))
-
-                    Button(modifier = Modifier.weight(1f), shape = CircleShape, onClick = {
-                        updateColor("system_accent3_10", C_10.toArgb())
-                        updateColor("system_accent3_50", C_50.toArgb())
-                        updateColor("system_accent3_100", C_100.toArgb())
-                        updateColor("system_accent3_200", C_200.toArgb())
-                        updateColor("system_accent3_300", C_300.toArgb())
-                        updateColor("system_accent3_400", C_400.toArgb())
-                        updateColor("system_accent3_500", C_500.toArgb())
-                        updateColor("system_accent3_600", C_600.toArgb())
-                        updateColor("system_accent3_700", C_700.toArgb())
-                        updateColor("system_accent3_800", C_800.toArgb())
-                        updateColor("system_accent3_900", C_900.toArgb())
-                        colorsXmlContent =
-                            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-
-                    }) {
-                        Text(text = "A3")
-                    }
-
-                }
                 Row {
                     OutlinedTextField(modifier = Modifier.weight(1f),
                         value = stringhue,
