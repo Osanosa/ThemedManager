@@ -229,7 +229,7 @@ fun HeaderRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 0.dp, vertical = 4.dp),
+               ,
             // verticalAlignment = Alignment.CenterVertically,
             // horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -338,6 +338,7 @@ fun HeaderRow(
                     ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
     }

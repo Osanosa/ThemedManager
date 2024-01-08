@@ -40,6 +40,7 @@ import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
 import pro.themed.manager.getOverlayList
+import pro.themed.manager.log
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables.themedId
 
@@ -57,7 +58,7 @@ fun DebugPage() {
             var dialogtext by rememberSaveable { mutableStateOf("empty") }
             var dialogname by rememberSaveable {
                 mutableStateOf(
-                    "empty".removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
+                    "empty"
                 )
             }
             val clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -73,7 +74,7 @@ fun DebugPage() {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Column(
                                 Modifier
-
+                                    .weight(1f)
                                     .verticalScroll(scroll)
                             ) {
                                 Text(dialogtext)
@@ -85,6 +86,21 @@ fun DebugPage() {
                                 Text(text = "Copy")
                             }
 
+                            Row {
+                                Button(modifier = Modifier.weight(1f), onClick = {
+                                    Shell("su").run("cmd overlay enable $dialogname")
+                                }) {
+                                    Text(text = "Enable")
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Button(modifier = Modifier.weight(1f), onClick = {
+                                Shell("su").run("cmd overlay disable $dialogname")
+                                    dialogname.log()
+                            }) {
+                                Text(text = "Disable")
+                            }
+                            }
                         }
                     }
                 }
@@ -162,7 +178,7 @@ fun DebugPage() {
                 Text(text = "Unsupported")
                 getOverlayList().unsupportedOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay
+                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
@@ -180,7 +196,7 @@ fun DebugPage() {
                 Text(text = "Enabled")
                 getOverlayList().enabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay
+                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
@@ -197,7 +213,7 @@ fun DebugPage() {
                 Text(text = "Disabled")
                 getOverlayList().disabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay
+                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")

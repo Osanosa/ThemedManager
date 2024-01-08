@@ -7,12 +7,13 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import pro.themed.manager.MyApplication
+import pro.themed.manager.MainActivity
+
 
 class MyBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val sharedPreferences: SharedPreferences =
-            MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+            MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         if (intent.action == Intent.ACTION_BOOT_COMPLETED &&  sharedPreferences.getBoolean("autoRateOnBoot", false)) {
 
 

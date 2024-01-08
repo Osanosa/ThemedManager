@@ -1,5 +1,6 @@
 package pro.themed.manager.comps
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -31,7 +32,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,10 +51,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
-import pro.themed.manager.ui.theme.Purple
+import pro.themed.manager.ui.theme.Accent
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
@@ -73,7 +76,6 @@ fun QsPanel() {
 @OptIn(
     ExperimentalLayoutApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class
 )
 @Preview
@@ -83,6 +85,14 @@ fun QSTileCard() {
     val testdp = (LocalConfiguration.current.smallestScreenWidthDp - 64 - 16) / 5
     val qsPath = "${GlobalVariables.modulePath}/onDemandCompiler/QsPanel"
     val qsShell = Shell("su")
+    qsShell.addOnStderrLineListener(object : Shell.OnLineListener {
+        override fun onLine(line: String) {
+            CoroutineScope(Dispatchers.Main).launch {
+
+                // do something
+                Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+            }        }
+    })
     qsShell.run("cd $qsPath")
     @Stable
     @Composable
@@ -124,7 +134,7 @@ fun QSTileCard() {
                 fontSize = 24.sp
             )
             IconButton(onClick = {
-                qsShell.run("for ol in \$(cmd overlay list | grep -E 'themed.qspanel' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
+                qsShell.run("cmd overlay disable themed.qspanel.generic")
             }) {
                 Image(
                     painter = painterResource(R.drawable.reset), contentDescription = null
@@ -152,7 +162,7 @@ fun QSTileCard() {
 
             }
 
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Purple),
+            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
                 shape = CircleShape,
                 selected = style.contains("default"),
                 onClick = { style = "default" },
@@ -169,7 +179,7 @@ fun QSTileCard() {
                     null
                 })
             Spacer(modifier = Modifier.width(8.dp))
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Purple),
+            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
                 shape = CircleShape,
                 selected = style.contains("clear"),
                 onClick = { style = "clear" },

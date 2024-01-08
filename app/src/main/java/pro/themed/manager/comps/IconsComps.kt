@@ -51,7 +51,6 @@ import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.cardcol
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun IconsTab() {
     Surface(

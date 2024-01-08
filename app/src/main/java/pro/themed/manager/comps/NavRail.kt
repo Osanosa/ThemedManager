@@ -1,5 +1,6 @@
 package pro.themed.manager.comps
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,11 +22,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import pro.themed.manager.log
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
@@ -57,16 +61,18 @@ fun NavigationRailSample(
 
 
 
-    NavigationRail(elevation = 0.dp,
+    NavigationRail(elevation = if ( isSystemInDarkTheme().also { it.log() })0.1.dp else (-80).dp,
         backgroundColor = MaterialTheme.colors.cardcol,
         contentColor = MaterialTheme.colors.textcol,
+
         modifier = Modifier
+            .shadow(1.dp)
+            .zIndex(10f)
             .width(64.dp)
             .onGloballyPositioned { layoutInfo ->
                 railHeight = layoutInfo.size.height
             }
             .then(if (contentExceedsAvailableSpace) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-
 
     ) {
         Column(modifier = Modifier.onGloballyPositioned { layoutInfo ->

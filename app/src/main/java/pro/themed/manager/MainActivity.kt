@@ -2,7 +2,6 @@ package pro.themed.manager
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -42,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -89,20 +90,6 @@ import pro.themed.manager.utils.loadRewarded
 import pro.themed.manager.utils.removeInterstitial
 
 
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        appContext = applicationContext // Initialize the appContext property
-
-        // Initialize any application-wide resources or settings here
-    }
-
-    companion object {
-        lateinit var appContext: Context
-            private set
-    }
-}
-
 data class OverlayListData(
     val overlayList: List<String>,
     val unsupportedOverlays: List<String>,
@@ -113,7 +100,7 @@ data class OverlayListData(
 
 @Composable
 fun AdmobBanner() {
-    if (!MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+    if (!MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
             .getBoolean("isContributor", false)
     ) {
         val isAdLoaded = remember { mutableStateOf(false) }
@@ -190,6 +177,11 @@ object SharedPreferencesManager {
     )
 }*/
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var appContext: Context
+            private set
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
@@ -197,7 +189,12 @@ class MainActivity : ComponentActivity() {
         Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
+        appContext = applicationContext // Initialize the appContext property
+        // Set the custom UncaughtExceptionHandler
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            val stackTrace = Log.getStackTraceString(throwable)
+            shareStackTrace(stackTrace)
+        }
 
         fun foregroundServiceRunning(): Boolean {
             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -217,13 +214,16 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             LaunchedEffect(Unit) {
-                if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
-                    loadInterstitial(MyApplication.appContext)
-                    loadRewarded(MyApplication.appContext)
-                }}
+                if (!SharedPreferencesManager.getSharedPreferences()
+                        .getBoolean("isContributor", false)
+                ) {
+                    loadInterstitial(appContext)
+                    loadRewarded(appContext)
+                }
+            }
 
             ThemedManagerTheme {
-                val context = MyApplication.appContext
+                val context = appContext
                 val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
 
                 if (sharedPreferences.getBoolean("onBoardingCompleted", false)) {
@@ -287,6 +287,14 @@ class MainActivity : ComponentActivity() {
 
             }
         }
+    }
+
+    private fun shareStackTrace(stackTrace: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, stackTrace)
+        }
+        startActivity(Intent.createChooser(intent, "Share stack trace"))
     }
 
     @Composable
@@ -462,20 +470,17 @@ fun OnBoarding(image: Int, text: String) {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically 
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = image),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(screenWidth)
+                modifier = Modifier.size(screenWidth)
             )
 
             androidx.compose.material3.Text(
                 text = text,
-                modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                  ,
+                modifier = Modifier.padding(horizontal = 30.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 16.sp,
                 color = MaterialTheme.colors.textcol
@@ -534,7 +539,15 @@ fun Main() {
                     ) {
                         Navigation(navController)
                     }
-                    NavigationRailSample(navController)
+                    Box(
+                        modifier = Modifier
+                            .zIndex(10f)
+                            .shadow(8.dp)
+
+
+                    ) {
+                        NavigationRailSample(navController)
+                    }
                 }
 
             }

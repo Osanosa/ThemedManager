@@ -66,7 +66,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.MyApplication
+import pro.themed.manager.MainActivity
+
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.getContrastColor
@@ -354,7 +355,7 @@ fun FabricatedMonet(
                                 }, onLongClick = {
                                     Toast
                                         .makeText(
-                                            MyApplication.appContext, "", Toast.LENGTH_SHORT
+                                            MainActivity.appContext, "", Toast.LENGTH_SHORT
                                         )
                                         .show()
                                 }), color = it
@@ -898,11 +899,13 @@ fun FabricatedMonet(
                         if (it) {
                             Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
                             Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
+                            Shell.SH.run("su -c cmd overlay disable com.android.systemui:dynamic")
                             overlayEnable("misc.flagmonet")
 
                         } else {
                             Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
                             Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                            Shell.SH.run("su -c cmd overlay enable com.android.systemui:dynamic")
                             Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
 
                         }

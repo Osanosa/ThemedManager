@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 231117,
-      "versionName": "23.11.17",
-      "outputFile": "ThemedManager-v23.11.17-release.apk"
+      "versionCode": 231220,
+      "versionName": "23.12.20",
+      "outputFile": "ThemedManager-v23.12.20-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/ThemedManager-v23.11.17-release.dm"
+        "baselineProfiles/1/ThemedManager-v23.12.20-release.dm"
       ]
     },
     {
-      "minApi": 2147483647,
-      "maxApi": 31,
+      "minApi": 31,
+      "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/ThemedManager-v23.11.17-release.dm"
+        "baselineProfiles/0/ThemedManager-v23.12.20-release.dm"
       ]
     }
   ],

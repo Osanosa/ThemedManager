@@ -21,7 +21,7 @@ class MyForegroundService : Service() {
     private val shell2 = Shell("su")
     private var isCountdownRunning = false // Flag to ensure countdown runs only once
     private val sharedPreferences: SharedPreferences =
-        MyApplication.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+        MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

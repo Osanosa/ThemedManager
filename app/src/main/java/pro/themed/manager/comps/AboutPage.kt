@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,7 +45,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.BuildConfig
-import pro.themed.manager.MyApplication
+import pro.themed.manager.MainActivity
+
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.AndroidDownloader
@@ -105,13 +107,13 @@ fun AboutPage() {
 
                     Toast.makeText(
                         context,
-                        MyApplication.appContext.getString(R.string.process_started_now_wait),
+                        MainActivity.appContext.getString(R.string.process_started_now_wait),
                         Toast.LENGTH_SHORT
                     ).show()
 
                     Shell("su").run("rm $path")
 
-                    AndroidDownloader(MyApplication.appContext).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
+                    AndroidDownloader(MainActivity.appContext).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
 
 
                 },
@@ -129,7 +131,7 @@ fun AboutPage() {
                 if (GlobalVariables.isdownloaded) {
                     Toast.makeText(
                         context,
-                        MyApplication.appContext.getString(R.string.installing),
+                        MainActivity.appContext.getString(R.string.installing),
                         Toast.LENGTH_SHORT
                     ).show()
                     val test = Shell("su").run(
@@ -144,9 +146,11 @@ fun AboutPage() {
                 CoroutineScope(Dispatchers.Main).launch {
                     showRewarded(context) {}
                 }
+
             }) {
                 Text(text = "Show ad")
             }
+
             AnimatedVisibility(easteregg, modifier = Modifier.padding(8.dp)) {
                 Column {
                     Image(
@@ -154,7 +158,8 @@ fun AboutPage() {
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(alignment = CenterHorizontally),
+                            .align(alignment = CenterHorizontally)
+                            .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.FillWidth
 
                     )
