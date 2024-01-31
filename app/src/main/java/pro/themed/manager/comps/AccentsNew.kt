@@ -13,12 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -71,7 +66,7 @@ fun AccentsAAPT() {
                     Shell("su").run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
                 }) {
                     Image(
-                          imageVector = ImageVector.vectorResource(R.drawable.reset),
+                        imageVector = ImageVector.vectorResource(R.drawable.reset),
                         contentDescription = null,
                     )
                 }
@@ -89,25 +84,19 @@ fun AccentsAAPT() {
             val color = Color.hsl(hue, saturation / 100, lightness / 100)
 
             Text(text = "hue is ${hue.toInt()}°")
-            androidx.compose.material3.Slider(modifier = Modifier
+            Slider(modifier = Modifier
                 .height(16.dp)
-                .padding(0.dp),
-                value = hue,
-                onValueChange = {
-                    hue = it.roundToInt().toFloat()
-                },
-                valueRange = 0f..360f,
-                onValueChangeFinished = {},
-                steps = 0,
-                thumb = {
-                    Image(
-                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
-                        contentDescription = null,
-                    )
+                .padding(0.dp), value = hue, onValueChange = {
+                hue = it.roundToInt().toFloat()
+            }, valueRange = 0f..360f, onValueChangeFinished = {}, steps = 0, thumb = {
+                Image(
+                    imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
+                    contentDescription = null,
+                )
 
-                })
+            })
             Text(text = "saturation is ${saturation.toInt()}%")
-            androidx.compose.material3.Slider(modifier = Modifier
+            Slider(modifier = Modifier
                 .height(16.dp)
                 .padding(0.dp),
                 value = saturation,
@@ -119,12 +108,12 @@ fun AccentsAAPT() {
                 steps = 0,
                 thumb = {
                     Image(
-                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
+                        imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
                         contentDescription = null,
                     )
                 })
             Text(text = "Lightness is ${lightness.toInt()}%")
-            androidx.compose.material3.Slider(modifier = Modifier
+            Slider(modifier = Modifier
                 .height(16.dp)
                 .padding(0.dp),
                 value = lightness,
@@ -136,7 +125,7 @@ fun AccentsAAPT() {
                 steps = 0,
                 thumb = {
                     Image(
-                          imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
+                        imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
                         contentDescription = null,
                     )
                 })
@@ -158,7 +147,7 @@ fun AccentsAAPT() {
                 },
             )
 
-            androidx.compose.material.Button(
+            Button(
                 modifier = Modifier.fillMaxWidth(), onClick = {
                     Shell("su").run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
                     Shell("su").run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
@@ -168,7 +157,7 @@ fun AccentsAAPT() {
 
 
                 }, colors = ButtonDefaults.buttonColors(
-                    backgroundColor = color, contentColor = if (lightness > 50f) {
+                    containerColor = color, contentColor = if (lightness > 50f) {
                         Color.Black
                     } else {
                         Color.White
@@ -180,7 +169,7 @@ fun AccentsAAPT() {
                     Text(text = "Build and update, $hex")
                     Icon(
                         modifier = Modifier.height(24.dp),
-                          imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px),
                         contentDescription = ""
                     )
 

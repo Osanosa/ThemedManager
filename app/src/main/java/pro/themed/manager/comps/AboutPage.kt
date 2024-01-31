@@ -19,12 +19,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,9 +43,7 @@ import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pro.themed.manager.BuildConfig
 import pro.themed.manager.MainActivity
-
 import pro.themed.manager.R
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.AndroidDownloader
@@ -57,7 +54,7 @@ import pro.themed.manager.utils.showRewarded
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutPage() {
-    Surface(color = MaterialTheme.colors.cardcol, modifier = Modifier.fillMaxSize()) {
+    Surface(color = cardcol, modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             horizontalAlignment = CenterHorizontally
@@ -79,7 +76,10 @@ fun AboutPage() {
                 )
             }
             val context = LocalContext.current
-            val versionName = BuildConfig.VERSION_NAME
+            val versionName = context.packageManager.getPackageInfo(
+                context.packageName,
+                0
+            ).versionName
             Text(text = stringResource(R.string.about_description))
             Text(
                 text = stringResource(R.string.app_version, versionName),
@@ -120,7 +120,7 @@ fun AboutPage() {
                 modifier = Modifier,
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.cardcol,
+                    containerColor = cardcol,
                 )
             ) {
                 Row {
@@ -141,7 +141,10 @@ fun AboutPage() {
                     GlobalVariables.isdownloaded = false
                 }
             }
-            Text(modifier = Modifier.padding(16.dp), text = "This text acts as separator so you won't click on button below on accident. Click it if you wanna support project by watching ad (tho I'd rather you to pay 1$/month")
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = "This text acts as separator so you won't click on button below on accident. Click it if you wanna support project by watching ad (tho I'd rather you to pay 1$/month"
+            )
             Button(onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
                     showRewarded(context) {}

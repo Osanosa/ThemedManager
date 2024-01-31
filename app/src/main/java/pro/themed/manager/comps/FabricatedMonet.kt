@@ -6,12 +6,14 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -26,16 +28,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -67,13 +69,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.MainActivity
-
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.getContrastColor
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
+import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
 
@@ -81,7 +83,7 @@ annotation class Composable
 
 @Preview
 @OptIn(
-    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class
+    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
 )
 @Composable
 fun FabricatedMonet(
@@ -287,6 +289,7 @@ fun FabricatedMonet(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .padding(start = 8.dp)
+            .background(cardcol)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -321,10 +324,14 @@ fun FabricatedMonet(
 
 
 
-        Surface {
+        Surface(color = cardcol) {
 
 
-            Column(modifier = Modifier.imePadding()) {
+            Column(
+                modifier = Modifier
+                    .imePadding()
+                    .background(cardcol)
+            ) {
 
                 @Stable
                 @Composable
@@ -398,11 +405,11 @@ fun FabricatedMonet(
                             M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
                             M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
                             M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
-                            Button(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .padding(2.dp),
+                            Button(modifier = Modifier
+                                .width(tilesize)
+                                .padding(2.dp),
                                 shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp),
                                 onClick = {
                                     updateColor("system_neutral1_10", C_10.toArgb())
                                     updateColor("system_neutral1_50", C_50.toArgb())
@@ -439,11 +446,11 @@ fun FabricatedMonet(
                             M3Tile(color = sn2_700, colorName = "sn2_700", themedColor = C_700)
                             M3Tile(color = sn2_800, colorName = "sn2_800", themedColor = C_800)
                             M3Tile(color = sn2_900, colorName = "sn2_900", themedColor = C_900)
-                            Button(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .padding(2.dp),
+                            Button(modifier = Modifier
+                                .width(tilesize)
+                                .padding(2.dp),
                                 shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp),
                                 onClick = {
                                     updateColor("system_neutral2_10", C_10.toArgb())
                                     updateColor("system_neutral2_50", C_50.toArgb())
@@ -481,11 +488,11 @@ fun FabricatedMonet(
                             M3Tile(color = sa1_700, colorName = "sa1_700", themedColor = C_700)
                             M3Tile(color = sa1_800, colorName = "sa1_800", themedColor = C_800)
                             M3Tile(color = sa1_900, colorName = "sa1_900", themedColor = C_900)
-                            Button(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .padding(2.dp),
+                            Button(modifier = Modifier
+                                .width(tilesize)
+                                .padding(2.dp),
                                 shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp),
                                 onClick = {
                                     updateColor("system_accent1_10", C_10.toArgb())
                                     updateColor("system_accent1_50", C_50.toArgb())
@@ -523,11 +530,11 @@ fun FabricatedMonet(
                             M3Tile(color = sa2_700, colorName = "sa2_700", themedColor = C_700)
                             M3Tile(color = sa2_800, colorName = "sa2_800", themedColor = C_800)
                             M3Tile(color = sa2_900, colorName = "sa2_900", themedColor = C_900)
-                            Button(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .padding(2.dp),
+                            Button(modifier = Modifier
+                                .width(tilesize)
+                                .padding(2.dp),
                                 shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp),
                                 onClick = {
                                     updateColor("system_accent2_10", C_10.toArgb())
                                     updateColor("system_accent2_50", C_50.toArgb())
@@ -565,11 +572,11 @@ fun FabricatedMonet(
                             M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
                             M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
                             M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
-                            Button(
-                                modifier = Modifier
-                                    .width(tilesize)
-                                    .padding(2.dp),
+                            Button(modifier = Modifier
+                                .width(tilesize)
+                                .padding(2.dp),
                                 shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp),
                                 onClick = {
                                     updateColor("system_accent3_10", C_10.toArgb())
                                     updateColor("system_accent3_50", C_50.toArgb())
@@ -615,7 +622,9 @@ fun FabricatedMonet(
                                 text = "N1",
                                 modifier = Modifier
                                     .width(tilesize)
-                                    .padding(2.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(C_500)
                                     .clickable {
                                         updateColor("system_neutral1_10", C_10.toArgb())
                                         updateColor("system_neutral1_50", C_50.toArgb())
@@ -630,8 +639,7 @@ fun FabricatedMonet(
                                         updateColor("system_neutral1_900", C_900.toArgb())
                                         colorsXmlContent =
                                             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                                    }
-                            )
+                                    })
 
 
                         }
@@ -668,8 +676,7 @@ fun FabricatedMonet(
                                         updateColor("system_neutral2_900", C_900.toArgb())
                                         colorsXmlContent =
                                             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                                    }
-                            )
+                                    })
                         }
 
                         Row {
@@ -704,8 +711,7 @@ fun FabricatedMonet(
                                         updateColor("system_accent1_900", C_900.toArgb())
                                         colorsXmlContent =
                                             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                                    }
-                            )
+                                    })
                         }
 
                         Row {
@@ -740,8 +746,7 @@ fun FabricatedMonet(
                                         updateColor("system_accent2_900", C_900.toArgb())
                                         colorsXmlContent =
                                             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                                    }
-                            )
+                                    })
                         }
 
                         Row {
@@ -776,8 +781,7 @@ fun FabricatedMonet(
                                         updateColor("system_accent3_900", C_900.toArgb())
                                         colorsXmlContent =
                                             colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
-                                    }
-                            )
+                                    })
                         }
                     }
                 }
@@ -839,19 +843,20 @@ fun FabricatedMonet(
                             label = { Text("Select Color Reference") },
                             singleLine = true
                         )
-                        ExposedDropdownMenu(expanded = isColorReferenceDropdownExpanded,
+                        ExposedDropdownMenu(
+                            expanded = isColorReferenceDropdownExpanded,
                             onDismissRequest = {
                                 // Dismiss the menu if needed
                                 isColorReferenceDropdownExpanded = false
                             }) {
                             atReferences.forEach { reference ->
-                                DropdownMenuItem(onClick = {
+                                DropdownMenuItem(text = {
+                                    Text(text = reference)
+                                }, onClick = {
                                     selectedColorReference = reference
                                     isColorReferenceDropdownExpanded = false
 
-                                }) {
-                                    Text(text = reference)
-                                }
+                                })
                             }
                         }
                     }
@@ -878,13 +883,13 @@ fun FabricatedMonet(
                             isMonetDropdownExpanded = false
                         }) {
                             hashtagReferences.forEach { color ->
-                                DropdownMenuItem(onClick = {
+                                DropdownMenuItem(text = {
+                                    Text(text = color)
+                                }, onClick = {
                                     selectedMonetColor = color
                                     isMonetDropdownExpanded = false
 
-                                }) {
-                                    Text(text = color)
-                                }
+                                })
                             }
                         }
                     }
@@ -938,7 +943,7 @@ fun FabricatedMonet(
 
 
                     }, colors = ButtonDefaults.buttonColors(
-                        backgroundColor = C_500, contentColor = if (lightness > 50f) {
+                        containerColor = C_500, contentColor = if (lightness > 50f) {
                             Color.Black
                         } else {
                             Color.White

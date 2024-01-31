@@ -7,9 +7,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -98,8 +98,8 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                 Text(
                     textAlign = TextAlign.Center,
                     text = "Themed overlays are missing\n\n\n\nTry installing module from about screen",
-                    color = androidx.compose.ui.graphics.Color.White,
-                    style = MaterialTheme.typography.subtitle1.copy(
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         shadow = Shadow(
                             color = Color.Black,
                             offset = Offset(4f, 4f),

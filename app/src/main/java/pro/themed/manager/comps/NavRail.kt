@@ -1,6 +1,5 @@
 package pro.themed.manager.comps
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,11 +8,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.NavigationRail
-import androidx.compose.material.NavigationRailItem
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import pro.themed.manager.log
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
@@ -61,9 +59,9 @@ fun NavigationRailSample(
 
 
 
-    NavigationRail(elevation = if ( isSystemInDarkTheme().also { it.log() })0.1.dp else (-80).dp,
-        backgroundColor = MaterialTheme.colors.cardcol,
-        contentColor = MaterialTheme.colors.textcol,
+    NavigationRail(
+        containerColor = cardcol,
+        contentColor = textcol,
 
         modifier = Modifier
             .shadow(1.dp)
@@ -123,8 +121,13 @@ fun CustomNavigationRailItem(
     itemTitle: String
 ) {
     NavigationRailItem(
-        selectedContentColor = MaterialTheme.colors.textcol,
-        unselectedContentColor = MaterialTheme.colors.textcol.copy(0.4f),
+        colors = NavigationRailItemDefaults.colors(
+            selectedIconColor = textcol,
+        selectedTextColor = textcol,
+        unselectedTextColor = textcol.copy(0.4f),
+        unselectedIconColor = textcol.copy(0.4f),
+        ),
+
         icon = {
             Icon(
                 painterResource(id = iconResource),

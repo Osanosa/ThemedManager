@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -23,7 +23,7 @@ fun SettingsPage() {
     val context = LocalContext.current
     // A surface container using the 'background' color from the theme
     Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
+        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
@@ -31,8 +31,9 @@ fun SettingsPage() {
 
 
 
-        Column(   modifier = Modifier.verticalScroll(rememberScrollState())) {
-            HeaderRow(header = "Automatically restart SystemUI",
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            HeaderRow(
+                header = "Automatically restart SystemUI",
                 subHeader = "Enabling this will automatically restart system interface after applying overlays",
                 isChecked = sharedPreferences.getBoolean("restart_system_ui", false),
                 onCheckedChange = {
@@ -43,7 +44,8 @@ fun SettingsPage() {
             )
             val scope = rememberCoroutineScope()
 
-            HeaderRow(header = stringResource(R.string.uninstall_unused_overlays_header),
+            HeaderRow(
+                header = stringResource(R.string.uninstall_unused_overlays_header),
                 subHeader = stringResource(R.string.uninstall_unused_overlays_subheader),
                 button1onClick = {
                     Looper.prepare()

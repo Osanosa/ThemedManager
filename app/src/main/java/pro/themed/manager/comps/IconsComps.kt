@@ -1,12 +1,10 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class
 )
 
 package pro.themed.manager.comps
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +19,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -54,11 +50,13 @@ import pro.themed.manager.ui.theme.cardcol
 @Composable
 fun IconsTab() {
     Surface(
-        modifier = Modifier
-            .fillMaxSize(),
-        color = MaterialTheme.colors.cardcol
+        modifier = Modifier.fillMaxSize(), color = cardcol
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp)
+        ) {
             AdmobBanner()
 
             NavbarCard()
@@ -75,14 +73,14 @@ fun IconsTab() {
 fun NavbarCard() {
 
     Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        border = BorderStroke(width = 1.dp, color = bordercol),
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(8.dp),
-        elevation = (0.dp),
+        elevation = (CardDefaults.cardElevation(0.dp)),
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
+        colors = CardDefaults.cardColors(cardcol)
     ) {
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 8
 
@@ -104,12 +102,13 @@ fun NavbarCard() {
                     Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.navbar' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                          imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null
+                        imageVector = ImageVector.vectorResource(id = R.drawable.reset),
+                        contentDescription = null
                     )
                 }
             }
 
-            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+            Divider(thickness = 1.dp, color = bordercol)
             AnimatedVisibility(expanded) {
                 Surface {
                     Column {
@@ -184,6 +183,7 @@ fun NavbarCard() {
         }
     }
 }
+
 @Stable
 @Composable
 private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String) {
@@ -197,10 +197,14 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
                 }
                 .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Image(
-                imageVector = ImageVector.vectorResource(id = back), contentDescription = null, Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = back),
+                contentDescription = null,
+                Modifier.size(testdp.dp)
             )
             Image(
-                imageVector = ImageVector.vectorResource(id = home), contentDescription = null, Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = home),
+                contentDescription = null,
+                Modifier.size(testdp.dp)
             )
             Image(
                 imageVector = ImageVector.vectorResource(id = recent),
@@ -212,20 +216,19 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IconPackCard() {
     val context = LocalContext.current
 
     Card(
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.bordercol),
+        border = BorderStroke(width = 1.dp, color = bordercol),
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(8.dp),
-        elevation = (0.dp),
+        elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.colors.cardcol
+        colors = CardDefaults.cardColors(cardcol)
     ) {
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 12
 
@@ -247,12 +250,13 @@ fun IconPackCard() {
                     Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.iconpack' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
                 }) {
                     Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null
+                        imageVector = ImageVector.vectorResource(id = R.drawable.reset),
+                        contentDescription = null
                     )
                 }
             }
 
-            Divider(thickness = 1.dp, color = MaterialTheme.colors.bordercol)
+            Divider(thickness = 1.dp, color = bordercol)
 
             AnimatedVisibility(expanded) {
                 Surface {
@@ -260,7 +264,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.acherus.android")
                             overlayEnable("iconpack.acherus.systemui")
                         }) {
@@ -270,32 +274,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Archeous", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -305,7 +309,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.circular.android")
                             overlayEnable("iconpack.circular.launcher")
                             overlayEnable("iconpack.circular.settings")
@@ -318,32 +322,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Circular   ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -353,7 +357,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.filled.android")
                             overlayEnable("iconpack.filled.launcher")
                             overlayEnable("iconpack.filled.settings")
@@ -366,32 +370,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Filled       ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -400,7 +404,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.kai.android")
                             overlayEnable("iconpack.kai.launcher")
                             overlayEnable("iconpack.kai.settings")
@@ -413,32 +417,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Kai           ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -447,7 +451,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.outline.android")
                             overlayEnable("iconpack.outline.launcher")
                             overlayEnable("iconpack.outline.settings")
@@ -460,32 +464,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Outline    ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -494,7 +498,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.oos.android")
                             overlayEnable("iconpack.oos.launcher")
                             overlayEnable("iconpack.oos.settings")
@@ -507,32 +511,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "OOS         ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -541,7 +545,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.pui.android")
                             overlayEnable("iconpack.pui.launcher")
                             overlayEnable("iconpack.pui.settings")
@@ -554,32 +558,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "PUI           ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -590,7 +594,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.rounded.android")
                             overlayEnable("iconpack.rounded.launcher")
                             overlayEnable("iconpack.rounded.settings")
@@ -603,32 +607,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Rounded ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -639,7 +643,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.sam.android")
                             overlayEnable("iconpack.sam.launcher")
                             overlayEnable("iconpack.sam.settings")
@@ -652,32 +656,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Sam         ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
@@ -686,7 +690,7 @@ fun IconPackCard() {
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = MaterialTheme.colors.cardcol, onClick = {
+                            .padding(2.dp), color = cardcol, onClick = {
                             overlayEnable("iconpack.victor.android")
                             overlayEnable("iconpack.victor.launcher")
                             overlayEnable("iconpack.victor.settings")
@@ -699,32 +703,32 @@ fun IconPackCard() {
                             ) {
                                 Text(text = "Victor      ", fontSize = 18.sp)
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_wifi_signal_3),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_wifi_signal_3),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_bluetooth_transient_animation),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_bluetooth_transient_animation),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_dnd),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_dnd),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_flashlight),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_flashlight),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_auto_rotate),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_auto_rotate),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                                 Image(
-                                      imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_airplane),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_airplane),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )

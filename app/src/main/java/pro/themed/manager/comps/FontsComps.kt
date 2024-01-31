@@ -16,15 +16,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FilterChip
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,16 +32,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.Accent
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun FontsTab() {
@@ -96,19 +95,19 @@ fun FontsTab() {
             Spacer(modifier = Modifier.width(8.dp))
 
             LaunchedEffect(font) {
-            //    Shell("su").run("cd ${GlobalVariables.modulePath}/onDemandCompiler/Font")
-              //  Shell("su").run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$font/g' "res/drawable/themed_qspanel.xml"""")
+                //    Shell("su").run("cd ${GlobalVariables.modulePath}/onDemandCompiler/Font")
+                //  Shell("su").run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$font/g' "res/drawable/themed_qspanel.xml"""")
 
                 Shell("su").run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
 
 
             }
 
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
+            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
                 shape = CircleShape,
                 selected = font.contains("System"),
                 onClick = { font = "System" },
-                content = { Text("System") },
+                label = { Text("System") },
                 leadingIcon = if (font.contains("System")) {
                     {
                         Icon(
@@ -121,11 +120,11 @@ fun FontsTab() {
                     null
                 })
             Spacer(modifier = Modifier.width(8.dp))
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
+            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
                 shape = CircleShape,
                 selected = font.contains("Clock"),
                 onClick = { font = "Clock" },
-                content = { Text("Clock") },
+                label = { Text("Clock") },
                 leadingIcon = if (font.contains("Clock")) {
                     {
                         Icon(
@@ -150,8 +149,10 @@ fun FontsTab() {
                     item.config_regularFontFamily
                 )
             }
-            item { Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Not yet implemented") }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Not yet implemented")
+            }
         }
     }
 }

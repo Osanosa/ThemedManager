@@ -28,11 +28,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,7 +78,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.comps.NavigationRailSample
 import pro.themed.manager.ui.theme.ThemedManagerTheme
-import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.GlobalVariables.magiskVersion
 import pro.themed.manager.utils.GlobalVariables.themedId
@@ -180,6 +179,8 @@ class MainActivity : ComponentActivity() {
     companion object {
         lateinit var appContext: Context
             private set
+
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -369,7 +370,7 @@ class MainActivity : ComponentActivity() {
             ) {
 
                 OutlinedButton(shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                     onClick = {
                         coroutineScope.launch {
 
@@ -387,22 +388,22 @@ class MainActivity : ComponentActivity() {
                     }) {
                     when (pagerState.currentPage) {
                         0 -> {
-                            androidx.compose.material3.Text(
-                                text = "Skip", color = MaterialTheme.colors.textcol
+                            Text(
+                                text = "Skip", color = textcol
                             )
 
                         }
 
                         else -> {
-                            androidx.compose.material3.Text(
-                                text = "Back", color = MaterialTheme.colors.textcol
+                            Text(
+                                text = "Back", color = textcol
                             )
                         }
                     }
                 }
                 // Spacer(modifier = Modifier.fillMaxWidth())
                 OutlinedButton(shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                     onClick = {
                         coroutineScope.launch {
                             if (pagerState.currentPage == 1) {
@@ -429,22 +430,22 @@ class MainActivity : ComponentActivity() {
                     }) {
                     when (pagerState.currentPage) {
                         pageCount - 1 -> {
-                            androidx.compose.material3.Text(
-                                text = "Get started", color = MaterialTheme.colors.textcol
+                            Text(
+                                text = "Get started", color = textcol
                             )
 
                         }
 
                         1 -> {
-                            androidx.compose.material3.Text(
-                                text = "Grant access", color = MaterialTheme.colors.textcol
+                            Text(
+                                text = "Grant access", color = textcol
                             )
 
                         }
 
                         else -> {
-                            androidx.compose.material3.Text(
-                                text = "Next", color = MaterialTheme.colors.textcol
+                            Text(
+                                text = "Next", color = textcol
                             )
                         }
                     }
@@ -478,12 +479,12 @@ fun OnBoarding(image: Int, text: String) {
                 modifier = Modifier.size(screenWidth)
             )
 
-            androidx.compose.material3.Text(
+            Text(
                 text = text,
                 modifier = Modifier.padding(horizontal = 30.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 16.sp,
-                color = MaterialTheme.colors.textcol
+                color = textcol
             )
         }
     } else {
@@ -501,14 +502,14 @@ fun OnBoarding(image: Int, text: String) {
                     .weight(0.8f)
                     .fillMaxSize()
             )
-            androidx.compose.material3.Text(
+            Text(
                 text = text,
                 modifier = Modifier
                     .padding(horizontal = 30.dp)
                     .weight(0.2f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
-                color = MaterialTheme.colors.textcol
+                color = textcol
             )
         }
     }
@@ -524,11 +525,7 @@ fun Main() {
 
         val navController = rememberNavController()
 
-        Scaffold(
-            backgroundColor = MaterialTheme.colors.cardcol,
-            //topBar = { TopAppBar() },
 
-        ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
                 Row(
@@ -551,7 +548,7 @@ fun Main() {
                 }
 
             }
-        }
+
     }
 }
 

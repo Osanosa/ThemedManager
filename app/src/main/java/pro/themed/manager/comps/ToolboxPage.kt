@@ -21,15 +21,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +52,12 @@ import pro.themed.manager.utils.GlobalVariables
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
     fun ToolboxPage() {
         val context = LocalContext.current
         Surface(
-            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
+            modifier = Modifier.fillMaxSize(), color = cardcol
         ) {
             var progress by rememberSaveable {
                 mutableStateOf(false)
@@ -201,9 +203,10 @@ import java.util.concurrent.TimeUnit
                         var customres by remember { mutableStateOf("") }
                         if (customresShown) {
                             AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                                title = { Text(stringResource(R.string.enter_your_custom_resolution)) },
-                                text = { Text(stringResource(R.string.downscale_warning)) },
-                                buttons = {
+                                content = {
+                                    Column {
+                                    Text(stringResource(R.string.enter_your_custom_resolution) )
+                                    Text(stringResource(R.string.downscale_warning))
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         TextField(modifier = Modifier
                                             .fillMaxWidth()
@@ -242,6 +245,7 @@ import java.util.concurrent.TimeUnit
                                             })
                                         Spacer(modifier = Modifier.height(8.dp))
 
+                                    }
                                     }
                                 })
                         }
@@ -359,8 +363,8 @@ import java.util.concurrent.TimeUnit
                         Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState()),
-                        elevation = 24.dp,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(8.dp)
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Row(

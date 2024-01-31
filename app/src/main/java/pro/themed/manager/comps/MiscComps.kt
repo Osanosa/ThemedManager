@@ -1,12 +1,14 @@
 package pro.themed.manager.comps
 
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,19 +19,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -43,24 +45,36 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.themed.manager.AdmobBanner
 import pro.themed.manager.R
+import pro.themed.manager.buildOverlay
 import pro.themed.manager.getOverlayList
+import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.utils.GlobalVariables
 import kotlin.math.roundToInt
 
 @Stable
@@ -127,7 +141,7 @@ fun Slideritem(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .size(24.dp),
-                              imageVector = ImageVector.vectorResource(id = R.drawable.reset),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.reset),
                             contentDescription = null,
                         )
                     }
@@ -148,11 +162,11 @@ fun Slideritem(
                                 overlayEnable("$overlayName$intvalue")
 
                             },
-                          imageVector = ImageVector.vectorResource(id = R.drawable.remove_48px),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.remove_48px),
                         contentDescription = null,
                     )
 
-                    androidx.compose.material3.Slider(modifier = Modifier
+                    Slider(modifier = Modifier
                         .height(16.dp)
                         .weight(1f)
                         .padding(0.dp),
@@ -166,7 +180,7 @@ fun Slideritem(
                         steps = sliderSteps,
                         thumb = {
                             Image(
-                                  imageVector = ImageVector.vectorResource(id = R.drawable.fiber_manual_record_48px),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.fiber_manual_record_48px),
                                 contentDescription = null,
                             )
 
@@ -182,7 +196,7 @@ fun Slideritem(
                                     .show()
                                 overlayEnable("$overlayName$intvalue")
                             },
-                          imageVector = ImageVector.vectorResource(id = R.drawable.add_48px),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.add_48px),
                         contentDescription = null,
                     )
 
@@ -196,7 +210,7 @@ fun Slideritem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
-@Preview
+
 @Composable
 fun HeaderRow(
     header: String = "",
@@ -227,9 +241,7 @@ fun HeaderRow(
     val context = LocalContext.current
     Surface {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-               ,
+            modifier = Modifier.fillMaxWidth(),
             // verticalAlignment = Alignment.CenterVertically,
             // horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -242,12 +254,12 @@ fun HeaderRow(
                         Text(
                             text = header,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.subtitle1
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         if (subHeader.isNotEmpty()) {
                             Text(
                                 text = subHeader,
-                                style = MaterialTheme.typography.body1,
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     }
@@ -264,11 +276,11 @@ fun HeaderRow(
                     Text(
                         text = header,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.subtitle1
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = subHeader,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -276,7 +288,7 @@ fun HeaderRow(
                     ) {
                         Text(
                             text = switchDescription,
-                            style = MaterialTheme.typography.body1,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )
                         Switch(
@@ -291,11 +303,11 @@ fun HeaderRow(
                 Text(
                     text = header,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = subHeader,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
@@ -306,7 +318,8 @@ fun HeaderRow(
                         onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
                         modifier = Modifier.weight(button1weight),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
                 }
 
@@ -316,7 +329,8 @@ fun HeaderRow(
                         onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
                         modifier = Modifier.weight(button2weight),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
                 }
                 if (button3text.isNotEmpty()) {
@@ -325,7 +339,8 @@ fun HeaderRow(
                         onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
                         modifier = Modifier.weight(button3weight),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
                 }
                 if (button4text.isNotEmpty()) {
@@ -334,7 +349,8 @@ fun HeaderRow(
                         onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
                         modifier = Modifier.weight(button4weight),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
                 }
             }
@@ -345,34 +361,123 @@ fun HeaderRow(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterial3Api
 //@Preview
 @Composable
 fun MiscTab() {
     Surface(
-        modifier = Modifier
-            .fillMaxSize(),
-        color = MaterialTheme.colors.cardcol
+        modifier = Modifier.fillMaxSize(), color = cardcol
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AdmobBanner()
 
-            Row(Modifier.padding(8.dp)) {
-                Icon(Icons.Default.Info, contentDescription = "")
-                Text(text = "Only supported options are being shown")
+            var rounded_corner_radius by remember { mutableStateOf("0") }
+            var config_qs_columns_landscape by remember { mutableStateOf("0") }
+            var config_qs_columns_portrait by remember { mutableStateOf("0") }
+            val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
+            val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
+
+
+
+NoiseTest()
+
+            LaunchedEffect(Unit) {
+                rounded_corner_radius =
+                    Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
+                        .stdout()
+                config_qs_columns_landscape =
+                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
+                        .stdout()
+                config_qs_columns_portrait = Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
+                    .stdout()
             }
-            Slideritem(
-                drawable = R.drawable.rounded_corner_48px,
-                header = stringResource(R.string.rounded_corners_header),
-                sliderSteps = 17,
-                sliderStepValue = 2,
-                minSliderValue = 0f,
-                maxSliderValue = 36f,
-                overlayName = "roundedcorners"
-            )
 
 
-            Divider()
+
+            Row {
+                OutlinedTextField(modifier = Modifier.weight(1f),
+                    value = rounded_corner_radius,
+                    singleLine = true,
+                    onValueChange = {
+                        Shell("su").run(
+                            """sed -i 's/<dimen name="rounded_corner_radius">[^<]*/<dimen name="rounded_corner_radius">${it}dip/g' $cornersPath/res/values/dimens.xml"""
+                        ).log(); rounded_corner_radius = it
+                    },
+                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    leadingIcon = {
+                                  Icon(
+                                      painter = painterResource(id = R.drawable.rounded_corner_48px),
+                                      contentDescription = null,
+                                      modifier = Modifier.size(24.dp)
+                                  )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            buildOverlay(cornersPath)
+                            Shell("su").run("""cmd overlay enable themed.corners.generic""")
+
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.move_up_24px),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    label = { Text("rounded_corner_radius", Modifier.basicMarquee()) })
+
+            }
+            Row {
+                OutlinedTextField(modifier = Modifier.weight(1f),
+                    value = config_qs_columns_landscape,
+                    singleLine = true,
+                    onValueChange = {
+                        Shell("su").run(
+                            """sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml)"""
+                        ); config_qs_columns_landscape = it
+                    },
+                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            buildOverlay(cornersPath)
+                            Shell("su").run("""cmd overlay enable themed.columnslandscape.generic""")
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.move_up_24px),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    label = { Text("config_qs_columns_landscape", Modifier.basicMarquee()) })
+                OutlinedTextField(modifier = Modifier.weight(1f),
+                    value = config_qs_columns_landscape,
+                    singleLine = true,
+                    onValueChange = {
+                        Shell("su").run(
+                            """sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml)"""
+                        ); config_qs_columns_landscape = it
+                    },
+                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            buildOverlay(cornersPath)
+                            Shell("su").run("""cmd overlay enable themed.columnslandscape.generic""")
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.move_up_24px),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    label = { Text("config_qs_columns_landscape", Modifier.basicMarquee()) })
+
+            }
 
 
 

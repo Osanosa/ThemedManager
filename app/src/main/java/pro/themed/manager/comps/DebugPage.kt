@@ -15,13 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +43,7 @@ import pro.themed.manager.utils.GlobalVariables.themedId
 fun DebugPage() {
     val context = LocalContext.current
     Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.cardcol
+        modifier = Modifier.fillMaxSize(), color = cardcol
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
@@ -95,11 +89,11 @@ fun DebugPage() {
                                 Spacer(modifier = Modifier.width(8.dp))
 
                                 Button(modifier = Modifier.weight(1f), onClick = {
-                                Shell("su").run("cmd overlay disable $dialogname")
+                                    Shell("su").run("cmd overlay disable $dialogname")
                                     dialogname.log()
-                            }) {
-                                Text(text = "Disable")
-                            }
+                                }) {
+                                    Text(text = "Disable")
+                                }
                             }
                         }
                     }
@@ -135,7 +129,7 @@ fun DebugPage() {
                         .weight(1f),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.cardcol,
+                        containerColor = cardcol,
                     )
 
                 ) {
@@ -162,7 +156,7 @@ fun DebugPage() {
                         .weight(1f),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.cardcol,
+                        containerColor = cardcol,
                     )
 
                 ) {
@@ -178,7 +172,8 @@ fun DebugPage() {
                 Text(text = "Unsupported")
                 getOverlayList().unsupportedOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
+                        dialogname =
+                            overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
@@ -196,7 +191,8 @@ fun DebugPage() {
                 Text(text = "Enabled")
                 getOverlayList().enabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
+                        dialogname =
+                            overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")
@@ -213,7 +209,8 @@ fun DebugPage() {
                 Text(text = "Disabled")
                 getOverlayList().disabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
-                        dialogname = overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
+                        dialogname =
+                            overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
                         dialogtext = Shell("su").run(
                             "cmd overlay dump ${
                                 overlay.removePrefix("[x] ").removePrefix("[ ] ")

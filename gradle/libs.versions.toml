@@ -1,0 +1,59 @@
+[versions]
+agp = "8.4.0-alpha07"
+coreSplashscreen = "1.0.1"
+kotlin = "1.9.22"
+coreKtx = "1.12.0"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+ktsh = "1.0.0"
+lifecycleRuntimeKtx = "2.7.0"
+activityCompose = "1.8.2"
+composeBom = "2024.01.00"
+googleServices = "4.4.0"
+firebaseAnalytics = "21.5.0"
+firebaseDatabase = "20.3.0"
+firebaseCrashlytics = "18.6.1"
+gradle = "8.4.0-alpha07"
+firebaseCrashlyticsGradle = "2.9.9"
+firebasePerf = "20.5.1"
+navigationCompose = "2.7.6"
+perfPlugin = "1.4.2"
+firebaseMessaging = "23.4.0"
+firebaseInappmessagingDisplay = "20.4.0"
+playServicesAds = "22.6.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "gradle" }
+firebase-crashlytics-gradle = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf", version.ref = "firebasePerf" }
+ktsh = { module = "com.jaredrummler:ktsh", version.ref = "ktsh" }
+perf-plugin = { group = "com.google.firebase", name = "perf-plugin", version.ref = "perfPlugin" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+firebase-inappmessaging-display = { group = "com.google.firebase", name = "firebase-inappmessaging-display", version.ref = "firebaseInappmessagingDisplay" }
+play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+

@@ -21,18 +21,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FilterChip
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -42,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
-import pro.themed.manager.ui.theme.Accent
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
@@ -74,9 +73,7 @@ fun QsPanel() {
 }
 
 @OptIn(
-    ExperimentalLayoutApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class
+    ExperimentalLayoutApi::class, ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class
 )
 @Preview
 @Composable
@@ -91,7 +88,8 @@ fun QSTileCard() {
 
                 // do something
                 Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-            }        }
+            }
+        }
     })
     qsShell.run("cd $qsPath")
     @Stable
@@ -104,9 +102,10 @@ fun QSTileCard() {
                 qsShell.run("sed -i 's/@drawable\\/[^\"]*/@drawable\\/$overlayname/g' \"res/drawable/ic_qs_circle.xml\"")
                 qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
 
-            }, modifier = Modifier
+            },
+            modifier = Modifier
                 .size(testdp.dp)
-                .background(color = MaterialTheme.colors.cardcol)
+                .background(color = cardcol)
         ) {
             Image(
                 modifier = Modifier
@@ -162,11 +161,11 @@ fun QSTileCard() {
 
             }
 
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
+            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Yellow),
                 shape = CircleShape,
                 selected = style.contains("default"),
                 onClick = { style = "default" },
-                content = { Text("Default") },
+                label = { Text("Default") },
                 leadingIcon = if (style.contains("default")) {
                     {
                         Icon(
@@ -179,11 +178,11 @@ fun QSTileCard() {
                     null
                 })
             Spacer(modifier = Modifier.width(8.dp))
-            FilterChip(colors = ChipDefaults.filterChipColors(selectedBackgroundColor = Accent),
+            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Yellow),
                 shape = CircleShape,
                 selected = style.contains("clear"),
                 onClick = { style = "clear" },
-                content = { Text("Clear") },
+                label = { Text("Clear") },
                 leadingIcon = if (style.contains("clear")) {
                     {
                         Icon(
@@ -364,7 +363,7 @@ fun QSTileCard() {
 
         }
         Row {
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = qs_label_container_margin,
                 singleLine = true,
                 onValueChange = {
@@ -381,7 +380,7 @@ fun QSTileCard() {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = qs_tile_start_padding,
                 singleLine = true,
                 onValueChange = {
@@ -396,7 +395,7 @@ fun QSTileCard() {
 
 
         Row {
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = columnsPortrait,
                 singleLine = true,
                 onValueChange = {
@@ -414,7 +413,7 @@ fun QSTileCard() {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = rowsPortrait,
                 singleLine = true,
                 onValueChange = {
@@ -430,7 +429,7 @@ fun QSTileCard() {
 
 
         Row {
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = columnsLandscape,
                 singleLine = true,
                 onValueChange = {
@@ -448,7 +447,7 @@ fun QSTileCard() {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = rowsLandscape,
                 singleLine = true,
                 onValueChange = {
@@ -463,7 +462,7 @@ fun QSTileCard() {
         }
 
         Row {
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = qsQuickTileSize,
                 singleLine = true,
                 onValueChange = {
@@ -480,7 +479,7 @@ fun QSTileCard() {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            androidx.compose.material.OutlinedTextField(modifier = Modifier.weight(1f),
+            OutlinedTextField(modifier = Modifier.weight(1f),
                 value = qsTileHeight,
                 singleLine = true,
                 onValueChange = {
