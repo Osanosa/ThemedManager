@@ -29,27 +29,28 @@ fun loadInterstitial(context: Context) {
             })
     }
 }
-    fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
-        val activity = context.findActivity()
 
-        if (mInterstitialAd != null && activity != null && !SharedPreferencesManager.getSharedPreferences()
-                .getBoolean("isContributor", false)
-        ) {
-            mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdFailedToShowFullScreenContent(e: com.google.android.gms.ads.AdError) {
-                    mInterstitialAd = null
-                }
+fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
+    val activity = context.findActivity()
 
-                override fun onAdDismissedFullScreenContent() {
-                    mInterstitialAd = null
-
-                    loadInterstitial(context)
-                    onAdDismissed()
-                }
+    if (mInterstitialAd != null && activity != null && !SharedPreferencesManager.getSharedPreferences()
+            .getBoolean("isContributor", false)
+    ) {
+        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdFailedToShowFullScreenContent(e: com.google.android.gms.ads.AdError) {
+                mInterstitialAd = null
             }
-            mInterstitialAd?.show(activity)
+
+            override fun onAdDismissedFullScreenContent() {
+                mInterstitialAd = null
+
+                loadInterstitial(context)
+                onAdDismissed()
+            }
         }
+        mInterstitialAd?.show(activity)
     }
+}
 
 
 fun removeInterstitial() {

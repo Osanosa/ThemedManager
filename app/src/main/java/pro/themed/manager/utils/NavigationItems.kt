@@ -10,5 +10,6 @@ sealed class NavigationItems(var route: String, var icon: Int, var title: String
     data object QsPanel : NavigationItems("QsPanel", R.drawable.outline_widgets_24, "QsPanel")
     data object IconsTab : NavigationItems("IconsTab", R.drawable.outline_widgets_24, "Icons")
     data object FontsTab : NavigationItems("FontsTab", R.drawable.round_api_24, "Fonts")
-    data object MiscTab : NavigationItems("MiscTab", R.drawable.baseline_miscellaneous_services_24, "Misc")
+    data object MiscTab :
+        NavigationItems("MiscTab", R.drawable.baseline_miscellaneous_services_24, "Misc")
 }

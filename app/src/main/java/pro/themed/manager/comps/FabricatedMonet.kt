@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -35,6 +38,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,12 +57,14 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.hsl
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -75,7 +81,7 @@ import pro.themed.manager.getContrastColor
 import pro.themed.manager.getOverlayList
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
 
@@ -96,6 +102,57 @@ fun FabricatedMonet(
     var selectedColorReference by remember { mutableStateOf("") }
     var selectedMonetColor by remember { mutableStateOf("") }
     var isDark by remember { mutableStateOf(sharedPreferences.getString("isDark", "")) }
+
+    @Composable
+    fun CustomThemeSwitch() {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .clip(CircleShape)
+                .clickable { }
+                .align(Alignment.CenterStart)
+                .padding(16.dp),
+                contentAlignment = Alignment.Center) {
+                AnimatedVisibility(visible = true) {
+                    Surface(color = Red, modifier = Modifier.fillMaxSize()) {}
+                }
+                Row {
+                    Icon(
+                        painter = painterResource(id = R.drawable.light_mode_24px),
+                        contentDescription = "Light", tint = textcol
+                    )
+                    Text(text = "Light")
+                }
+            }
+            Icon(
+                painter = painterResource(id = R.drawable.developer_mode_24px),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp), tint = textcol
+            )
+            Box(modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .clip(CircleShape)
+
+                .clickable { }
+                .align(Alignment.CenterEnd)
+                .padding(16.dp),
+                contentAlignment = Alignment.Center) {
+                AnimatedVisibility(visible = isDark == "") {
+                    Surface(color = MaterialTheme.colorScheme.primaryContainer) {}
+                }
+                Row {
+                    Icon(
+                        painter = painterResource(id = R.drawable.dark_mode_24px),
+                        contentDescription = "Dark", tint = textcol
+                    )
+                    Text(text = "Dark")
+                }
+            }
+        }
+    }
+
     var isColorReferenceDropdownExpanded by remember { mutableStateOf(false) }
     var isMonetDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -222,7 +279,7 @@ fun FabricatedMonet(
     var stringhue by remember {
         mutableStateOf(
             sharedPreferences.getString(
-                "hue", "0"
+                "hue", "45"
             ).toString()
         )
     }
@@ -237,7 +294,7 @@ fun FabricatedMonet(
     var stringsaturation by rememberSaveable {
         mutableStateOf(
             sharedPreferences.getString(
-                "saturation", "100"
+                "saturation", "50"
             ).toString()
         )
     }
@@ -288,8 +345,8 @@ fun FabricatedMonet(
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(start = 8.dp)
-            .background(cardcol)
+            .padding(horizontal = 8.dp)
+        // .background(cardcol)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -319,25 +376,39 @@ fun FabricatedMonet(
         } else {
             12
         }
-        val tilesize = (((configuration.screenWidthDp - 8 - 64) / divisor)).dp
+        val tilesize = (((configuration.screenWidthDp - 16 - 64) / divisor)).dp
         tilesize.log()
 
 
-
-        Surface(color = cardcol) {
+        CustomThemeSwitch()
+        Surface {
 
 
             Column(
                 modifier = Modifier
                     .imePadding()
-                    .background(cardcol)
+                // .background(cardcol)
             ) {
 
                 @Stable
                 @Composable
-                fun M3Tile(color: Int?, colorName: String, themedColor: Color) {
+                fun M3Tile(
+                    color: Int?,
+                    colorName: String,
+                    themedColor: Color,
+                    topStart: Float = 0f,
+                    topEnd: Float = 0f,
+                    bottomStart: Float = 0f,
+                    bottomEnd: Float = 0f
+                ) {
                     color?.let { Color(it) }?.let {
                         Surface(
+                            shape = RoundedCornerShape(
+                                topStart = topStart,
+                                topEnd = topEnd,
+                                bottomStart = bottomStart,
+                                bottomEnd = bottomEnd
+                            ),
                             modifier = Modifier
                                 .width(tilesize)
                                 .aspectRatio(2f)
@@ -394,7 +465,12 @@ fun FabricatedMonet(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(4.dp)
                             )
-                            M3Tile(color = sn1_10, colorName = "sn1_10", themedColor = C_10)
+                            M3Tile(
+                                color = sn1_10,
+                                colorName = "sn1_10",
+                                themedColor = C_10,
+                                topStart = 50f
+                            )
                             M3Tile(color = sn1_50, colorName = "sn1_50", themedColor = C_50)
                             M3Tile(color = sn1_100, colorName = "sn1_100", themedColor = C_100)
                             M3Tile(color = sn1_200, colorName = "sn1_200", themedColor = C_200)
@@ -404,7 +480,12 @@ fun FabricatedMonet(
                             M3Tile(color = sn1_600, colorName = "sn1_600", themedColor = C_600)
                             M3Tile(color = sn1_700, colorName = "sn1_700", themedColor = C_700)
                             M3Tile(color = sn1_800, colorName = "sn1_800", themedColor = C_800)
-                            M3Tile(color = sn1_900, colorName = "sn1_900", themedColor = C_900)
+                            M3Tile(
+                                color = sn1_900,
+                                colorName = "sn1_900",
+                                themedColor = C_900,
+                                bottomStart = 50f
+                            )
                             Button(modifier = Modifier
                                 .width(tilesize)
                                 .padding(2.dp),
@@ -561,7 +642,12 @@ fun FabricatedMonet(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(4.dp)
                             )
-                            M3Tile(color = sa3_10, colorName = "sa3_10", themedColor = C_10)
+                            M3Tile(
+                                color = sa3_10,
+                                colorName = "sa3_10",
+                                themedColor = C_10,
+                                topEnd = 50f
+                            )
                             M3Tile(color = sa3_50, colorName = "sa3_50", themedColor = C_50)
                             M3Tile(color = sa3_100, colorName = "sa3_100", themedColor = C_100)
                             M3Tile(color = sa3_200, colorName = "sa3_200", themedColor = C_200)
@@ -571,7 +657,12 @@ fun FabricatedMonet(
                             M3Tile(color = sa3_600, colorName = "sa3_600", themedColor = C_600)
                             M3Tile(color = sa3_700, colorName = "sa3_700", themedColor = C_700)
                             M3Tile(color = sa3_800, colorName = "sa3_800", themedColor = C_800)
-                            M3Tile(color = sa3_900, colorName = "sa3_900", themedColor = C_900)
+                            M3Tile(
+                                color = sa3_900,
+                                colorName = "sa3_900",
+                                themedColor = C_900,
+                                bottomEnd = 50f
+                            )
                             Button(modifier = Modifier
                                 .width(tilesize)
                                 .padding(2.dp),
@@ -796,8 +887,15 @@ fun FabricatedMonet(
                             stringhue = it; editor.putString("hue", it).apply()
 
                         },
+                        supportingText = {
+                            Text(
+                                "0..360",
+                                modifier = Modifier.basicMarquee(),
+                                textAlign = TextAlign.Center
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        label = { Text("H") })
+                        label = { Text("Hue", modifier = Modifier.basicMarquee()) })
                     Spacer(Modifier.width(8.dp))
 
                     OutlinedTextField(modifier = Modifier.weight(1f),
@@ -806,8 +904,15 @@ fun FabricatedMonet(
                         onValueChange = {
                             stringsaturation = it; editor.putString("saturation", it).apply()
                         },
+                        supportingText = {
+                            Text(
+                                "0..100",
+                                modifier = Modifier.basicMarquee(),
+                                textAlign = TextAlign.Center
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        label = { Text("S") })
+                        label = { Text("Saturation", modifier = Modifier.basicMarquee()) })
                     Spacer(Modifier.width(8.dp))
 
                     OutlinedTextField(modifier = Modifier.weight(1f),
@@ -816,8 +921,15 @@ fun FabricatedMonet(
                         onValueChange = {
                             stringlightness = it; editor.putString("lightness", it).apply()
                         },
+                        supportingText = {
+                            Text(
+                                "-10..10",
+                                modifier = Modifier.basicMarquee(),
+                                textAlign = TextAlign.Center
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        label = { Text("L") })
+                        label = { Text("Lightness", modifier = Modifier.basicMarquee()) })
 
                 }
 
@@ -843,8 +955,7 @@ fun FabricatedMonet(
                             label = { Text("Select Color Reference") },
                             singleLine = true
                         )
-                        ExposedDropdownMenu(
-                            expanded = isColorReferenceDropdownExpanded,
+                        ExposedDropdownMenu(expanded = isColorReferenceDropdownExpanded,
                             onDismissRequest = {
                                 // Dismiss the menu if needed
                                 isColorReferenceDropdownExpanded = false
@@ -893,13 +1004,15 @@ fun FabricatedMonet(
                             }
                         }
                     }
+
                 }
 
 
+                val isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") }
                 HeaderRow(
-                    header = "Disable Monet",
+                    header = "Disable stock Monet",
                     subHeader = "Ye you need to enable this first, duh",
-                    isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") },
+                    isChecked = isChecked,
                     onCheckedChange = {
                         if (it) {
                             Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")

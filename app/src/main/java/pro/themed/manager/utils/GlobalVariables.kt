@@ -9,7 +9,6 @@ import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.MainActivity
 
 
-
 object GlobalVariables {
     val sharedPreferences: SharedPreferences by lazy {
         MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
@@ -30,7 +29,6 @@ object GlobalVariables {
         Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
             .stdout()
     }
-
 
 
 }

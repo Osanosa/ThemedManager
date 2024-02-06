@@ -82,7 +82,9 @@ fun Navigation(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun getComposableForRoute(route: String): @Composable () -> Unit {
-    return if (getOverlayList().overlayList.isEmpty()) {
+
+    val overlays = getOverlayList().overlayList.isEmpty()
+    return if (overlays) {
         {
             Box(
                 contentAlignment = androidx.compose.ui.Alignment.Center,

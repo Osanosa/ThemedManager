@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +50,7 @@ fun DebugPage() {
     Surface(
         modifier = Modifier.fillMaxSize(), color = cardcol
     ) {
+        val overlayList = getOverlayList()
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
@@ -168,9 +174,9 @@ fun DebugPage() {
             Spacer(modifier = Modifier.height(8.dp))
 
 
-            if (getOverlayList().unsupportedOverlays.isNotEmpty()) {
+            if (overlayList.unsupportedOverlays.isNotEmpty()) {
                 Text(text = "Unsupported")
-                getOverlayList().unsupportedOverlays.forEach { overlay ->
+                overlayList.unsupportedOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname =
                             overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
@@ -187,9 +193,9 @@ fun DebugPage() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (getOverlayList().enabledOverlays.isNotEmpty()) {
+            if (overlayList.enabledOverlays.isNotEmpty()) {
                 Text(text = "Enabled")
-                getOverlayList().enabledOverlays.forEach { overlay ->
+                overlayList.enabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname =
                             overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")
@@ -205,9 +211,9 @@ fun DebugPage() {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            if (getOverlayList().disabledOverlays.isNotEmpty()) {
+            if (overlayList.disabledOverlays.isNotEmpty()) {
                 Text(text = "Disabled")
-                getOverlayList().disabledOverlays.forEach { overlay ->
+                overlayList.disabledOverlays.forEach { overlay ->
                     Text(text = overlay, modifier = Modifier.combinedClickable(onClick = {
                         dialogname =
                             overlay.removePrefix("[x] ").removePrefix("[ ] ").removePrefix("--- ")

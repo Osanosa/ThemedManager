@@ -11,8 +11,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
 
         if (intent.action == "android.intent.action.DOWNLOAD_COMPLETE") {
 
-                GlobalVariables.isdownloaded = true
-
+            GlobalVariables.isdownloaded = true
 
 
         }

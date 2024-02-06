@@ -1,5 +1,5 @@
 [versions]
-agp = "8.4.0-alpha07"
+agp = "8.4.0-alpha08"
 coreSplashscreen = "1.0.1"
 kotlin = "1.9.22"
 coreKtx = "1.12.0"
@@ -14,7 +14,7 @@ googleServices = "4.4.0"
 firebaseAnalytics = "21.5.0"
 firebaseDatabase = "20.3.0"
 firebaseCrashlytics = "18.6.1"
-gradle = "8.4.0-alpha07"
+gradle = "8.4.0-alpha08"
 firebaseCrashlyticsGradle = "2.9.9"
 firebasePerf = "20.5.1"
 navigationCompose = "2.7.6"
@@ -39,7 +39,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.2.0-rc01" }
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }

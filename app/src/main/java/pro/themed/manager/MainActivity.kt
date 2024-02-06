@@ -87,6 +87,7 @@ import pro.themed.manager.utils.Navigation
 import pro.themed.manager.utils.loadInterstitial
 import pro.themed.manager.utils.loadRewarded
 import pro.themed.manager.utils.removeInterstitial
+import java.io.IOException
 
 
 data class OverlayListData(
@@ -138,17 +139,27 @@ fun getOverlayList(): OverlayListData {
 }
 
 private fun fetchOverlayList(): OverlayListData {
+    return try {
+        val result = Shell("su").run("cmd overlay list").stdout()
+        val overlayList = result.lines().filter { it.contains("themed") }.sorted()
 
-    val result = Shell("su").run("cmd overlay list").stdout()
-    val overlayList = result.lines().filter { it.contains("themed") }.sorted()
+        val unsupportedOverlays = overlayList.filter { it.contains("---") }
+        val enabledOverlays = overlayList.filter { it.contains("[x]") }
+        val disabledOverlays = overlayList.filter { it.contains("[ ]") }
 
-    val unsupportedOverlays = overlayList.filter { it.contains("---") }
-    val enabledOverlays = overlayList.filter { it.contains("[x]") }
-    val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+        OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+    } catch (e: IOException) {
+        OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {
+            Toast.makeText(
+                MainActivity.appContext,
+                "Error while reading overlay list. \n check su access",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
-    return OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+
 }
-
 
 object SharedPreferencesManager {
     private lateinit var sharedPreferences: SharedPreferences
@@ -526,28 +537,28 @@ fun Main() {
         val navController = rememberNavController()
 
 
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Box(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Navigation(navController)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .zIndex(10f)
-                            .shadow(8.dp)
-
-
-                    ) {
-                        NavigationRailSample(navController)
-                    }
+                    Navigation(navController)
                 }
+                Box(
+                    modifier = Modifier
+                        .zIndex(10f)
+                        .shadow(8.dp)
 
+
+                ) {
+                    NavigationRailSample(navController)
+                }
             }
+
+        }
 
     }
 }
@@ -595,35 +606,6 @@ fun overlayEnable(overlayname: String) {
 
 fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
-
-        /*    val signerConfig = ApkSigner.SignerConfig.Builder("overlay", privateKey, certs).build()
-            val signerConfigs: MutableList<ApkSigner.SignerConfig> = ArrayList()
-            signerConfigs.add(signerConfig)
-            val source = "$modulePath/onDemandCompiler/unsigned.apk"
-            val signedOverlayAPKPath = "$modulePath/onDemandCompiler/signed.apk"
-
-            ApkSigner.Builder(signerConfigs)
-                .setV1SigningEnabled(false)
-                .setV2SigningEnabled(true)
-                .setInputApk(File(source))
-                .setOutputApk(File(signedOverlayAPKPath))
-                .setMinSdkVersion(Build.VERSION.SDK_INT)
-                .build()
-                .sign()
-
-            com.android.apksigner.ApkSignerTool.main(
-                arrayOf(
-                    "sign",
-                    "--key",
-                    "$modulePath/onDemandCompiler/testkey.pk8",
-                    "--cert",
-                    "$modulePath/onDemandCompiler/testkey.x509.pem",
-                    "--out",
-                    "signed.apk",
-                    "unsigned.apk"
-                )
-            )
-    */
         val compileShell = Shell("su")
         compileShell.run("cd $path")
         compileShell.run("pwd")
@@ -633,4 +615,3 @@ fun buildOverlay(path: String = "") {
 
     }
 }
-

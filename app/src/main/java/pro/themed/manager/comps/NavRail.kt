@@ -76,19 +76,19 @@ fun NavigationRailSample(
         Column(modifier = Modifier.onGloballyPositioned { layoutInfo ->
             topColumnHeight = layoutInfo.size.height
         }, verticalArrangement = Arrangement.Top) {
-           itemstop.forEachIndexed { _, item ->
-    val isSelected = currentRoute == item.route
-    CustomNavigationRailItem(
-        isSelected = isSelected,
-        onClick = {
-            if (!isSelected) {
-                navController.navigate(item.route)
+            itemstop.forEachIndexed { _, item ->
+                val isSelected = currentRoute == item.route
+                CustomNavigationRailItem(
+                    isSelected = isSelected,
+                    onClick = {
+                        if (!isSelected) {
+                            navController.navigate(item.route)
+                        }
+                    },
+                    iconResource = item.icon,
+                    itemTitle = item.title
+                )
             }
-        },
-        iconResource = item.icon,
-        itemTitle = item.title
-    )
-}
         }
         Spacer(modifier = Modifier.weight(1f))
         Column(modifier = Modifier
@@ -112,6 +112,7 @@ fun NavigationRailSample(
         }
     }
 }
+
 @Stable
 @Composable
 fun CustomNavigationRailItem(
@@ -123,9 +124,9 @@ fun CustomNavigationRailItem(
     NavigationRailItem(
         colors = NavigationRailItemDefaults.colors(
             selectedIconColor = textcol,
-        selectedTextColor = textcol,
-        unselectedTextColor = textcol.copy(0.4f),
-        unselectedIconColor = textcol.copy(0.4f),
+            selectedTextColor = textcol,
+            unselectedTextColor = textcol.copy(0.4f),
+            unselectedIconColor = textcol.copy(0.4f),
         ),
 
         icon = {

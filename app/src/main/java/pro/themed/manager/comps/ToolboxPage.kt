@@ -21,7 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,158 +54,158 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-    fun ToolboxPage() {
-        val context = LocalContext.current
-        Surface(
-            modifier = Modifier.fillMaxSize(), color = cardcol
-        ) {
-            var progress by rememberSaveable {
-                mutableStateOf(false)
-            }
-            var progresstext by remember { mutableStateOf("Waiting to start") }
+fun ToolboxPage() {
+    val context = LocalContext.current
+    Surface(
+        modifier = Modifier.fillMaxSize(), color = cardcol
+    ) {
+        var progress by rememberSaveable {
+            mutableStateOf(false)
+        }
+        var progresstext by remember { mutableStateOf("Waiting to start") }
 
-            Box {
+        Box {
 
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    SharedPreferencesManager.initialize(context)
-                    val sharedPreferences: SharedPreferences =
-                        context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                    val editor: SharedPreferences.Editor = sharedPreferences.edit()
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                SharedPreferencesManager.initialize(context)
+                val sharedPreferences: SharedPreferences =
+                    context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
 
 
-                    Column(Modifier.padding(horizontal = 8.dp)) {
-                        HeaderRow(stringResource(R.string.disable_overlays),
-                            stringResource(R.string.disable_overlays_header),
-                            button1text = stringResource(R.string.all),
-                            button1onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
-                            button2text = stringResource(R.string.stock),
-                            button2onClick = {
-                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                                Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                            },
-                            button3text = stringResource(R.string.themed),
-                            button3onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
-                        HeaderRow(
-                            stringResource(R.string.restart_systemui),
-                            stringResource(R.string.systemui_restart_header),
-                            button1text = stringResource(R.string.restart_now),
-                            button1onClick = { Shell("su").run("su -c killall com.android.systemui") },
-                        )
-                        HeaderRow(stringResource(R.string.change_system_theme),
-                            stringResource(R.string.change_a_theme_of_your_device),
-                            button1text = stringResource(R.string.light),
-                            button1onClick = {
-                                Shell("su").run("cmd uimode night no")
-                            },
-                            button2text = stringResource(R.string.dark),
-                            button2onClick = {
-                                Shell("su").run("cmd uimode night yes")
-                            },
-                            button3text = stringResource(R.string.auto),
-                            button3onClick = {
-                                Shell("su").run("cmd uimode night auto")
-                            })
-                        HeaderRow(
-                            stringResource(R.string.clear_app_caches),
-                            stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
-                            button1text = stringResource(R.string.clear_all),
-                            button1onClick = {
-                                val freebefore =
-                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                        .replace(Regex("[^0-9]"), "").toLong()
-                                Shell("su").run("pm trim-caches 100000g")
-                                val freeafter =
-                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                        .replace(Regex("[^0-9]"), "").toLong()
-                                val difference: Float = freeafter.toFloat() - freebefore.toFloat()
-                                val toast = when {
-                                    difference > 1024 * 1024 -> "${
-                                        DecimalFormat("#.##").format(
-                                            difference / 1024 / 1024
-                                        )
-                                    }Gb"
+                Column(Modifier.padding(horizontal = 8.dp)) {
+                    HeaderRow(stringResource(R.string.disable_overlays),
+                        stringResource(R.string.disable_overlays_header),
+                        button1text = stringResource(R.string.all),
+                        button1onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
+                        button2text = stringResource(R.string.stock),
+                        button2onClick = {
+                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                        },
+                        button3text = stringResource(R.string.themed),
+                        button3onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
+                    HeaderRow(
+                        stringResource(R.string.restart_systemui),
+                        stringResource(R.string.systemui_restart_header),
+                        button1text = stringResource(R.string.restart_now),
+                        button1onClick = { Shell("su").run("su -c killall com.android.systemui") },
+                    )
+                    HeaderRow(stringResource(R.string.change_system_theme),
+                        stringResource(R.string.change_a_theme_of_your_device),
+                        button1text = stringResource(R.string.light),
+                        button1onClick = {
+                            Shell("su").run("cmd uimode night no")
+                        },
+                        button2text = stringResource(R.string.dark),
+                        button2onClick = {
+                            Shell("su").run("cmd uimode night yes")
+                        },
+                        button3text = stringResource(R.string.auto),
+                        button3onClick = {
+                            Shell("su").run("cmd uimode night auto")
+                        })
+                    HeaderRow(
+                        stringResource(R.string.clear_app_caches),
+                        stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
+                        button1text = stringResource(R.string.clear_all),
+                        button1onClick = {
+                            val freebefore =
+                                Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    .replace(Regex("[^0-9]"), "").toLong()
+                            Shell("su").run("pm trim-caches 100000g")
+                            val freeafter =
+                                Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
+                                    .replace(Regex("[^0-9]"), "").toLong()
+                            val difference: Float = freeafter.toFloat() - freebefore.toFloat()
+                            val toast = when {
+                                difference > 1024 * 1024 -> "${
+                                    DecimalFormat("#.##").format(
+                                        difference / 1024 / 1024
+                                    )
+                                }Gb"
 
-                                    difference > 1024 -> "${
-                                        DecimalFormat("#.##").format(
-                                            difference / 1024
-                                        )
-                                    }Mb"
+                                difference > 1024 -> "${
+                                    DecimalFormat("#.##").format(
+                                        difference / 1024
+                                    )
+                                }Mb"
 
-                                    else -> "${DecimalFormat("#").format(difference)}Kb"
+                                else -> "${DecimalFormat("#").format(difference)}Kb"
+                            }
+
+                            Handler(Looper.getMainLooper()).post {
+                                Toast.makeText(
+                                    context, "+$toast", Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                    )
+                    val forcedex2oat =
+                        if (sharedPreferences.getBoolean("force_dex2oat", false)) " -f" else ""
+
+
+                    HeaderRow(
+                        stringResource(R.string.dex2oat),
+                        stringResource(R.string.dex2oat_subheader),
+                        button1weight = 1.2f,
+                        button1text = "Everything",
+                        button1onClick = {
+                            progress = true
+                            Shell("su").run("cmd package compile -m everything -a$forcedex2oat") {
+                                onStdOut = { line: String ->
+                                    progresstext = line
                                 }
-
-                                Handler(Looper.getMainLooper()).post {
-                                    Toast.makeText(
-                                        context, "+$toast", Toast.LENGTH_SHORT
-                                    ).show()
+                                timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+                            }
+                            Shell("su").run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
+                                onStdOut = { line: String ->
+                                    progresstext = line
                                 }
-                            },
-                        )
-                        val forcedex2oat =
-                            if (sharedPreferences.getBoolean("force_dex2oat", false)) " -f" else ""
+                                timeout = Shell.Timeout(1, TimeUnit.SECONDS)
 
+                            }
 
-                        HeaderRow(
-                            stringResource(R.string.dex2oat),
-                            stringResource(R.string.dex2oat_subheader),
-                            button1weight = 1.2f,
-                            button1text = "Everything",
-                            button1onClick = {
-                                progress = true
-                                Shell("su").run("cmd package compile -m everything -a$forcedex2oat") {
-                                    onStdOut = { line: String ->
-                                        progresstext = line
-                                    }
-                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+                        },
+                        button2text = "Layouts",
+                        button2onClick = {
+                            progress = true
+                            Shell("su").run("cmd package compile --compile-layouts -a$forcedex2oat") {
+                                onStdOut = { line: String ->
+                                    progresstext = line
                                 }
-                                Shell("su").run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
-                                    onStdOut = { line: String ->
-                                        progresstext = line
-                                    }
-                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+                                timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+                            }
 
+                        },
+                        button3text = "Reset",
+                        button3onClick = {
+                            progress = true
+                            Shell("su").run("cmd package compile --reset -a") {
+                                onStdOut = { line: String ->
+                                    progresstext = line
                                 }
+                                timeout = Shell.Timeout(1, TimeUnit.SECONDS)
+                            }
 
-                            },
-                            button2text = "Layouts",
-                            button2onClick = {
-                                progress = true
-                                Shell("su").run("cmd package compile --compile-layouts -a$forcedex2oat") {
-                                    onStdOut = { line: String ->
-                                        progresstext = line
-                                    }
-                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
-                                }
+                        },
+                        showSwitch = true,
+                        switchDescription = "Force recompile even if not needed",
+                        isChecked = sharedPreferences.getBoolean("force_dex2oat", false),
+                        onCheckedChange = {
+                            editor.putBoolean("force_dex2oat", it).apply()
 
-                            },
-                            button3text = "Reset",
-                            button3onClick = {
-                                progress = true
-                                Shell("su").run("cmd package compile --reset -a") {
-                                    onStdOut = { line: String ->
-                                        progresstext = line
-                                    }
-                                    timeout = Shell.Timeout(1, TimeUnit.SECONDS)
-                                }
-
-                            },
-                            showSwitch = true,
-                            switchDescription = "Force recompile even if not needed",
-                            isChecked = sharedPreferences.getBoolean("force_dex2oat", false),
-                            onCheckedChange = {
-                                editor.putBoolean("force_dex2oat", it).apply()
-
-                            },
-                        )
-                        var customresShown by remember { mutableStateOf(false) }
-                        var customres by remember { mutableStateOf("") }
-                        if (customresShown) {
-                            AlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
-                                content = {
-                                    Column {
-                                    Text(stringResource(R.string.enter_your_custom_resolution) )
+                        },
+                    )
+                    var customresShown by remember { mutableStateOf(false) }
+                    var customres by remember { mutableStateOf("") }
+                    if (customresShown) {
+                        BasicAlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
+                            content = {
+                                Column {
+                                    Text(stringResource(R.string.enter_your_custom_resolution))
                                     Text(stringResource(R.string.downscale_warning))
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         TextField(modifier = Modifier
@@ -246,152 +246,154 @@ import java.util.concurrent.TimeUnit
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                     }
-                                    }
-                                })
-                        }
-                        HeaderRow(
-                            stringResource(R.string.downscale),
-                            stringResource(R.string.downscale_subheader),
-                            button1text = "1/2",
-                            button1onClick = {
-                                downscalebydivisor("2")
-                                if (sharedPreferences.getBoolean("resetwm", false)) {
-                                    Thread.sleep(10000)
-                                    Shell("su").run("wm size reset ; wm density reset")
                                 }
-
-                            },
-                            button2text = "1/3",
-                            button2onClick = {
-                                downscalebydivisor("3")
-                                if (sharedPreferences.getBoolean("resetwm", false)) {
-                                    Thread.sleep(10000)
-                                    Shell("su").run("wm size reset ; wm density reset")
-                                }
-
-                            },
-                            button3text = "Set",
-                            button3onClick = {
-
-                                customresShown = true
-
-
-                            },
-                            button4text = "Reset",
-                            button4onClick = {
-                                Shell("su").run("wm size reset ; wm density reset")
-
-                            },
-                            showSwitch = true,
-                            switchDescription = stringResource(R.string.reset_to_defaults_after_10_seconds),
-                            isChecked = sharedPreferences.getBoolean("resetwm", false),
-                            onCheckedChange = {
-                                editor.putBoolean("resetwm", it).apply()
-
-                            },
-                        )
-
-                        HeaderRow(header = "AutoRefreshRate ForegroundService",
-                            subHeader = "Dynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
-                            button1text = "Stop",
-                            button2text = "Start",
-                            button2onClick = {
-                                Shell("su").run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
-                            },
-                            button1onClick = {
-                                Shell("su").run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService").log()
-                            },
-                            showSwitch = true,
-                            switchDescription = "Start on boot",
-                            isChecked = GlobalVariables.sharedPreferences.getBoolean(
-                                "autoRateOnBoot", false
-                            ),
-                            onCheckedChange = {
-                                sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
                             })
-                        var MaxRate by remember {
-                            mutableStateOf(
-                                sharedPreferences.getString(
-                                    "maxRate", "0"
-                                ).toString()
-                            )
-                        }
+                    }
+                    HeaderRow(
+                        stringResource(R.string.downscale),
+                        stringResource(R.string.downscale_subheader),
+                        button1text = "1/2",
+                        button1onClick = {
+                            downscalebydivisor("2")
+                            if (sharedPreferences.getBoolean("resetwm", false)) {
+                                Thread.sleep(10000)
+                                Shell("su").run("wm size reset ; wm density reset")
+                            }
 
-                        var MinRate by remember {
-                            mutableStateOf(
-                                sharedPreferences.getString(
-                                    "minRate", "0"
-                                ).toString()
-                            )
-                        }
-                        Row {
-                            OutlinedTextField(modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .padding(horizontal = 8.dp),
-                                value = MaxRate,
-                                singleLine = true,
-                                onValueChange = {
-                                    MaxRate = it; editor.putString("maxRate", it).apply()
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                label = { Text("Enter max refresh mode") })
-                            OutlinedTextField(modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                                value = MinRate,
-                                singleLine = true,
-                                onValueChange = {
-                                    MinRate = it;editor.putString("minRate", it).apply()
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                label = { Text("Enter min refresh mode") })
-                        }
-                        Spacer(Modifier.height(18.dp))
+                        },
+                        button2text = "1/3",
+                        button2onClick = {
+                            downscalebydivisor("3")
+                            if (sharedPreferences.getBoolean("resetwm", false)) {
+                                Thread.sleep(10000)
+                                Shell("su").run("wm size reset ; wm density reset")
+                            }
 
+                        },
+                        button3text = "Set",
+                        button3onClick = {
+
+                            customresShown = true
+
+
+                        },
+                        button4text = "Reset",
+                        button4onClick = {
+                            Shell("su").run("wm size reset ; wm density reset")
+
+                        },
+                        showSwitch = true,
+                        switchDescription = stringResource(R.string.reset_to_defaults_after_10_seconds),
+                        isChecked = sharedPreferences.getBoolean("resetwm", false),
+                        onCheckedChange = {
+                            editor.putBoolean("resetwm", it).apply()
+
+                        },
+                    )
+
+                    HeaderRow(header = "AutoRefreshRate ForegroundService",
+                        subHeader = "Dynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
+                        button1text = "Stop",
+                        button2text = "Start",
+                        button2onClick = {
+                            Shell("su").run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                                .log()
+                        },
+                        button1onClick = {
+                            Shell("su").run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                                .log()
+                        },
+                        showSwitch = true,
+                        switchDescription = "Start on boot",
+                        isChecked = GlobalVariables.sharedPreferences.getBoolean(
+                            "autoRateOnBoot", false
+                        ),
+                        onCheckedChange = {
+                            sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                        })
+                    var MaxRate by remember {
+                        mutableStateOf(
+                            sharedPreferences.getString(
+                                "maxRate", "0"
+                            ).toString()
+                        )
                     }
 
-                }
-                AnimatedVisibility(
-                    visible = progress,
-                    Modifier
-                        .align(
-                            Alignment.Center
+                    var MinRate by remember {
+                        mutableStateOf(
+                            sharedPreferences.getString(
+                                "minRate", "0"
+                            ).toString()
                         )
-                        .padding(16.dp), enter = scaleIn()
-                ) {
-                    Card(
-                        Modifier
+                    }
+                    Row {
+                        OutlinedTextField(modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(horizontal = 8.dp),
+                            value = MaxRate,
+                            singleLine = true,
+                            onValueChange = {
+                                MaxRate = it; editor.putString("maxRate", it).apply()
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            label = { Text("Enter max refresh mode") })
+                        OutlinedTextField(modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(rememberScrollState()),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(8.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                if (progresstext.contains("/")) CircularProgressIndicator()
-                                if (progresstext.contains("/")) Spacer(Modifier.width(16.dp))
-                                Text(text = progresstext)
-                            }
-                            if (!progresstext.contains("/")) Button(onClick = {
-                                progress = false
-                            }) { Text("Hide") }
+                            .padding(horizontal = 8.dp),
+                            value = MinRate,
+                            singleLine = true,
+                            onValueChange = {
+                                MinRate = it;editor.putString("minRate", it).apply()
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            label = { Text("Enter min refresh mode") })
+                    }
+                    Spacer(Modifier.height(18.dp))
+
+                }
+
+            }
+            AnimatedVisibility(
+                visible = progress,
+                Modifier
+                    .align(
+                        Alignment.Center
+                    )
+                    .padding(16.dp), enter = scaleIn()
+            ) {
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            if (progresstext.contains("/")) CircularProgressIndicator()
+                            if (progresstext.contains("/")) Spacer(Modifier.width(16.dp))
+                            Text(text = progresstext)
                         }
+                        if (!progresstext.contains("/")) Button(onClick = {
+                            progress = false
+                        }) { Text("Hide") }
                     }
                 }
             }
-
         }
 
     }
 
+}
 
-    private fun downscalebydivisor(divisor: String) {
 
-        Shell("su").run(
-            command = """
+private fun downscalebydivisor(divisor: String) {
+
+    Shell("su").run(
+        command = """
                 # Set the number of division
                 divisor=$divisor
                 
@@ -423,13 +425,13 @@ import java.util.concurrent.TimeUnit
                 wm size ${'$'}width"x"${'$'}height
                 wm density ${'$'}density
                 """
-        )
+    )
 
-    }
+}
 
-    private fun downscalebynumber(width: String) {
-        Shell("su").run(
-            command = """
+private fun downscalebynumber(width: String) {
+    Shell("su").run(
+        command = """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
                 
@@ -459,5 +461,5 @@ import java.util.concurrent.TimeUnit
                 wm density ${'$'}(printf "%.0f" ${'$'}new_density)
                 
                 """
-        )
-    }
+    )
+}
