@@ -4,6 +4,7 @@ package pro.themed.manager.comps
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,8 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
+import pro.themed.manager.log
 import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
@@ -56,6 +61,17 @@ fun AccentsAAPT() {
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
         Column {
+            val shell = Shell("su")
+            shell.addOnCommandResultListener(object : Shell.OnCommandResultListener {
+                override fun onResult(result: Shell.Command.Result) {
+                    CoroutineScope(Dispatchers.Main).launch {
+
+                        // do something
+                        Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+                        result.log()
+                    }
+                }
+            })
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +86,7 @@ fun AccentsAAPT() {
                 )
 
                 IconButton(modifier = Modifier, onClick = {
-                    Shell("su").run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
+                    shell.run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
                 }) {
                     Image(
                         imageVector = ImageVector.vectorResource(R.drawable.reset),
@@ -137,29 +153,26 @@ fun AccentsAAPT() {
                     )
                 })
             val hex = String.format("%08x".format(color.toArgb()))
-            val isDark = if (sharedPreferences.getBoolean("accents_dark", false)) "-night" else ""
+            var isDark = ""
             HeaderRow(
                 header = "Override colors for dark theme",
                 showSwitch = true,
-                isChecked = sharedPreferences.getBoolean("accents_dark", false),
+                isChecked = false,
                 onCheckedChange = {
-                    if (it) {
-                        editor.putBoolean("accents_dark", true)
-                        editor.apply()
+                    isDark = if (it) {
+                        "-night"
                     } else {
-                        editor.putBoolean("accents_dark", false)
-                        editor.apply()
-
+                        ""
                     }
                 },
             )
 
             Button(
                 modifier = Modifier.fillMaxWidth(), onClick = {
-                    Shell("su").run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
-                    Shell("su").run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
-                    buildOverlay()
-                    Shell("su").run("""cmd overlay enable themed.accent.generic""")
+                    shell.run("cd /data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
+                    shell.run("""sed -i 's/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' "res/values$isDark/colors.xml"""")
+                    buildOverlay("/data/adb/modules/ThemedProject/onDemandCompiler/staticAccent")
+                    shell.run("""cmd overlay enable themed.accent.generic""")
                     showInterstitial(context) {}
 
 

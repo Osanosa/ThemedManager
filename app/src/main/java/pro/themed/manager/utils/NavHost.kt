@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.comps.AboutPage
 import pro.themed.manager.comps.FabricatedMonet
@@ -28,7 +29,6 @@ import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.comps.QsPanel
 import pro.themed.manager.comps.SettingsPage
 import pro.themed.manager.comps.ToolboxPage
-import pro.themed.manager.getOverlayList
 
 @ExperimentalMaterial3Api
 @Composable
@@ -66,6 +66,20 @@ fun Navigation(navController: NavHostController) {
                     } else {
                         slideOutVertically(targetOffsetY = { it / 2 }) + fadeOut()
                     }
+                },
+                popEnterTransition = {
+                    if (index < routes.indexOf(navController.currentBackStackEntry?.destination?.route)) {
+                        slideInVertically(initialOffsetY = { -it / 2 }) + fadeIn()
+                    } else {
+                        slideInVertically(initialOffsetY = { it / 2 }) + fadeIn()
+                    }
+                },
+                popExitTransition = {
+                    if (index > routes.indexOf(navController.previousBackStackEntry?.destination?.route)) {
+                        slideOutVertically(targetOffsetY = { it / 2 }) + fadeOut()
+                    } else {
+                        slideOutVertically(targetOffsetY = { -it / 2 }) + fadeOut()
+                    }
                 }
             ) {
                 when (route) {
@@ -83,7 +97,7 @@ fun Navigation(navController: NavHostController) {
 @Composable
 fun getComposableForRoute(route: String): @Composable () -> Unit {
 
-    val overlays = getOverlayList().overlayList.isEmpty()
+    val overlays = MainActivity.overlayList.overlayList.isEmpty()
     return if (overlays) {
         {
             Box(

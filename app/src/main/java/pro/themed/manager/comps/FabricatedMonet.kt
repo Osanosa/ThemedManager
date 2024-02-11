@@ -78,7 +78,6 @@ import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.getContrastColor
-import pro.themed.manager.getOverlayList
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.textcol
@@ -348,6 +347,7 @@ fun FabricatedMonet(
             .padding(horizontal = 8.dp)
         // .background(cardcol)
     ) {
+        AccentsAAPT()
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = CenterVertically,
@@ -1008,7 +1008,7 @@ fun FabricatedMonet(
                 }
 
 
-                val isChecked = getOverlayList().enabledOverlays.any { it.contains("flagmonet") }
+                val isChecked = MainActivity.overlayList.enabledOverlays.any { it.contains("flagmonet") }
                 HeaderRow(
                     header = "Disable stock Monet",
                     subHeader = "Ye you need to enable this first, duh",

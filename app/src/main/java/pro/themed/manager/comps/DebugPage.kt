@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.jaredrummler.ktsh.Shell
+import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
-import pro.themed.manager.getOverlayList
-import pro.themed.manager.log
+import pro.themed.manager.fetchOverlayList
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.GlobalVariables.themedId
 
@@ -50,7 +50,7 @@ fun DebugPage() {
     Surface(
         modifier = Modifier.fillMaxSize(), color = cardcol
     ) {
-        val overlayList = getOverlayList()
+        val overlayList = MainActivity.overlayList
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
@@ -89,6 +89,7 @@ fun DebugPage() {
                             Row {
                                 Button(modifier = Modifier.weight(1f), onClick = {
                                     Shell("su").run("cmd overlay enable $dialogname")
+                                    MainActivity.overlayList = fetchOverlayList()
                                 }) {
                                     Text(text = "Enable")
                                 }
@@ -96,7 +97,7 @@ fun DebugPage() {
 
                                 Button(modifier = Modifier.weight(1f), onClick = {
                                     Shell("su").run("cmd overlay disable $dialogname")
-                                    dialogname.log()
+                                    MainActivity.overlayList = fetchOverlayList()
                                 }) {
                                     Text(text = "Disable")
                                 }

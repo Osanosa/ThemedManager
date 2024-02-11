@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -131,22 +132,15 @@ fun AdmobBanner() {
     }
 }
 
-@Composable
-fun getOverlayList(): OverlayListData {
-    val overlayList by remember { mutableStateOf(fetchOverlayList()) }
 
-    return overlayList
-}
-
-private fun fetchOverlayList(): OverlayListData {
+fun fetchOverlayList(): OverlayListData {
     return try {
         val result = Shell("su").run("cmd overlay list").stdout()
         val overlayList = result.lines().filter { it.contains("themed") }.sorted()
-
         val unsupportedOverlays = overlayList.filter { it.contains("---") }
         val enabledOverlays = overlayList.filter { it.contains("[x]") }
         val disabledOverlays = overlayList.filter { it.contains("[ ]") }
-
+"overlay list".log()
         OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
     } catch (e: IOException) {
         OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {
@@ -190,6 +184,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         lateinit var appContext: Context
             private set
+        var overlayList: OverlayListData by mutableStateOf(fetchOverlayList() )
 
 
     }
@@ -245,7 +240,6 @@ class MainActivity : ComponentActivity() {
                             context, getString(R.string.no_root_access), Toast.LENGTH_LONG
                         ).show()
                     }
-                    getOverlayList()
                     Main()
                     LaunchedEffect(Unit) {
                         splashScreen.setKeepOnScreenCondition { false }
@@ -600,6 +594,7 @@ fun overlayEnable(overlayname: String) {
         Firebase.analytics.logEvent("Overlay_Selected") {
             param("Overlay_Name", overlayname)
         }
+        MainActivity.overlayList = fetchOverlayList()
     }
 
 }
@@ -607,11 +602,19 @@ fun overlayEnable(overlayname: String) {
 fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
         val compileShell = Shell("su")
+        compileShell.addOnStderrLineListener(object : Shell.OnLineListener {
+            override fun onLine(line: String) {
+                CoroutineScope(Dispatchers.Main).launch {
+
+                    Toast.makeText(MainActivity.appContext, line, Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
         compileShell.run("cd $path")
         compileShell.run("pwd")
         compileShell.run("""aapt p -f -v -M AndroidManifest.xml -I /system/framework/framework-res.apk -S res -F unsigned.apk --min-sdk-version 26 --target-sdk-version 29""").stderr.log()
         compileShell.run("""zipsigner unsigned.apk signed.apk""").log()
         compileShell.run("""pm install signed.apk""").log()
-
+        MainActivity.overlayList = fetchOverlayList()
     }
 }

@@ -3,6 +3,8 @@ package pro.themed.manager.comps
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Environment
 import android.widget.TextView
 import android.widget.Toast
@@ -10,6 +12,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,10 +37,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jaredrummler.ktsh.Shell
@@ -49,6 +55,42 @@ import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.utils.AndroidDownloader
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showRewarded
+
+@Composable
+fun LinkButtons(modifier: Modifier = Modifier) {
+    Row(horizontalArrangement = Arrangement.SpaceAround) {
+        val context = LocalContext.current
+        val webIntent =
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
+
+        IconButton(onClick = { context.startActivity(webIntent) }) {
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.telegram_logo),
+                contentDescription = "Telegram support group"
+            )
+        }
+
+        val webIntent1 = Intent(
+            Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
+        )
+
+        IconButton(onClick = { context.startActivity(webIntent1) }) {
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.iconmonstr_github_1),
+                contentDescription = null
+            )
+        }
+
+        val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
+
+        IconButton(onClick = { context.startActivity(webIntent2) }) {
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.baseline_language_24),
+                contentDescription = null
+            )
+        }
+    }
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -75,6 +117,7 @@ fun AboutPage() {
                     contentScale = ContentScale.FillWidth
                 )
             }
+            LinkButtons()
             val context = LocalContext.current
             val versionName = context.packageManager.getPackageInfo(
                 context.packageName,

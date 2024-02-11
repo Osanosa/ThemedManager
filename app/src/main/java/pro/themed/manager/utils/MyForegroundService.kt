@@ -30,7 +30,8 @@ class MyForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        sharedPreferences = this.applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+        sharedPreferences =
+            this.applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         startForegroundService()
     }
 
@@ -52,6 +53,7 @@ class MyForegroundService : Service() {
 
         startForeground(1001, notificationBuilder.build())
     }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val actualIntent = intent ?: Intent() // Use an empty intent if it's null
 
@@ -99,7 +101,7 @@ class MyForegroundService : Service() {
             timeout = Shell.Timeout(1, TimeUnit.SECONDS)
         }
 
-     startForegroundService()
+        startForegroundService()
         return super.onStartCommand(actualIntent, flags, startId)
     }
 

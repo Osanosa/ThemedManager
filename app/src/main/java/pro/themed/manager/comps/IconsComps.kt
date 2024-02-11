@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.AdmobBanner
+import pro.themed.manager.MainActivity
 import pro.themed.manager.R
-import pro.themed.manager.getOverlayList
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.cardcol
@@ -189,7 +189,7 @@ fun NavbarCard() {
 private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String) {
     val context = LocalContext.current
 
-    if (getOverlayList().overlayList.any { it.contains(name) }) {
+    if (MainActivity.overlayList.overlayList.any { it.contains(name) }) {
         Row(
             Modifier
                 .clickable {

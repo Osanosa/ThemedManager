@@ -1,7 +1,6 @@
 package pro.themed.manager.comps
 
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
@@ -45,32 +44,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.themed.manager.AdmobBanner
+import pro.themed.manager.MainActivity.Companion.overlayList
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
-import pro.themed.manager.getOverlayList
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.cardcol
@@ -96,7 +86,7 @@ fun Slideritem(
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
-    if (getOverlayList().overlayList.any { it.contains(overlayName) } && !getOverlayList().unsupportedOverlays.any {
+    if (overlayList.overlayList.any() { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
             it.contains(
                 overlayName
             )
@@ -378,10 +368,6 @@ fun MiscTab() {
             val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
             val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
 
-
-
-            NoiseTest()
-
             LaunchedEffect(Unit) {
                 rounded_corner_radius =
                     Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
@@ -514,7 +500,7 @@ fun MiscTab() {
                         Shell.SH.run("su -c cmd overlay disable themed.misc.roundiconmask")
                     }
                 },
-                isChecked = getOverlayList().enabledOverlays.any { it.contains("roundiconmask") },
+                isChecked = overlayList.enabledOverlays.any { it.contains("roundiconmask") },
             )
             HeaderRow(
                 header = "Borderless",
@@ -527,7 +513,7 @@ fun MiscTab() {
                         Shell.SH.run("su -c cmd overlay disable themed.misc.borderless")
                     }
                 },
-                isChecked = getOverlayList().enabledOverlays.any { it.contains("borderless") },
+                isChecked = overlayList.enabledOverlays.any { it.contains("borderless") },
             )
 
 
@@ -536,160 +522,3 @@ fun MiscTab() {
 
 }
 
-@Preview
-@Composable
-fun NoiseTest() {
-
-    val imageList = listOf(
-        ImageBitmap.imageResource(R.drawable.colornoice_00000),
-        ImageBitmap.imageResource(R.drawable.colornoice_00001),
-        ImageBitmap.imageResource(R.drawable.colornoice_00002),
-        ImageBitmap.imageResource(R.drawable.colornoice_00003),
-        ImageBitmap.imageResource(R.drawable.colornoice_00004),
-        ImageBitmap.imageResource(R.drawable.colornoice_00005),
-        ImageBitmap.imageResource(R.drawable.colornoice_00006),
-        ImageBitmap.imageResource(R.drawable.colornoice_00007),
-        ImageBitmap.imageResource(R.drawable.colornoice_00008),
-        ImageBitmap.imageResource(R.drawable.colornoice_00009),
-        ImageBitmap.imageResource(R.drawable.colornoice_00010),
-        ImageBitmap.imageResource(R.drawable.colornoice_00011),
-        ImageBitmap.imageResource(R.drawable.colornoice_00012),
-        ImageBitmap.imageResource(R.drawable.colornoice_00013),
-        ImageBitmap.imageResource(R.drawable.colornoice_00014),
-        ImageBitmap.imageResource(R.drawable.colornoice_00015),
-        ImageBitmap.imageResource(R.drawable.colornoice_00016),
-        ImageBitmap.imageResource(R.drawable.colornoice_00017),
-        ImageBitmap.imageResource(R.drawable.colornoice_00018),
-        ImageBitmap.imageResource(R.drawable.colornoice_00019),
-        ImageBitmap.imageResource(R.drawable.colornoice_00020),
-        ImageBitmap.imageResource(R.drawable.colornoice_00021),
-        ImageBitmap.imageResource(R.drawable.colornoice_00022),
-        ImageBitmap.imageResource(R.drawable.colornoice_00023),
-        ImageBitmap.imageResource(R.drawable.colornoice_00024),
-        ImageBitmap.imageResource(R.drawable.colornoice_00025),
-        ImageBitmap.imageResource(R.drawable.colornoice_00026),
-        ImageBitmap.imageResource(R.drawable.colornoice_00027),
-        ImageBitmap.imageResource(R.drawable.colornoice_00028),
-        ImageBitmap.imageResource(R.drawable.colornoice_00029),
-        ImageBitmap.imageResource(R.drawable.colornoice_00030),
-        ImageBitmap.imageResource(R.drawable.colornoice_00031),
-        ImageBitmap.imageResource(R.drawable.colornoice_00032),
-        ImageBitmap.imageResource(R.drawable.colornoice_00033),
-        ImageBitmap.imageResource(R.drawable.colornoice_00034),
-        ImageBitmap.imageResource(R.drawable.colornoice_00035),
-        ImageBitmap.imageResource(R.drawable.colornoice_00036),
-        ImageBitmap.imageResource(R.drawable.colornoice_00037),
-        ImageBitmap.imageResource(R.drawable.colornoice_00038),
-        ImageBitmap.imageResource(R.drawable.colornoice_00039),
-        ImageBitmap.imageResource(R.drawable.colornoice_00040),
-        ImageBitmap.imageResource(R.drawable.colornoice_00041),
-        ImageBitmap.imageResource(R.drawable.colornoice_00042),
-        ImageBitmap.imageResource(R.drawable.colornoice_00043),
-        ImageBitmap.imageResource(R.drawable.colornoice_00044),
-        ImageBitmap.imageResource(R.drawable.colornoice_00045),
-        ImageBitmap.imageResource(R.drawable.colornoice_00046),
-        ImageBitmap.imageResource(R.drawable.colornoice_00047),
-        ImageBitmap.imageResource(R.drawable.colornoice_00048),
-        ImageBitmap.imageResource(R.drawable.colornoice_00049),
-        ImageBitmap.imageResource(R.drawable.colornoice_00050),
-        ImageBitmap.imageResource(R.drawable.colornoice_00051),
-        ImageBitmap.imageResource(R.drawable.colornoice_00052),
-        ImageBitmap.imageResource(R.drawable.colornoice_00053),
-        ImageBitmap.imageResource(R.drawable.colornoice_00054),
-        ImageBitmap.imageResource(R.drawable.colornoice_00055),
-        ImageBitmap.imageResource(R.drawable.colornoice_00056),
-        ImageBitmap.imageResource(R.drawable.colornoice_00057),
-        ImageBitmap.imageResource(R.drawable.colornoice_00058),
-        ImageBitmap.imageResource(R.drawable.colornoice_00059),
-        ImageBitmap.imageResource(R.drawable.colornoice_00060),
-        ImageBitmap.imageResource(R.drawable.colornoice_00061),
-        ImageBitmap.imageResource(R.drawable.colornoice_00062),
-        ImageBitmap.imageResource(R.drawable.colornoice_00063),
-        ImageBitmap.imageResource(R.drawable.colornoice_00064),
-        ImageBitmap.imageResource(R.drawable.colornoice_00065),
-        ImageBitmap.imageResource(R.drawable.colornoice_00066),
-        ImageBitmap.imageResource(R.drawable.colornoice_00067),
-        ImageBitmap.imageResource(R.drawable.colornoice_00068),
-        ImageBitmap.imageResource(R.drawable.colornoice_00069),
-        ImageBitmap.imageResource(R.drawable.colornoice_00070),
-        ImageBitmap.imageResource(R.drawable.colornoice_00071),
-        ImageBitmap.imageResource(R.drawable.colornoice_00072),
-        ImageBitmap.imageResource(R.drawable.colornoice_00073),
-        ImageBitmap.imageResource(R.drawable.colornoice_00074),
-        ImageBitmap.imageResource(R.drawable.colornoice_00075),
-        ImageBitmap.imageResource(R.drawable.colornoice_00076),
-        ImageBitmap.imageResource(R.drawable.colornoice_00077),
-        ImageBitmap.imageResource(R.drawable.colornoice_00078),
-        ImageBitmap.imageResource(R.drawable.colornoice_00079),
-        ImageBitmap.imageResource(R.drawable.colornoice_00080),
-        ImageBitmap.imageResource(R.drawable.colornoice_00081),
-        ImageBitmap.imageResource(R.drawable.colornoice_00082),
-        ImageBitmap.imageResource(R.drawable.colornoice_00083),
-        ImageBitmap.imageResource(R.drawable.colornoice_00084),
-        ImageBitmap.imageResource(R.drawable.colornoice_00085),
-        ImageBitmap.imageResource(R.drawable.colornoice_00086),
-        ImageBitmap.imageResource(R.drawable.colornoice_00087),
-        ImageBitmap.imageResource(R.drawable.colornoice_00088),
-        ImageBitmap.imageResource(R.drawable.colornoice_00089),
-        ImageBitmap.imageResource(R.drawable.colornoice_00090),
-        ImageBitmap.imageResource(R.drawable.colornoice_00091),
-        ImageBitmap.imageResource(R.drawable.colornoice_00092),
-        ImageBitmap.imageResource(R.drawable.colornoice_00093),
-        ImageBitmap.imageResource(R.drawable.colornoice_00094),
-        ImageBitmap.imageResource(R.drawable.colornoice_00095),
-        ImageBitmap.imageResource(R.drawable.colornoice_00096),
-        ImageBitmap.imageResource(R.drawable.colornoice_00097),
-        ImageBitmap.imageResource(R.drawable.colornoice_00098),
-        ImageBitmap.imageResource(R.drawable.colornoice_00099),
-        ImageBitmap.imageResource(R.drawable.colornoice_00100),
-        ImageBitmap.imageResource(R.drawable.colornoice_00101),
-        ImageBitmap.imageResource(R.drawable.colornoice_00102),
-        ImageBitmap.imageResource(R.drawable.colornoice_00103),
-        ImageBitmap.imageResource(R.drawable.colornoice_00104),
-        ImageBitmap.imageResource(R.drawable.colornoice_00105),
-        ImageBitmap.imageResource(R.drawable.colornoice_00106),
-        ImageBitmap.imageResource(R.drawable.colornoice_00107),
-        ImageBitmap.imageResource(R.drawable.colornoice_00108),
-        ImageBitmap.imageResource(R.drawable.colornoice_00109),
-        ImageBitmap.imageResource(R.drawable.colornoice_00110),
-        ImageBitmap.imageResource(R.drawable.colornoice_00111),
-        ImageBitmap.imageResource(R.drawable.colornoice_00112),
-        ImageBitmap.imageResource(R.drawable.colornoice_00113),
-        ImageBitmap.imageResource(R.drawable.colornoice_00114),
-        ImageBitmap.imageResource(R.drawable.colornoice_00115),
-        ImageBitmap.imageResource(R.drawable.colornoice_00116),
-        ImageBitmap.imageResource(R.drawable.colornoice_00117),
-        ImageBitmap.imageResource(R.drawable.colornoice_00118),
-        ImageBitmap.imageResource(R.drawable.colornoice_00119),
-        ImageBitmap.imageResource(R.drawable.colornoice_00120),
-        ImageBitmap.imageResource(R.drawable.colornoice_00121),
-        ImageBitmap.imageResource(R.drawable.colornoice_00122),
-        ImageBitmap.imageResource(R.drawable.colornoice_00123),
-        ImageBitmap.imageResource(R.drawable.colornoice_00124)
-    )
-
-    var currentFrame by remember { mutableStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentFrame = (currentFrame + 1) % imageList.size
-            delay(10L)  // Adjust delay as needed
-        }
-    }
-
-    Canvas(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-
-        val paint = Paint().asFrameworkPaint().apply {
-            isAntiAlias = true
-            shader = ImageShader(imageList[currentFrame], TileMode.Repeated, TileMode.Repeated)
-        }
-
-        drawIntoCanvas {
-            it.nativeCanvas.drawPaint(paint)
-        }
-        paint.reset()
-    }
-}
