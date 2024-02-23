@@ -4,8 +4,6 @@ import android.content.Context
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import pro.themed.manager.SharedPreferencesManager
@@ -48,11 +46,10 @@ fun showRewarded(context: Context, onAdDismissed: () -> Unit) {
                 onAdDismissed()
             }
         }
-        mRewardedAd?.show(activity, object : OnUserEarnedRewardListener {
-            override fun onUserEarnedReward(rewardItem: RewardItem) {
-                // Handle the reward
-            }
-        })
+        mRewardedAd?.show(activity) {
+            // Handle the reward
+        }
+
     }
 }
 

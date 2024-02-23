@@ -140,7 +140,7 @@ fun fetchOverlayList(): OverlayListData {
         val unsupportedOverlays = overlayList.filter { it.contains("---") }
         val enabledOverlays = overlayList.filter { it.contains("[x]") }
         val disabledOverlays = overlayList.filter { it.contains("[ ]") }
-"overlay list".log()
+        "overlay list".log()
         OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
     } catch (e: IOException) {
         OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {
@@ -184,8 +184,8 @@ class MainActivity : ComponentActivity() {
     companion object {
         lateinit var appContext: Context
             private set
-        var overlayList: OverlayListData by mutableStateOf(fetchOverlayList() )
-
+        var overlayList: OverlayListData by mutableStateOf(fetchOverlayList())
+        var isDark by mutableStateOf("")
 
     }
 
@@ -243,7 +243,6 @@ class MainActivity : ComponentActivity() {
                     Main()
                     LaunchedEffect(Unit) {
                         splashScreen.setKeepOnScreenCondition { false }
-
                         // Initialize Firebase Database reference
                         val database =
                             FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
@@ -602,13 +601,19 @@ fun overlayEnable(overlayname: String) {
 fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
         val compileShell = Shell("su")
-        compileShell.addOnStderrLineListener(object : Shell.OnLineListener {
+       /* compileShell.addOnStderrLineListener(object : Shell.OnLineListener {
             override fun onLine(line: String) {
                 CoroutineScope(Dispatchers.Main).launch {
-
                     Toast.makeText(MainActivity.appContext, line, Toast.LENGTH_SHORT).show()
+                    line.log()
                 }
             }
+        })*/
+        compileShell.addOnCommandResultListener(object : Shell.OnCommandResultListener {
+            override fun onResult(result: Shell.Command.Result) {
+                result.log()
+            }
+
         })
         compileShell.run("cd $path")
         compileShell.run("pwd")

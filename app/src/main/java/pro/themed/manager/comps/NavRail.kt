@@ -19,15 +19,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.theapache64.rebugger.Rebugger
 import pro.themed.manager.ui.theme.cardcol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
@@ -37,8 +40,7 @@ import pro.themed.manager.utils.NavigationItems
 fun NavigationRailSample(
     navController: NavController,
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+
 
     val itemsbottom = listOf(
         NavigationItems.ColorsTab,
@@ -50,14 +52,11 @@ fun NavigationRailSample(
     val itemstop = listOf(
         NavigationItems.About, NavigationItems.Settings, NavigationItems.Toolbox
     )
-    var topColumnHeight by remember { mutableIntStateOf(0) }
-    var bottomColumnHeight by remember { mutableIntStateOf(0) }
-    var railHeight by remember { mutableIntStateOf(0) }
+
+    var topColumnHeight by rememberSaveable { mutableIntStateOf(0) }
+    var bottomColumnHeight by rememberSaveable { mutableIntStateOf(0) }
+    var railHeight by rememberSaveable { mutableIntStateOf(0) }
     var contentExceedsAvailableSpace by remember { mutableStateOf(false) }
-    contentExceedsAvailableSpace =
-        topColumnHeight / itemstop.size * (itemstop.size + itemsbottom.size) > railHeight
-
-
 
     NavigationRail(
         containerColor = cardcol,
@@ -68,25 +67,24 @@ fun NavigationRailSample(
             .zIndex(10f)
             .width(64.dp)
             .onGloballyPositioned { layoutInfo ->
-                railHeight = layoutInfo.size.height
+                val newRailHeight = layoutInfo.size.height
+                if (railHeight != newRailHeight) {
+                    railHeight = newRailHeight
+                }
             }
             .then(if (contentExceedsAvailableSpace) Modifier.verticalScroll(rememberScrollState()) else Modifier)
 
     ) {
         Column(modifier = Modifier.onGloballyPositioned { layoutInfo ->
-            topColumnHeight = layoutInfo.size.height
+            val newTopColumnHeight = layoutInfo.size.height
+            if (topColumnHeight != newTopColumnHeight) {
+                topColumnHeight = newTopColumnHeight
+            }
         }, verticalArrangement = Arrangement.Top) {
             itemstop.forEachIndexed { _, item ->
-                val isSelected = currentRoute == item.route
                 CustomNavigationRailItem(
-                    isSelected = isSelected,
-                    onClick = {
-                        if (!isSelected) {
-                            navController.navigate(item.route)
-                        }
-                    },
-                    iconResource = item.icon,
-                    itemTitle = item.title
+                 item = item,
+                    navController = navController
                 )
             }
         }
@@ -94,33 +92,38 @@ fun NavigationRailSample(
         Column(modifier = Modifier
             .wrapContentHeight()
             .onGloballyPositioned { layoutInfo ->
-                bottomColumnHeight = layoutInfo.size.height
+                val newBottomColumnHeight = layoutInfo.size.height
+                if (bottomColumnHeight != newBottomColumnHeight) {
+                    bottomColumnHeight = newBottomColumnHeight
+                }
             }) {
             itemsbottom.forEachIndexed { _, item ->
-                val isSelected = currentRoute == item.route
                 CustomNavigationRailItem(
-                    isSelected = isSelected,
-                    onClick = {
-                        if (!isSelected) {
-                            navController.navigate(item.route)
-                        }
-                    },
-                    iconResource = item.icon,
-                    itemTitle = item.title
+                    item = item,
+                    navController = navController
                 )
             }
         }
     }
+
+    contentExceedsAvailableSpace =
+        topColumnHeight / itemstop.size * (itemstop.size + itemsbottom.size) > railHeight
 }
 
 @Stable
 @Composable
-fun CustomNavigationRailItem(
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    iconResource: Int,
-    itemTitle: String
-) {
+fun CustomNavigationRailItem(item: NavigationItems, navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute by remember {
+        mutableStateOf(navBackStackEntry?.destination?.route)}
+    Rebugger(
+        trackMap = mapOf(
+            "item" to item,
+            "navController" to navController,
+            "navBackStackEntry" to navBackStackEntry,
+            "currentRoute" to currentRoute,
+        ),
+    )
     NavigationRailItem(
         colors = NavigationRailItemDefaults.colors(
             selectedIconColor = textcol,
@@ -131,13 +134,21 @@ fun CustomNavigationRailItem(
 
         icon = {
             Icon(
-                painterResource(id = iconResource),
-                contentDescription = itemTitle,
+                imageVector = ImageVector.vectorResource(id = item.icon),
+                contentDescription = item.title,
                 modifier = Modifier.size(24.dp)
             )
         },
-        label = { Text(itemTitle) },
-        selected = isSelected,
-        onClick = onClick
+        label = { Text( item.title) },
+        selected = currentRoute == item.route,
+        onClick = {
+            navController.navigate(item.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
     )
 }

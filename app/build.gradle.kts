@@ -100,6 +100,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("io.github.theapache64:rebugger:1.0.0-rc02")
 
 
     implementation(libs.ktsh)

@@ -86,7 +86,7 @@ fun Slideritem(
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
-    if (overlayList.overlayList.any() { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
+    if (overlayList.overlayList.any { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
             it.contains(
                 overlayName
             )
@@ -351,6 +351,7 @@ fun HeaderRow(
 }
 
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterial3Api
 //@Preview
@@ -361,49 +362,37 @@ fun MiscTab() {
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AdmobBanner()
-
-            var rounded_corner_radius by remember { mutableStateOf("0") }
-            var config_qs_columns_landscape by remember { mutableStateOf("0") }
-            var config_qs_columns_portrait by remember { mutableStateOf("0") }
-            val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
-            val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
-
-            LaunchedEffect(Unit) {
-                rounded_corner_radius =
-                    Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
-                        .stdout()
-                config_qs_columns_landscape =
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
-                        .stdout()
-                config_qs_columns_portrait =
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
-                        .stdout()
-            }
-
-
-
-            Row {
-                OutlinedTextField(modifier = Modifier.weight(1f),
-                    value = rounded_corner_radius,
+            @Composable
+            fun MiscTextField(
+                input: String,
+                path: String,
+                resource: String,
+                file: String,
+                overlay: String,
+                modifier: Modifier, drawable: Int
+            ) {
+                var input by remember { mutableStateOf(input) }
+                OutlinedTextField(modifier = modifier,
+                    value = input,
                     singleLine = true,
                     onValueChange = {
                         Shell("su").run(
-                            """sed -i 's/<dimen name="rounded_corner_radius">[^<]*/<dimen name="rounded_corner_radius">${it}dip/g' $cornersPath/res/values/dimens.xml"""
-                        ).log(); rounded_corner_radius = it
+                            """sed -i 's/<${file.removeSuffix("s")} name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
+                        ).log(); input = it
                     },
                     placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.rounded_corner_48px),
+                            painter = painterResource(id = drawable),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
                     },
                     trailingIcon = {
                         IconButton(onClick = {
-                            buildOverlay(cornersPath)
-                            Shell("su").run("""cmd overlay enable themed.corners.generic""")
+                            buildOverlay(path)
+                            Shell("su").run("""cmd overlay enable $overlay""")
 
                         }) {
                             Icon(
@@ -413,57 +402,86 @@ fun MiscTab() {
                             )
                         }
                     },
-                    label = { Text("rounded_corner_radius", Modifier.basicMarquee()) })
+                    label = { Text(resource, Modifier.basicMarquee()) })
+            }
+            val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
+            val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
+
+            var rounded_corner_radius by remember { mutableStateOf( Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
+                .stdout()) }
+            var config_qs_columns_landscape by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
+                .stdout()) }
+            var config_qs_columns_portrait by remember { mutableStateOf(  Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
+                .stdout()) }
+            var config_qs_rows_landscape by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                .stdout()) }
+            var config_qs_rows_portrait by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                .stdout()) }
+
+            LaunchedEffect(Unit) {
+
+            }
+
+
+
+            Row {
+                MiscTextField(
+                    input = rounded_corner_radius,
+                    path = cornersPath,
+                    resource = "rounded_corner_radius",
+                    file = """dimens""",
+                    overlay = """themed.corners.generic""",
+                    modifier = Modifier.weight(1f),
+                    drawable = R.drawable.rounded_corner_48px
+                )
 
             }
             Row {
-                OutlinedTextField(modifier = Modifier.weight(1f),
-                    value = config_qs_columns_landscape,
-                    singleLine = true,
-                    onValueChange = {
-                        Shell("su").run(
-                            """sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml)"""
-                        ); config_qs_columns_landscape = it
-                    },
-                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            buildOverlay(cornersPath)
-                            Shell("su").run("""cmd overlay enable themed.columnslandscape.generic""")
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.move_up_24px),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    label = { Text("config_qs_columns_landscape", Modifier.basicMarquee()) })
-                OutlinedTextField(modifier = Modifier.weight(1f),
-                    value = config_qs_columns_landscape,
-                    singleLine = true,
-                    onValueChange = {
-                        Shell("su").run(
-                            """sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml)"""
-                        ); config_qs_columns_landscape = it
-                    },
-                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            buildOverlay(cornersPath)
-                            Shell("su").run("""cmd overlay enable themed.columnslandscape.generic""")
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.move_up_24px),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    label = { Text("config_qs_columns_landscape", Modifier.basicMarquee()) })
+                //columns portrait
+                MiscTextField(
+                    input = config_qs_columns_portrait,
+                    path = qsGridGenericPath + "ColumnsPortraitGeneric/",
+                    resource = "config_qs_columns_portrait",
+                    file = "integers",
+                    overlay = "themed.columnsportrait.generic",
+                    modifier = Modifier.weight(1f),
+                    drawable = R.drawable.view_week_48px
+                )
 
+                //columns landscape
+                MiscTextField(
+                    input = config_qs_columns_landscape,
+                    path = qsGridGenericPath + "ColumnsLandscapeGeneric/",
+                    resource = "config_qs_columns_landscape",
+                    file = "integers",
+                    overlay = "themed.columnslandscape.generic",
+                    modifier = Modifier.weight(1f),
+                    drawable = R.drawable.view_week_48px
+                )
+
+
+            }
+            Row {
+    //rows portrait
+                MiscTextField(
+                    input = config_qs_rows_portrait,
+                    path = qsGridGenericPath + "RowsPortraitGeneric/",
+                    resource = "config_qs_rows_portrait",
+                    file = "integers",
+                    overlay = "themed.rowsportrait.generic",
+                    modifier = Modifier.weight(1f),
+                    drawable = R.drawable.table_rows_48px
+                )
+                //rows landscape
+                MiscTextField(
+                    input = config_qs_rows_landscape,
+                    path = qsGridGenericPath    + "RowsLandscapeGeneric/",
+                    resource = "config_qs_rows_landscape",
+                    file = "integers",
+                    overlay = "themed.rowslandscape.generic",
+                    modifier = Modifier.weight(1f),
+                    drawable = R.drawable.table_rows_48px
+                )
             }
 
 
