@@ -7,7 +7,9 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,7 +67,6 @@ fun ToolboxPage() {
         var progresstext by remember { mutableStateOf("Waiting to start") }
 
         Box {
-
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 SharedPreferencesManager.initialize(context)
                 val sharedPreferences: SharedPreferences =
@@ -74,7 +75,10 @@ fun ToolboxPage() {
 
 
 
-                Column(Modifier.padding(horizontal = 8.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     HeaderRow(stringResource(R.string.disable_overlays),
                         stringResource(R.string.disable_overlays_header),
                         button1text = stringResource(R.string.all),
@@ -145,7 +149,6 @@ fun ToolboxPage() {
                     )
                     val forcedex2oat =
                         if (sharedPreferences.getBoolean("force_dex2oat", false)) " -f" else ""
-
 
                     HeaderRow(
                         stringResource(R.string.dex2oat),
@@ -224,7 +227,6 @@ fun ToolboxPage() {
                                                 .fillMaxWidth()
                                                 .weight(1f),
                                                 onClick = {
-
                                                     downscalebynumber(width = customres)
                                                     Shell("su").run("sleep 10 ; wm size reset ; wm density reset")
                                                 }) { Text(text = stringResource(R.string.test)) }
@@ -234,7 +236,6 @@ fun ToolboxPage() {
                                                     .fillMaxWidth()
                                                     .weight(1f),
                                                 onClick = {
-
                                                     downscalebynumber(width = customres)
                                                 },
                                             ) { Text(text = stringResource(R.string.apply)) }
@@ -272,9 +273,7 @@ fun ToolboxPage() {
                         },
                         button3text = "Set",
                         button3onClick = {
-
                             customresShown = true
-
 
                         },
                         button4text = "Reset",
@@ -310,45 +309,56 @@ fun ToolboxPage() {
                         ),
                         onCheckedChange = {
                             sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
-                        })
-                    var MaxRate by remember {
-                        mutableStateOf(
-                            sharedPreferences.getString(
-                                "maxRate", "0"
-                            ).toString()
-                        )
-                    }
+                        },
+                        content = {
+                            var MaxRate by remember {
+                                mutableStateOf(
+                                    sharedPreferences.getString(
+                                        "maxRate", "0"
+                                    ).toString()
+                                )
+                            }
 
-                    var MinRate by remember {
-                        mutableStateOf(
-                            sharedPreferences.getString(
-                                "minRate", "0"
-                            ).toString()
-                        )
-                    }
-                    Row {
-                        OutlinedTextField(modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(horizontal = 8.dp),
-                            value = MaxRate,
-                            singleLine = true,
-                            onValueChange = {
-                                MaxRate = it; editor.putString("maxRate", it).apply()
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("Enter max refresh mode") })
-                        OutlinedTextField(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                            value = MinRate,
-                            singleLine = true,
-                            onValueChange = {
-                                MinRate = it;editor.putString("minRate", it).apply()
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("Enter min refresh mode") })
-                    }
-                    Spacer(Modifier.height(18.dp))
+                            var MinRate by remember {
+                                mutableStateOf(
+                                    sharedPreferences.getString(
+                                        "minRate", "0"
+                                    ).toString()
+                                )
+                            }
+                            Row {
+                                OutlinedTextField(modifier = Modifier
+                                    .fillMaxWidth(0.5f)
+                                    .padding(horizontal = 8.dp),
+                                    value = MaxRate,
+                                    singleLine = true,
+                                    onValueChange = {
+                                        MaxRate = it; editor.putString("maxRate", it).apply()
+                                    },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    label = {
+                                        Text(
+                                            "Enter max refresh mode",
+                                            modifier = Modifier.basicMarquee()
+                                        )
+                                    })
+                                OutlinedTextField(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                    value = MinRate,
+                                    singleLine = true,
+                                    onValueChange = {
+                                        MinRate = it;editor.putString("minRate", it).apply()
+                                    },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    label = {
+                                        Text(
+                                            "Enter min refresh mode",
+                                            modifier = Modifier.basicMarquee()
+                                        )
+                                    })
+                            }
+                        })
 
                 }
 
@@ -389,9 +399,7 @@ fun ToolboxPage() {
 
 }
 
-
 private fun downscalebydivisor(divisor: String) {
-
     Shell("su").run(
         command = """
                 # Set the number of division

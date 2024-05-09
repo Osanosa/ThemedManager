@@ -15,17 +15,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -51,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
@@ -64,6 +67,7 @@ import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.GlobalVariables
 import kotlin.math.roundToInt
 
@@ -83,7 +87,6 @@ fun Slideritem(
     var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
     var intvalue by rememberSaveable { mutableIntStateOf(sliderPosition.roundToInt()) }
 
-
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
     if (overlayList.overlayList.any { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
@@ -92,8 +95,6 @@ fun Slideritem(
             )
         }) {
         Surface {
-
-
             Column(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
@@ -117,7 +118,6 @@ fun Slideritem(
                             text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
-
                             Text(text = "Value: $intvalue")
 
                         }
@@ -140,7 +140,6 @@ fun Slideritem(
                 Row(
                     Modifier, verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Image(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -193,14 +192,13 @@ fun Slideritem(
                 }
             }
 
-
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
-
+@Preview
 @Composable
 fun HeaderRow(
     header: String = "",
@@ -221,6 +219,7 @@ fun HeaderRow(
     onCheckedChange: (Boolean) -> Unit = {},
     isChecked: Boolean = false,
     showSwitch: Boolean = false,
+    content: @Composable () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     var checkedState by remember { mutableStateOf(isChecked) }
@@ -229,40 +228,80 @@ fun HeaderRow(
         checkedState = isChecked
     }
     val context = LocalContext.current
-    Surface {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            // verticalAlignment = Alignment.CenterVertically,
-            // horizontalArrangement = Arrangement.SpaceBetween
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = textcol.copy(alpha = 0.05f),
+            contentColor = textcol
+        ),
+    ) {
+        Card(
+            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
+                containerColor = textcol.copy(alpha = 0.05f), contentColor = textcol
+            ), modifier = Modifier.padding(8.dp)
         ) {
-            if (showSwitch && switchDescription.isEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                // verticalAlignment = Alignment.CenterVertically,
+                // horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (showSwitch && switchDescription.isEmpty()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                text = header,
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            if (subHeader.isNotEmpty()) {
+                                Text(
+                                    text = subHeader,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                        }
+
+                        Switch(
+                            checked = checkedState, onCheckedChange = {
+                                checkedState = it
+                                onCheckedChange(it)
+                            }, modifier = Modifier
+                        )
+                    }
+                } else if (showSwitch && switchDescription.isNotEmpty()) {
+                    Column(Modifier) {
                         Text(
                             text = header,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        if (subHeader.isNotEmpty()) {
+                        Text(
+                            text = subHeader,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text(
-                                text = subHeader,
+                                text = switchDescription,
                                 style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Switch(
+                                checked = checkedState, onCheckedChange = {
+                                    checkedState = it
+                                    onCheckedChange(it)
+                                }, modifier = Modifier
                             )
                         }
                     }
-
-                    Switch(
-                        checked = checkedState, onCheckedChange = {
-                            checkedState = it
-                            onCheckedChange(it)
-                        }, modifier = Modifier
-                    )
-                }
-            } else if (showSwitch && switchDescription.isNotEmpty()) {
-                Column(Modifier) {
+                } else {
                     Text(
                         text = header,
                         fontWeight = FontWeight.Bold,
@@ -272,85 +311,51 @@ fun HeaderRow(
                         text = subHeader,
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = switchDescription,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Switch(
-                            checked = checkedState, onCheckedChange = {
-                                checkedState = it
-                                onCheckedChange(it)
-                            }, modifier = Modifier
-                        )
+                }
+                content()
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (button1text.isNotEmpty()) {
+                        Button(
+                            onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
+                            modifier = Modifier.weight(button1weight),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                        ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
+                    }
+
+                    if (button2text.isNotEmpty()) {
+                        Button(
+                            onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
+                            modifier = Modifier.weight(button2weight),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                        ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
+                    }
+                    if (button3text.isNotEmpty()) {
+                        Button(
+                            onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
+                            modifier = Modifier.weight(button3weight),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                        ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
+                    }
+                    if (button4text.isNotEmpty()) {
+                        Button(
+                            onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
+                            modifier = Modifier.weight(button4weight),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                        ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
                     }
                 }
-            } else {
-                Text(
-                    text = header,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = subHeader,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
             }
-
-
-            Row {
-                if (button1text.isNotEmpty()) {
-                    OutlinedButton(
-                        onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
-                        modifier = Modifier.weight(button1weight),
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
-                }
-
-                if (button2text.isNotEmpty()) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
-                        modifier = Modifier.weight(button2weight),
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
-                }
-                if (button3text.isNotEmpty()) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
-                        modifier = Modifier.weight(button3weight),
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
-                }
-                if (button4text.isNotEmpty()) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedButton(
-                        onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
-                        modifier = Modifier.weight(button4weight),
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
         }
-
     }
 }
-
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterial3Api
@@ -369,16 +374,23 @@ fun MiscTab() {
                 resource: String,
                 file: String,
                 overlay: String,
-                modifier: Modifier, drawable: Int
+                modifier: Modifier,
+                drawable: Int
             ) {
                 var input by remember { mutableStateOf(input) }
                 OutlinedTextField(modifier = modifier,
                     value = input,
                     singleLine = true,
                     onValueChange = {
-                        Shell("su").run(
-                            """sed -i 's/<${file.removeSuffix("s")} name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
-                        ).log(); input = it
+                        if (file == "integers") {
+                            Shell("su").run(
+                                """sed -i 's/<integer name="$resource">[^<]*/<integer name="$resource">${it}/g' $path/res/values/$file.xml"""
+                            ).log(); input = it
+                        } else if (file == "dimens") {
+                            Shell("su").run(
+                                """sed -i 's/<dimens name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
+                            ).log(); input = it
+                        }
                     },
                     placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -404,25 +416,43 @@ fun MiscTab() {
                     },
                     label = { Text(resource, Modifier.basicMarquee()) })
             }
+
             val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
             val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
 
-            var rounded_corner_radius by remember { mutableStateOf( Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
-                .stdout()) }
-            var config_qs_columns_landscape by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
-                .stdout()) }
-            var config_qs_columns_portrait by remember { mutableStateOf(  Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
-                .stdout()) }
-            var config_qs_rows_landscape by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
-                .stdout()) }
-            var config_qs_rows_portrait by remember { mutableStateOf(Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
-                .stdout()) }
-
-            LaunchedEffect(Unit) {
-
+            var rounded_corner_radius by remember {
+                mutableStateOf(
+                    Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
+                        .stdout()
+                )
+            }
+            var config_qs_columns_landscape by remember {
+                mutableStateOf(
+                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
+                        .stdout()
+                )
+            }
+            var config_qs_columns_portrait by remember {
+                mutableStateOf(
+                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
+                        .stdout()
+                )
+            }
+            var config_qs_rows_landscape by remember {
+                mutableStateOf(
+                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                        .stdout()
+                )
+            }
+            var config_qs_rows_portrait by remember {
+                mutableStateOf(
+                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                        .stdout()
+                )
             }
 
-
+            LaunchedEffect(Unit) {
+            }
 
             Row {
                 MiscTextField(
@@ -443,7 +473,7 @@ fun MiscTab() {
                     path = qsGridGenericPath + "ColumnsPortraitGeneric/",
                     resource = "config_qs_columns_portrait",
                     file = "integers",
-                    overlay = "themed.columnsportrait.generic",
+                    overlay = "themed.qsgrid.columnsportrait.generic",
                     modifier = Modifier.weight(1f),
                     drawable = R.drawable.view_week_48px
                 )
@@ -454,37 +484,34 @@ fun MiscTab() {
                     path = qsGridGenericPath + "ColumnsLandscapeGeneric/",
                     resource = "config_qs_columns_landscape",
                     file = "integers",
-                    overlay = "themed.columnslandscape.generic",
+                    overlay = "themed.qsgrid.columnslandscape.generic",
                     modifier = Modifier.weight(1f),
                     drawable = R.drawable.view_week_48px
                 )
 
-
             }
             Row {
-    //rows portrait
+                //rows portrait
                 MiscTextField(
                     input = config_qs_rows_portrait,
                     path = qsGridGenericPath + "RowsPortraitGeneric/",
                     resource = "config_qs_rows_portrait",
                     file = "integers",
-                    overlay = "themed.rowsportrait.generic",
+                    overlay = "themed.qsgrid.rowsportrait.generic",
                     modifier = Modifier.weight(1f),
                     drawable = R.drawable.table_rows_48px
                 )
                 //rows landscape
                 MiscTextField(
                     input = config_qs_rows_landscape,
-                    path = qsGridGenericPath    + "RowsLandscapeGeneric/",
+                    path = qsGridGenericPath + "RowsLandscapeGeneric/",
                     resource = "config_qs_rows_landscape",
                     file = "integers",
-                    overlay = "themed.rowslandscape.generic",
+                    overlay = "themed.qsgrid.rowslandscape.generic",
                     modifier = Modifier.weight(1f),
                     drawable = R.drawable.table_rows_48px
                 )
             }
-
-
 
             Slideritem(
                 drawable = R.drawable.table_rows_48px,
@@ -495,8 +522,6 @@ fun MiscTab() {
                 maxSliderValue = 80f,
                 overlayName = "qsquicktilesize"
             )
-
-
 
             Slideritem(
                 drawable = R.drawable.table_rows_48px,
@@ -533,7 +558,6 @@ fun MiscTab() {
                 },
                 isChecked = overlayList.enabledOverlays.any { it.contains("borderless") },
             )
-
 
         }
     }

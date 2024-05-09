@@ -15,14 +15,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun ThemedManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, content: @Composable () -> Unit
 ) {
-
     val DarkColorScheme = darkColorScheme(
         surface = cardcol,
         background = cardcol,

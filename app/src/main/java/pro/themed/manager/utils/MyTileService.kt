@@ -6,14 +6,12 @@ import android.widget.Toast
 import com.jaredrummler.ktsh.Shell
 
 class MyTileService : TileService() {
-
     override fun onClick() {
         super.onClick()
         // Handle tile click
         val tile = qsTile
         if (tile != null) {
             if (tile.state == Tile.STATE_ACTIVE) {
-
                 // Tile is active, deactivate it
                 tile.state = Tile.STATE_INACTIVE
                 tile.updateTile()

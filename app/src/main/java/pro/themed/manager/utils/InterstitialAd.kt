@@ -10,7 +10,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import pro.themed.manager.SharedPreferencesManager
 
-
 var mInterstitialAd: InterstitialAd? = null
 
 fun loadInterstitial(context: Context) {
@@ -51,7 +50,6 @@ fun showInterstitial(context: Context, onAdDismissed: () -> Unit) {
         mInterstitialAd?.show(activity)
     }
 }
-
 
 fun removeInterstitial() {
     mInterstitialAd?.fullScreenContentCallback = null

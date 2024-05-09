@@ -8,7 +8,6 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import pro.themed.manager.SharedPreferencesManager
 
-
 var mRewardedAd: RewardedAd? = null
 
 fun loadRewarded(context: Context) {

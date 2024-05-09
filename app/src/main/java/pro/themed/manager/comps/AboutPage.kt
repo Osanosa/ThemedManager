@@ -1,6 +1,5 @@
 package pro.themed.manager.comps
 
-
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -92,7 +91,6 @@ fun LinkButtons(modifier: Modifier = Modifier) {
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutPage() {
@@ -131,7 +129,6 @@ fun AboutPage() {
             val path =
                 Environment.getExternalStorageDirectory().path + "/" + Environment.DIRECTORY_DOWNLOADS + "/ThemedProject.zip"
 
-
             fun showBigTextMessage(context: Context, message: String) {
                 val dialog = AlertDialog.Builder(context).setMessage(message)
                     .setPositiveButton("OK") { dialog, _ ->
@@ -147,7 +144,6 @@ fun AboutPage() {
             }
             OutlinedButton(
                 onClick = {
-
                     Toast.makeText(
                         context,
                         MainActivity.appContext.getString(R.string.process_started_now_wait),
@@ -157,7 +153,6 @@ fun AboutPage() {
                     Shell("su").run("rm $path")
 
                     AndroidDownloader(MainActivity.appContext).downloadFile("https://github.com/osanosa/themedproject/releases/latest/download/ThemedProject.zip")
-
 
                 },
                 modifier = Modifier,

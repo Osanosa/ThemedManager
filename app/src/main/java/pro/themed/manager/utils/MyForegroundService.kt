@@ -62,7 +62,6 @@ class MyForegroundService : Service() {
             onStdOut = {
                 countdown = 3 // Reset countdown to the initial value
                 serviceScope.launch {
-
                     if (!isCountdownRunning) {
                         isCountdownRunning = true // Set flag to indicate countdown is running
                         if (!isMaxRate) {

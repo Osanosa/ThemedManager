@@ -90,14 +90,12 @@ import pro.themed.manager.utils.loadRewarded
 import pro.themed.manager.utils.removeInterstitial
 import java.io.IOException
 
-
 data class OverlayListData(
     val overlayList: List<String>,
     val unsupportedOverlays: List<String>,
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
-
 
 @Composable
 fun AdmobBanner() {
@@ -132,7 +130,6 @@ fun AdmobBanner() {
     }
 }
 
-
 fun fetchOverlayList(): OverlayListData {
     return try {
         val result = Shell("su").run("cmd overlay list").stdout()
@@ -151,7 +148,6 @@ fun fetchOverlayList(): OverlayListData {
             ).show()
         }
     }
-
 
 }
 
@@ -190,8 +186,6 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         SharedPreferencesManager.initialize(applicationContext)
         Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
         val splashScreen = installSplashScreen()
@@ -318,7 +312,6 @@ class MainActivity : ComponentActivity() {
             HorizontalPager(
                 state = pagerState, Modifier.weight(1f),
             ) {
-
                     index ->
 
                 when (index) {
@@ -372,12 +365,10 @@ class MainActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 OutlinedButton(shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                     onClick = {
                         coroutineScope.launch {
-
                             if (pagerState.currentPage == 0) {
                                 SH.run("su")
                                 sharedPreferences.edit().putBoolean("onBoardingCompleted", true)
@@ -411,8 +402,6 @@ class MainActivity : ComponentActivity() {
                     onClick = {
                         coroutineScope.launch {
                             if (pagerState.currentPage == 1) {
-
-
                                 if ("root" !in whoami) {
                                     Toast.makeText(
                                         context,
@@ -526,12 +515,9 @@ fun OnBoarding(image: Int, text: String) {
 @Composable
 fun Main() {
     Column {
-
         val navController = rememberNavController()
 
-
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -544,7 +530,6 @@ fun Main() {
                     modifier = Modifier
                         .zIndex(10f)
                         .shadow(8.dp)
-
 
                 ) {
                     NavigationRailSample(navController)
@@ -559,7 +544,6 @@ fun Main() {
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
-
 @Composable
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 fun getContrastColor(background: Int): Color {
@@ -569,7 +553,6 @@ fun getContrastColor(background: Int): Color {
     val luminance = (0.299 * background.red + 0.587 * background.green + 0.114 * background.blue)
     return if (luminance > threshold) Color.Black else Color.White
 }
-
 
 fun overlayEnable(overlayname: String) {
     CoroutineScope(Dispatchers.IO).launch {
@@ -581,7 +564,6 @@ fun overlayEnable(overlayname: String) {
         } else {
             Shell("su").run("su -c cmd overlay enable themed.$overlayname")
         }
-
 
         val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
         val restart_system_ui: Boolean = sharedPreferences.getBoolean("restart_system_ui", false)

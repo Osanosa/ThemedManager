@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,16 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.theapache64.rebugger.Rebugger
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.textcol
 import pro.themed.manager.utils.NavigationItems
 
@@ -40,8 +38,6 @@ import pro.themed.manager.utils.NavigationItems
 fun NavigationRailSample(
     navController: NavController,
 ) {
-
-
     val itemsbottom = listOf(
         NavigationItems.ColorsTab,
         NavigationItems.QsPanel,
@@ -59,12 +55,11 @@ fun NavigationRailSample(
     var contentExceedsAvailableSpace by remember { mutableStateOf(false) }
 
     NavigationRail(
-        containerColor = cardcol,
+        containerColor = bordercol,
         contentColor = textcol,
 
         modifier = Modifier
-            .shadow(1.dp)
-            .zIndex(10f)
+
             .width(64.dp)
             .onGloballyPositioned { layoutInfo ->
                 val newRailHeight = layoutInfo.size.height
@@ -114,16 +109,11 @@ fun NavigationRailSample(
 @Composable
 fun CustomNavigationRailItem(item: NavigationItems, navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute by remember {
-        mutableStateOf(navBackStackEntry?.destination?.route)}
-    Rebugger(
-        trackMap = mapOf(
-            "item" to item,
-            "navController" to navController,
-            "navBackStackEntry" to navBackStackEntry,
-            "currentRoute" to currentRoute,
-        ),
-    )
+    val isSelected by remember {
+        derivedStateOf {
+            navBackStackEntry?.destination?.route == item.route
+        }
+    }
     NavigationRailItem(
         colors = NavigationRailItemDefaults.colors(
             selectedIconColor = textcol,
@@ -140,7 +130,7 @@ fun CustomNavigationRailItem(item: NavigationItems, navController: NavController
             )
         },
         label = { Text( item.title) },
-        selected = currentRoute == item.route,
+        selected = isSelected,
         onClick = {
             navController.navigate(item.route) {
                 popUpTo(navController.graph.startDestinationId) {

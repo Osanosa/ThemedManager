@@ -8,7 +8,6 @@ import androidx.core.net.toUri
 class AndroidDownloader(
     context: Context
 ) : Downloader {
-
     private val downloadManager = context.getSystemService(DownloadManager::class.java)
 
     override fun downloadFile(url: String): Long {

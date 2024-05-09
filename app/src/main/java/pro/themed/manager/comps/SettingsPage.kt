@@ -29,8 +29,6 @@ fun SettingsPage() {
             context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-
-
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             HeaderRow(
                 header = "Automatically restart SystemUI",

@@ -70,7 +70,6 @@ fun DebugPage() {
                     }, properties = DialogProperties(usePlatformDefaultWidth = false)
                 ) {
                     Card {
-
                         Column(modifier = Modifier.padding(16.dp)) {
                             Column(
                                 Modifier
@@ -107,7 +106,6 @@ fun DebugPage() {
                 }
             }
 
-
             Text(text = "Your ThemedId is ${themedId}, your prevelegies are due ${
                 SharedPreferencesManager.getSharedPreferences()
                     .getString("isContributorDate", "null")
@@ -117,7 +115,6 @@ fun DebugPage() {
             Row {
                 OutlinedButton(
                     onClick = {
-
                         Shell("su").run("rm /sdcard/themeddebug/logs")
                         Shell("su").run("mkdir /sdcard/themeddebug")
                         Shell("su").run("mkdir /sdcard/themeddebug/logs")
@@ -128,7 +125,6 @@ fun DebugPage() {
                         Toast.makeText(
                             context, context.getString(R.string.done), Toast.LENGTH_SHORT
                         ).show()
-
 
                     },
                     modifier = Modifier
@@ -156,7 +152,6 @@ fun DebugPage() {
                             context, context.getString(R.string.done), Toast.LENGTH_SHORT
                         ).show()
 
-
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -173,7 +168,6 @@ fun DebugPage() {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "If you're having issues of something not working you need to collect files and send zipped /sdcard/themeddebug")
             Spacer(modifier = Modifier.height(8.dp))
-
 
             if (overlayList.unsupportedOverlays.isNotEmpty()) {
                 Text(text = "Unsupported")

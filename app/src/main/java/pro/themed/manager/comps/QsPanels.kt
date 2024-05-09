@@ -85,7 +85,6 @@ fun QSTileCard() {
     qsShell.addOnStderrLineListener(object : Shell.OnLineListener {
         override fun onLine(line: String) {
             CoroutineScope(Dispatchers.Main).launch {
-
                 // do something
                 Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
             }
@@ -95,15 +94,10 @@ fun QSTileCard() {
     @Stable
     @Composable
     fun MyIconButton(overlayname: String, contentdescription: String, iconname: Int) {
-
-
         IconButton(
             onClick = {
                 qsShell.run("sed -i 's/@drawable\\/[^\"]*/@drawable\\/$overlayname/g' \"res/drawable/ic_qs_circle.xml\"")
-                qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
-
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .size(testdp.dp)
                 .background(color = cardcol)
         ) {
@@ -117,7 +111,6 @@ fun QSTileCard() {
         }
 
     }
-
 
     Column(modifier = Modifier) {
         Row(
@@ -142,11 +135,11 @@ fun QSTileCard() {
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-
             Text(text = "Style:")
             Spacer(modifier = Modifier.width(8.dp))
 
             var style by remember { mutableStateOf("") }
+
             LaunchedEffect(Unit) {
                 style =
                     qsShell.run("""awk -F'bg_' '/<item android:drawable="@drawable\/bg_/ {print $2}' $qsPath/res/drawable/themed_qspanel.xml | sed 's/\" \/>//g'""")
@@ -155,9 +148,6 @@ fun QSTileCard() {
             LaunchedEffect(style) {
                 qsShell.run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$style/g' "$qsPath/res/drawable/themed_qspanel.xml"""")
                     .log()
-
-                qsShell.run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
-
 
             }
 
@@ -197,8 +187,6 @@ fun QSTileCard() {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
-
 
         Surface {
             Column {
@@ -368,7 +356,7 @@ fun QSTileCard() {
                 singleLine = true,
                 onValueChange = {
                     qs_label_container_margin = it
-                    qsShell.run("""sed -i 's/<dimen name="qs_label_container_margin">[^<]*/<dimen name="qs_label_container_margin">${it}dip/g' $qsPath/res/values/dimens.xml""")
+                    qsShell.run("""sed -i 's/<dimen name="qs_label_container_margin">[^"]*/<dimen name="qs_label_container_margin">${it}dip/g' $qsPath/res/values/dimens.xml""")
 
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -385,7 +373,7 @@ fun QSTileCard() {
                 singleLine = true,
                 onValueChange = {
                     qs_tile_start_padding = it
-                    qsShell.run("""sed -i 's/<dimen name="qs_tile_start_padding">[^<]*/<dimen name="qs_tile_start_padding">${it}dip/g' $qsPath/res/values/dimens.xml""")
+                    qsShell.run("""sed -i 's/<dimen name="qs_tile_start_padding">[^"]*/<dimen name="qs_tile_start_padding">${it}dip/g' $qsPath/res/values/dimens.xml""")
 
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -393,117 +381,15 @@ fun QSTileCard() {
 
         }
 
-
-        Row {
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = columnsPortrait,
-                singleLine = true,
-                onValueChange = {
-                    columnsPortrait = it
-                    qsShell.run("""sed -i 's/<integer name="quick_settings_num_columns">[^<]*/<integer name="quick_settings_num_columns">${it}/g' $qsPath/res/values/integers.xml""")
-                    qsShell.run("""sed -i 's/<integer name="config_qs_columns_portrait">[^<]*/<integer name="config_qs_columns_portrait">${it}/g' $qsPath/res/values/integers.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = {
-                    Text(
-                        text = "columnsPortrait", Modifier.basicMarquee()
-                    )
-                })
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = rowsPortrait,
-                singleLine = true,
-                onValueChange = {
-                    rowsPortrait = it
-                    qsShell.run("""sed -i 's/<integer name="config_qs_rows_portrait">[^<]*/<integer name="config_qs_rows_portrait">${it}/g' $qsPath/res/values/integers.xml""")
-                    qsShell.run("""sed -i 's/<integer name="quick_settings_max_rows">[^<]*/<integer name="quick_settings_max_rows">${it}/g' $qsPath/res/values/integers.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text("rowsPortrait", Modifier.basicMarquee()) })
-
-        }
-
-
-        Row {
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = columnsLandscape,
-                singleLine = true,
-                onValueChange = {
-                    columnsLandscape = it
-                    qsShell.run("""sed -i 's/<integer name="config_qs_columns_landscape">[^<]*/<integer name="config_qs_columns_landscape">${it}/g' $qsPath/res/values/integers.xml""")
-                    qsShell.run("""sed -i 's/<integer name="quick_settings_num_columns">[^<]*/<integer name="quick_settings_num_columns">${it}/g' $qsPath/res/values-land/integers.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = {
-                    Text(
-                        text = "columnsLandscape", Modifier.basicMarquee()
-                    )
-                })
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = rowsLandscape,
-                singleLine = true,
-                onValueChange = {
-                    rowsLandscape = it
-                    qsShell.run("""sed -i 's/<integer name="config_qs_rows_landscape">[^<]*/<integer name="config_qs_rows_landscape">${it}/g' $qsPath/res/values/integers.xml""")
-                    qsShell.run("""sed -i 's/<integer name="quick_settings_max_rows">[^<]*/<integer name="quick_settings_max_rows">${it}/g' $qsPath/res/values-land/integers.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text("rowsLandscape", Modifier.basicMarquee()) })
-
-        }
-
-        Row {
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = qsQuickTileSize,
-                singleLine = true,
-                onValueChange = {
-                    qsQuickTileSize = it
-                    qsShell.run("""sed -i 's/<dimen name="qs_quick_tile_size">[^<]*/<dimen name="qs_quick_tile_size">${it}dip/g' $qsPath/res/values/dimens.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = {
-                    Text(
-                        text = "qsQuickTileSize", Modifier.basicMarquee()
-                    )
-                })
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            OutlinedTextField(modifier = Modifier.weight(1f),
-                value = qsTileHeight,
-                singleLine = true,
-                onValueChange = {
-                    qsTileHeight = it
-                    qsShell.run("""sed -i 's/<dimen name="qs_tile_height">[^<]*/<dimen name="qs_tile_height">${it}dip/g' $qsPath/res/values/dimens.xml""")
-
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text("qsTileHeight", Modifier.basicMarquee()) })
-        }
-
-
-
         Button(
             modifier = Modifier.fillMaxWidth(), onClick = {
                 buildOverlay(qsPath)
                 qsShell.run("""cmd overlay enable themed.qspanel.generic""")
                 showInterstitial(context) {}
 
-
             }, shape = CircleShape
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-
                 Text(text = "Build and update")
                 Icon(
                     modifier = Modifier.height(24.dp),

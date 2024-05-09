@@ -8,6 +8,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,9 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -87,19 +86,14 @@ fun FontsTab() {
 
         }
     }
-    Column {
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-
             Text(text = "Apply to:")
             Spacer(modifier = Modifier.width(8.dp))
 
             LaunchedEffect(font) {
                 //    Shell("su").run("cd ${GlobalVariables.modulePath}/onDemandCompiler/Font")
                 //  Shell("su").run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$font/g' "res/drawable/themed_qspanel.xml"""")
-
-                Shell("su").run("cmd vibrator_manager synced -f -d dumpstate oneshot 50")
-
 
             }
 

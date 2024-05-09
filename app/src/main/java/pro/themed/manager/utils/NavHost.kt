@@ -1,6 +1,5 @@
 package pro.themed.manager.utils
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -26,9 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -113,7 +109,6 @@ fun Navigation(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun getComposableForRoute(route: String): @Composable () -> Unit {
-
     val overlays = MainActivity.overlayList.overlayList.isEmpty()
     return if (overlays) {
         {
@@ -152,16 +147,12 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
+                                .background(textcol.copy(alpha = 0.05f), shape = CircleShape)
                         ) {
-                            val isDarkState = remember { mutableStateOf(false) }
-                            val backgroundColor by animateColorAsState(
-                                targetValue = if (isDarkState.value) textcol.copy(alpha = 0.1f) else Color.Transparent
-                            )
                             Row(modifier = Modifier
                                 .weight(1f)
                                 .clip(CircleShape)
-                                .background(if (isDark == "") textcol.copy(alpha = 0.1f) else Color.Transparent)
-
+                                .background(if (isDark == "") textcol.copy(alpha = 0.05f) else Color.Transparent, shape = CircleShape)
 
                                 .clickable { isDark = "" }
                                 .padding(16.dp),
@@ -181,11 +172,10 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 tint = textcol
                             )
 
-
                             Row(modifier = Modifier
                                 .weight(1f)
                                 .clip(CircleShape)
-                                .background(if (isDark == "-night") textcol.copy(alpha = 0.1f) else Color.Transparent)
+                                .background(if (isDark == "-night") textcol.copy(alpha = 0.05f) else Color.Transparent)
                                 .clickable { isDark = "-night" }
 
                                 .padding(16.dp),

@@ -67,11 +67,9 @@ fun IconsTab() {
 
 }
 
-
 //@Preview
 @Composable
 fun NavbarCard() {
-
     Card(
         border = BorderStroke(width = 1.dp, color = bordercol),
         modifier = Modifier
@@ -176,7 +174,6 @@ fun NavbarCard() {
                             "tecno"
                         )
 
-
                     }
                 }
             }
@@ -214,7 +211,6 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
         }
     }
 }
-
 
 @Composable
 fun IconPackCard() {
@@ -590,7 +586,6 @@ fun IconPackCard() {
                             }
                         }
 
-
                         Surface(modifier = Modifier
                             .fillMaxWidth()
                             .height(testdp.dp + 8.dp)
@@ -638,7 +633,6 @@ fun IconPackCard() {
                                 )
                             }
                         }
-
 
                         Surface(modifier = Modifier
                             .fillMaxWidth()
@@ -741,5 +735,4 @@ fun IconPackCard() {
         }
     }
 }
-
 

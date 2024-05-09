@@ -8,7 +8,6 @@ import android.widget.Toast
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 
-
 class MyBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val sharedPreferences: SharedPreferences =

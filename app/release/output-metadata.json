@@ -11,27 +11,11 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 240224,
-      "versionName": "24.02.24",
+      "versionCode": 240510,
+      "versionName": "24.05.10",
       "outputFile": "app-release.apk"
     }
   ],
   "elementType": "File",
-  "baselineProfiles": [
-    {
-      "minApi": 28,
-      "maxApi": 30,
-      "baselineProfiles": [
-        "baselineProfiles/1/app-release.dm"
-      ]
-    },
-    {
-      "minApi": 31,
-      "maxApi": 2147483647,
-      "baselineProfiles": [
-        "baselineProfiles/0/app-release.dm"
-      ]
-    }
-  ],
   "minSdkVersionForDexing": 26
 }

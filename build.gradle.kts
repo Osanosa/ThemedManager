@@ -11,3 +11,10 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
 }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+    compilerOptions.freeCompilerArgs.addAll(
+        "-P",
+        "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+        "plugin:androidx.compose.compiler.plugins.kotlin:nonSkippingGroupOptimization=true"
+    )
+}

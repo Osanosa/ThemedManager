@@ -18,16 +18,16 @@ android {
             keyAlias = "key0"
             keyPassword = "HolyLumi"
         }
-    }
-
-
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            val appName = "ThemedManager"
-            val versionName = defaultConfig.versionName
-            output.outputFile.renameTo(File(output.outputFile.parent, "${appName}-v${versionName}-${variant.buildType.name}.apk"))
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                val appName = "ThemedManager"
+                val versionName = defaultConfig.versionName
+                output.outputFile.renameTo(File(output.outputFile.parent, "${appName}-v${versionName}-${variant.buildType.name}.apk"))
+            }
         }
     }
+
+
     namespace = "pro.themed.manager"
     compileSdk = 34
 
@@ -50,24 +50,27 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isDebuggable = true
+            isJniDebuggable = true
         }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("release")
+            isJniDebuggable = true
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -77,7 +80,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -109,4 +111,6 @@ dependencies {
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
+
+    implementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
 }
