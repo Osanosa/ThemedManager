@@ -50,7 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.MainActivity
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.AndroidDownloader
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showRewarded
@@ -94,7 +94,7 @@ fun LinkButtons(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutPage() {
-    Surface(color = cardcol, modifier = Modifier.fillMaxSize()) {
+    Surface(color = background, modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             horizontalAlignment = CenterHorizontally
@@ -158,7 +158,7 @@ fun AboutPage() {
                 modifier = Modifier,
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = cardcol,
+                    containerColor = background,
                 )
             ) {
                 Row {

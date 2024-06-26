@@ -90,7 +90,7 @@ import pro.themed.manager.buildOverlay
 import pro.themed.manager.getContrastColor
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
@@ -254,8 +254,8 @@ fun FabricatedMonet(
         onClick = { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = textcol.copy(alpha = 0.05f),
-            contentColor = textcol
+            containerColor = contentcol.copy(alpha = 0.05f),
+            contentColor = contentcol
         ),
         modifier = Modifier.animateContentSize()
     ) {
@@ -263,7 +263,7 @@ fun FabricatedMonet(
             onClick = { /*TODO*/ },
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
-                containerColor = textcol.copy(alpha = 0.05f), contentColor = textcol
+                containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol
             ),
             modifier = Modifier
                 .animateContentSize()
@@ -324,7 +324,7 @@ fun FabricatedMonet(
                 } else {
                     12
                 }
-                val tilesize = (((configuration.screenWidthDp - 16 - 64) / divisor)).dp
+                val tilesize = (((configuration.screenWidthDp - 16 - 64 -16) / divisor)).dp
                 tilesize.log()
                 HorizontalDivider()
 
@@ -348,6 +348,7 @@ fun FabricatedMonet(
                         exit = fadeOut() + shrinkVertically(targetHeight = { it / 2 })
                     ) {
                         Column(
+                            horizontalAlignment = CenterHorizontally,
                             modifier = Modifier.imePadding()
                             // .background(cardcol)
                         ) {
@@ -428,7 +429,7 @@ fun FabricatedMonet(
                                                 color = sn1_10,
                                                 colorName = "sn1_10",
                                                 themedColor = C_10,
-                                                topStart = 50f
+                                                topStart = 25f
                                             )
                                             M3Tile(
                                                 color = sn1_50,
@@ -479,7 +480,7 @@ fun FabricatedMonet(
                                                 color = sn1_900,
                                                 colorName = "sn1_900",
                                                 themedColor = C_900,
-                                                bottomStart = 50f
+                                                bottomStart = 25f
                                             )
                                         }
 
@@ -685,7 +686,7 @@ fun FabricatedMonet(
                                                 color = sa3_10,
                                                 colorName = "sa3_10",
                                                 themedColor = C_10,
-                                                topEnd = 50f
+                                                topEnd = 25f
                                             )
                                             M3Tile(
                                                 color = sa3_50,
@@ -736,7 +737,7 @@ fun FabricatedMonet(
                                                 color = sa3_900,
                                                 colorName = "sa3_900",
                                                 themedColor = C_900,
-                                                bottomEnd = 50f
+                                                bottomEnd = 25f
                                             )
 
                                         }
@@ -1371,9 +1372,9 @@ fun FabricatedMonet(
                                             .clip(RoundedCornerShape(8.dp))
                                             .background(
                                                 if (colorName == selectedColorReference) {
-                                                    textcol.copy(alpha = 0.32f)
+                                                    contentcol.copy(alpha = 0.32f)
                                                 } else {
-                                                    textcol.copy(alpha = 0.12f)
+                                                    contentcol.copy(alpha = 0.12f)
                                                 }
                                             )
                                             .clickable(onClick = {

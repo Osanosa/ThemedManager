@@ -22,20 +22,20 @@ fun ThemedManagerTheme(
     dynamicColor: Boolean = false, content: @Composable () -> Unit
 ) {
     val DarkColorScheme = darkColorScheme(
-        surface = cardcol,
-        background = cardcol,
+        surface = background,
+        background = background,
 
-        onSurface = textcol,
-        onBackground = textcol,
-        onPrimary = textcol,
-        onPrimaryContainer = textcol,
+        onSurface = pro.themed.manager.ui.theme.contentcol,
+        onBackground = pro.themed.manager.ui.theme.contentcol,
+        onPrimary = pro.themed.manager.ui.theme.contentcol,
+        onPrimaryContainer = pro.themed.manager.ui.theme.contentcol,
     )
 
     val LightColorScheme = lightColorScheme(
-        surface = cardcol,
-        background = cardcol,
-        onSurface = textcol,
-        onBackground = textcol,
+        surface = background,
+        background = background,
+        onSurface = pro.themed.manager.ui.theme.contentcol,
+        onBackground = pro.themed.manager.ui.theme.contentcol,
 
         /* Other default colors to override
         primary = Purple40,
@@ -68,7 +68,7 @@ fun ThemedManagerTheme(
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.5.sp,
-            color = textcol
+            color = pro.themed.manager.ui.theme.contentcol
         )
         /* Other default text styles to override
         titleLarge = TextStyle(

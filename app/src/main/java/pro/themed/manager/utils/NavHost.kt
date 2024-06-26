@@ -48,7 +48,7 @@ import pro.themed.manager.comps.MiscTab
 import pro.themed.manager.comps.QsPanel
 import pro.themed.manager.comps.SettingsPage
 import pro.themed.manager.comps.ToolboxPage
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.contentcol
 
 @ExperimentalMaterial3Api
 @Composable
@@ -143,16 +143,17 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                             .verticalScroll(rememberScrollState())
                             .padding(horizontal = 8.dp)
                     ) {
+                        Spacer(Modifier.height(32.dp))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
-                                .background(textcol.copy(alpha = 0.05f), shape = CircleShape)
+                                .background(contentcol.copy(alpha = 0.05f), shape = CircleShape)
                         ) {
                             Row(modifier = Modifier
                                 .weight(1f)
                                 .clip(CircleShape)
-                                .background(if (isDark == "") textcol.copy(alpha = 0.05f) else Color.Transparent, shape = CircleShape)
+                                .background(if (isDark == "") contentcol.copy(alpha = 0.05f) else Color.Transparent, shape = CircleShape)
 
                                 .clickable { isDark = "" }
                                 .padding(16.dp),
@@ -160,7 +161,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 Icon(
                                     painter = painterResource(id = R.drawable.light_mode_24px),
                                     contentDescription = "Light",
-                                    tint = textcol
+                                    tint = contentcol
                                 )
                                 Text(text = "Light")
                             }
@@ -169,13 +170,13 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 painter = painterResource(id = R.drawable.developer_mode_24px),
                                 contentDescription = null,
                                 modifier = Modifier.padding(16.dp),
-                                tint = textcol
+                                tint = contentcol
                             )
 
                             Row(modifier = Modifier
                                 .weight(1f)
                                 .clip(CircleShape)
-                                .background(if (isDark == "-night") textcol.copy(alpha = 0.05f) else Color.Transparent)
+                                .background(if (isDark == "-night") contentcol.copy(alpha = 0.05f) else Color.Transparent)
                                 .clickable { isDark = "-night" }
 
                                 .padding(16.dp),
@@ -183,7 +184,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 Icon(
                                     painter = painterResource(id = R.drawable.dark_mode_24px),
                                     contentDescription = "Dark",
-                                    tint = textcol
+                                    tint = contentcol
                                 )
                                 Text(text = "Dark")
                             }

@@ -49,7 +49,7 @@ import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
 import pro.themed.manager.log
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit
 fun ToolboxPage() {
     val context = LocalContext.current
     Surface(
-        modifier = Modifier.fillMaxSize(), color = cardcol
+        modifier = Modifier.fillMaxSize(), color = background
     ) {
         var progress by rememberSaveable {
             mutableStateOf(false)
@@ -73,7 +73,7 @@ fun ToolboxPage() {
                     context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-
+                Spacer(Modifier.height(32.dp))
 
                 Column(
                     Modifier.padding(horizontal = 8.dp),
@@ -327,9 +327,7 @@ fun ToolboxPage() {
                                 )
                             }
                             Row {
-                                OutlinedTextField(modifier = Modifier
-                                    .fillMaxWidth(0.5f)
-                                    .padding(horizontal = 8.dp),
+                                OutlinedTextField(modifier = Modifier.fillMaxWidth(0.5f),
                                     value = MaxRate,
                                     singleLine = true,
                                     onValueChange = {
@@ -342,9 +340,8 @@ fun ToolboxPage() {
                                             modifier = Modifier.basicMarquee()
                                         )
                                     })
-                                OutlinedTextField(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp),
+                                Spacer(modifier = Modifier.width(8.dp))
+                                OutlinedTextField(modifier = Modifier.fillMaxWidth(),
                                     value = MinRate,
                                     singleLine = true,
                                     onValueChange = {
@@ -361,6 +358,7 @@ fun ToolboxPage() {
                         })
 
                 }
+                Spacer(Modifier.height(32.dp))
 
             }
             AnimatedVisibility(

@@ -57,7 +57,7 @@ import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
-import pro.themed.manager.ui.theme.cardcol
+import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
 import pro.themed.manager.utils.showInterstitial
 
@@ -99,7 +99,7 @@ fun QSTileCard() {
                 qsShell.run("sed -i 's/@drawable\\/[^\"]*/@drawable\\/$overlayname/g' \"res/drawable/ic_qs_circle.xml\"")
             }, modifier = Modifier
                 .size(testdp.dp)
-                .background(color = cardcol)
+                .background(color = background)
         ) {
             Image(
                 modifier = Modifier

@@ -7,6 +7,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
+    alias(libs.plugins.compose.compiler)
 
 }
 
@@ -51,8 +52,8 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
-            isDebuggable = true
-            isJniDebuggable = true
+            //isDebuggable = true
+            // isJniDebuggable = true
         }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("release")
@@ -68,9 +69,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -102,7 +100,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("io.github.theapache64:rebugger:1.0.0-rc02")
+    implementation("io.github.theapache64:rebugger:1.0.0-rc03")
 
 
     implementation(libs.ktsh)
@@ -112,5 +110,5 @@ dependencies {
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
-    implementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
+    testImplementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
 }

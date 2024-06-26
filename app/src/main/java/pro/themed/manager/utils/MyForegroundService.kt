@@ -58,7 +58,7 @@ class MyForegroundService : Service() {
         val actualIntent = intent ?: Intent() // Use an empty intent if it's null
 
         Thread {}.start()
-        shell1.run("getevent | grep 0003") {
+        shell1.run("getevent") {
             onStdOut = {
                 countdown = 3 // Reset countdown to the initial value
                 serviceScope.launch {

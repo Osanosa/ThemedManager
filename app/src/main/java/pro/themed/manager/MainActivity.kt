@@ -11,6 +11,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +30,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -79,7 +84,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.comps.NavigationRailSample
 import pro.themed.manager.ui.theme.ThemedManagerTheme
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.contentcol
+import pro.themed.manager.ui.theme.cookieBackdrop
+import pro.themed.manager.ui.theme.cookieForeground
 import pro.themed.manager.utils.GlobalVariables.magiskVersion
 import pro.themed.manager.utils.GlobalVariables.themedId
 import pro.themed.manager.utils.GlobalVariables.whoami
@@ -96,6 +103,30 @@ data class OverlayListData(
     val enabledOverlays: List<String>,
     val disabledOverlays: List<String>,
 )
+
+@Composable
+fun CookieCard(
+    modifier: Modifier = Modifier,  onClick: () -> Unit = {}, content: @Composable () -> Unit,
+) {
+    Card(
+        onClick = { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cookieBackdrop, contentColor = contentcol
+        ),
+        modifier = Modifier.animateContentSize()
+    ) {
+        Card(
+            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
+                containerColor = cookieForeground, contentColor = contentcol
+            ), modifier = Modifier
+                .animateContentSize()
+                .padding(8.dp)
+        ) {
+            content()
+        }
+    }
+}
 
 @Composable
 fun AdmobBanner() {
@@ -214,6 +245,7 @@ class MainActivity : ComponentActivity() {
 
         }
         setContent {
+            enableEdgeToEdge()
             LaunchedEffect(Unit) {
                 if (!SharedPreferencesManager.getSharedPreferences()
                         .getBoolean("isContributor", false)
@@ -311,8 +343,7 @@ class MainActivity : ComponentActivity() {
             }
             HorizontalPager(
                 state = pagerState, Modifier.weight(1f),
-            ) {
-                    index ->
+            ) { index ->
 
                 when (index) {
                     0 -> {
@@ -384,14 +415,14 @@ class MainActivity : ComponentActivity() {
                     when (pagerState.currentPage) {
                         0 -> {
                             Text(
-                                text = "Skip", color = textcol
+                                text = "Skip", color = contentcol
                             )
 
                         }
 
                         else -> {
                             Text(
-                                text = "Back", color = textcol
+                                text = "Back", color = contentcol
                             )
                         }
                     }
@@ -424,21 +455,21 @@ class MainActivity : ComponentActivity() {
                     when (pagerState.currentPage) {
                         pageCount - 1 -> {
                             Text(
-                                text = "Get started", color = textcol
+                                text = "Get started", color = contentcol
                             )
 
                         }
 
                         1 -> {
                             Text(
-                                text = "Grant access", color = textcol
+                                text = "Grant access", color = contentcol
                             )
 
                         }
 
                         else -> {
                             Text(
-                                text = "Next", color = textcol
+                                text = "Next", color = contentcol
                             )
                         }
                     }
@@ -477,7 +508,7 @@ fun OnBoarding(image: Int, text: String) {
                 modifier = Modifier.padding(horizontal = 30.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 16.sp,
-                color = textcol
+                color = contentcol
             )
         }
     } else {
@@ -502,7 +533,7 @@ fun OnBoarding(image: Int, text: String) {
                     .weight(0.2f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
-                color = textcol
+                color = contentcol
             )
         }
     }
@@ -583,14 +614,14 @@ fun overlayEnable(overlayname: String) {
 fun buildOverlay(path: String = "") {
     CoroutineScope(Dispatchers.IO).launch {
         val compileShell = Shell("su")
-       /* compileShell.addOnStderrLineListener(object : Shell.OnLineListener {
+        compileShell.addOnStderrLineListener(object : Shell.OnLineListener {
             override fun onLine(line: String) {
                 CoroutineScope(Dispatchers.Main).launch {
                     Toast.makeText(MainActivity.appContext, line, Toast.LENGTH_SHORT).show()
                     line.log()
                 }
             }
-        })*/
+        })
         compileShell.addOnCommandResultListener(object : Shell.OnCommandResultListener {
             override fun onResult(result: Shell.Command.Result) {
                 result.log()

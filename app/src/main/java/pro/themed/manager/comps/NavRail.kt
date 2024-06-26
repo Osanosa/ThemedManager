@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import pro.themed.manager.ui.theme.bordercol
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.NavigationItems
 
 @Stable
@@ -56,7 +56,7 @@ fun NavigationRailSample(
 
     NavigationRail(
         containerColor = bordercol,
-        contentColor = textcol,
+        contentColor = contentcol,
 
         modifier = Modifier
 
@@ -116,10 +116,10 @@ fun CustomNavigationRailItem(item: NavigationItems, navController: NavController
     }
     NavigationRailItem(
         colors = NavigationRailItemDefaults.colors(
-            selectedIconColor = textcol,
-            selectedTextColor = textcol,
-            unselectedTextColor = textcol.copy(0.4f),
-            unselectedIconColor = textcol.copy(0.4f),
+            selectedIconColor = contentcol,
+            selectedTextColor = contentcol,
+            unselectedTextColor = contentcol.copy(0.4f),
+            unselectedIconColor = contentcol.copy(0.4f),
         ),
 
         icon = {

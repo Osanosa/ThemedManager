@@ -59,7 +59,7 @@ import pro.themed.manager.MainActivity.Companion.isDark
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
@@ -74,14 +74,14 @@ fun AccentsAAPT() {
     Card(
         onClick = { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = textcol.copy(alpha = 0.05f), contentColor = textcol),
+        colors = CardDefaults.cardColors(containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol),
         modifier = Modifier.animateContentSize()
     ) {
         Card(
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
-                containerColor = textcol.copy(alpha = 0.05f),
-                contentColor = textcol
+                containerColor = contentcol.copy(alpha = 0.05f),
+                contentColor = contentcol
             ),
             modifier = Modifier
                 .animateContentSize()

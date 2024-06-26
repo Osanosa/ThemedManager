@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,13 +62,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.themed.manager.AdmobBanner
+import pro.themed.manager.CookieCard
 import pro.themed.manager.MainActivity.Companion.overlayList
 import pro.themed.manager.R
 import pro.themed.manager.buildOverlay
 import pro.themed.manager.log
 import pro.themed.manager.overlayEnable
-import pro.themed.manager.ui.theme.cardcol
-import pro.themed.manager.ui.theme.textcol
+import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
 import kotlin.math.roundToInt
 
@@ -94,7 +95,7 @@ fun Slideritem(
                 overlayName
             )
         }) {
-        Surface {
+
             Column(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
@@ -194,7 +195,7 @@ fun Slideritem(
 
         }
     }
-}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
@@ -231,13 +232,14 @@ fun HeaderRow(
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = textcol.copy(alpha = 0.05f),
-            contentColor = textcol
+            containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
+            contentColor = pro.themed.manager.ui.theme.contentcol
         ),
     ) {
         Card(
             shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                containerColor = textcol.copy(alpha = 0.05f), contentColor = textcol
+                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
+                contentColor = pro.themed.manager.ui.theme.contentcol
             ), modifier = Modifier.padding(8.dp)
         ) {
             Column(
@@ -248,23 +250,23 @@ fun HeaderRow(
                 // horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (showSwitch && switchDescription.isEmpty()) {
+                    Text(
+                        text = header,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column(Modifier.weight(1f)) {
+                        if (subHeader.isNotEmpty()) {
                             Text(
-                                text = header,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.bodyMedium
+                                text = subHeader,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
                             )
-                            if (subHeader.isNotEmpty()) {
-                                Text(
-                                    text = subHeader,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            }
                         }
+
 
                         Switch(
                             checked = checkedState, onCheckedChange = {
@@ -320,7 +322,9 @@ fun HeaderRow(
                             modifier = Modifier.weight(button1weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                            )
                         ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
                     }
 
@@ -330,7 +334,9 @@ fun HeaderRow(
                             modifier = Modifier.weight(button2weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                            )
                         ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
                     }
                     if (button3text.isNotEmpty()) {
@@ -339,7 +345,9 @@ fun HeaderRow(
                             modifier = Modifier.weight(button3weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                            )
                         ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
                     }
                     if (button4text.isNotEmpty()) {
@@ -348,7 +356,9 @@ fun HeaderRow(
                             modifier = Modifier.weight(button4weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = textcol.copy(alpha = 0.1f))
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                            )
                         ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
                     }
                 }
@@ -363,9 +373,16 @@ fun HeaderRow(
 @Composable
 fun MiscTab() {
     Surface(
-        modifier = Modifier.fillMaxSize(), color = cardcol
+        modifier = Modifier.fillMaxSize(), color = background
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Spacer(Modifier.height(32.dp))
+
             AdmobBanner()
             @Composable
             fun MiscTextField(
@@ -375,10 +392,9 @@ fun MiscTab() {
                 file: String,
                 overlay: String,
                 modifier: Modifier,
-                drawable: Int
             ) {
                 var input by remember { mutableStateOf(input) }
-                OutlinedTextField(modifier = modifier,
+                OutlinedTextField(modifier = modifier.padding(bottom = 2.dp),
                     value = input,
                     singleLine = true,
                     onValueChange = {
@@ -394,13 +410,7 @@ fun MiscTab() {
                     },
                     placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = drawable),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
+
                     trailingIcon = {
                         IconButton(onClick = {
                             buildOverlay(path)
@@ -451,87 +461,125 @@ fun MiscTab() {
                 )
             }
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(Unit) {}
+
+            CookieCard {
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.rounded_corner_48px),
+                        null,
+                        Modifier
+                            .size(24.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    MiscTextField(
+                        input = rounded_corner_radius,
+                        path = cornersPath,
+                        resource = "rounded_corner_radius",
+                        file = """dimens""",
+                        overlay = """themed.corners.generic""",
+                        modifier = Modifier.weight(1f),
+                    )
+
+                }
+            }
+            CookieCard {
+
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.view_week_48px),
+                        null,
+                        Modifier
+                            .size(24.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+
+                    //columns portrait
+                    MiscTextField(
+                        input = config_qs_columns_portrait,
+                        path = qsGridGenericPath + "ColumnsPortraitGeneric/",
+                        resource = "config_qs_columns_portrait",
+                        file = "integers",
+                        overlay = "themed.qsgrid.columnsportrait.generic",
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
+
+                    //columns landscape
+                    MiscTextField(
+                        input = config_qs_columns_landscape,
+                        path = qsGridGenericPath + "ColumnsLandscapeGeneric/",
+                        resource = "config_qs_columns_landscape",
+                        file = "integers",
+                        overlay = "themed.qsgrid.columnslandscape.generic",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                }
+            }
+            CookieCard {
+
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.table_rows_48px),
+                        null,
+                        Modifier
+                            .size(24.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+
+                    //rows portrait
+                    MiscTextField(
+                        input = config_qs_rows_portrait,
+                        path = qsGridGenericPath + "RowsPortraitGeneric/",
+                        resource = "config_qs_rows_portrait",
+                        file = "integers",
+                        overlay = "themed.qsgrid.rowsportrait.generic",
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
+
+                    //rows landscape
+                    MiscTextField(
+                        input = config_qs_rows_landscape,
+                        path = qsGridGenericPath + "RowsLandscapeGeneric/",
+                        resource = "config_qs_rows_landscape",
+                        file = "integers",
+                        overlay = "themed.qsgrid.rowslandscape.generic",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
 
-            Row {
-                MiscTextField(
-                    input = rounded_corner_radius,
-                    path = cornersPath,
-                    resource = "rounded_corner_radius",
-                    file = """dimens""",
-                    overlay = """themed.corners.generic""",
-                    modifier = Modifier.weight(1f),
-                    drawable = R.drawable.rounded_corner_48px
-                )
+            CookieCard {
 
-            }
-            Row {
-                //columns portrait
-                MiscTextField(
-                    input = config_qs_columns_portrait,
-                    path = qsGridGenericPath + "ColumnsPortraitGeneric/",
-                    resource = "config_qs_columns_portrait",
-                    file = "integers",
-                    overlay = "themed.qsgrid.columnsportrait.generic",
-                    modifier = Modifier.weight(1f),
-                    drawable = R.drawable.view_week_48px
+                Slideritem(
+                    drawable = R.drawable.table_rows_48px,
+                    header = stringResource(R.string.qsquicktilesize),
+                    sliderSteps = 1,
+                    sliderStepValue = 20,
+                    minSliderValue = 60f,
+                    maxSliderValue = 80f,
+                    overlayName = "qsquicktilesize"
                 )
-
-                //columns landscape
-                MiscTextField(
-                    input = config_qs_columns_landscape,
-                    path = qsGridGenericPath + "ColumnsLandscapeGeneric/",
-                    resource = "config_qs_columns_landscape",
-                    file = "integers",
-                    overlay = "themed.qsgrid.columnslandscape.generic",
-                    modifier = Modifier.weight(1f),
-                    drawable = R.drawable.view_week_48px
-                )
-
-            }
-            Row {
-                //rows portrait
-                MiscTextField(
-                    input = config_qs_rows_portrait,
-                    path = qsGridGenericPath + "RowsPortraitGeneric/",
-                    resource = "config_qs_rows_portrait",
-                    file = "integers",
-                    overlay = "themed.qsgrid.rowsportrait.generic",
-                    modifier = Modifier.weight(1f),
-                    drawable = R.drawable.table_rows_48px
-                )
-                //rows landscape
-                MiscTextField(
-                    input = config_qs_rows_landscape,
-                    path = qsGridGenericPath + "RowsLandscapeGeneric/",
-                    resource = "config_qs_rows_landscape",
-                    file = "integers",
-                    overlay = "themed.qsgrid.rowslandscape.generic",
-                    modifier = Modifier.weight(1f),
-                    drawable = R.drawable.table_rows_48px
+                Slideritem(
+                    drawable = R.drawable.table_rows_48px,
+                    header = stringResource(R.string.qstileheight),
+                    sliderSteps = 1,
+                    sliderStepValue = 20,
+                    minSliderValue = 60f,
+                    maxSliderValue = 80f,
+                    overlayName = "qstileheight"
                 )
             }
 
-            Slideritem(
-                drawable = R.drawable.table_rows_48px,
-                header = stringResource(R.string.qsquicktilesize),
-                sliderSteps = 1,
-                sliderStepValue = 20,
-                minSliderValue = 60f,
-                maxSliderValue = 80f,
-                overlayName = "qsquicktilesize"
-            )
-
-            Slideritem(
-                drawable = R.drawable.table_rows_48px,
-                header = stringResource(R.string.qstileheight),
-                sliderSteps = 1,
-                sliderStepValue = 20,
-                minSliderValue = 60f,
-                maxSliderValue = 80f,
-                overlayName = "qstileheight"
-            )
             HeaderRow(
                 header = "RoundIconMask",
                 subHeader = "Makes app icons masks a perfect circle",

@@ -7,12 +7,12 @@
     <path
         android:fillAlpha="0.6"
         android:fillColor="@color/DrawableColor"
-        android:pathData="M24 0c13.26 0 24 10.75 24 24S37.26 48 24 48 0 37.26 0 24 10.75 0 24 0z" />
+        android:pathData="M24 0c13.3 0 24 10.8 24 24S37.3 48 24 48 0 37.3 0 24 10.8 0 24 0z" />
     <path
         android:fillAlpha="0.8"
         android:fillColor="@color/DrawableColor"
         android:pathData="M24 4.8c10.6 0 19.2 8.6 19.2 19.2S34.6 43.2 24 43.2 4.8 34.6 4.8 24 13.4 4.8 24 4.8z" />
     <path
         android:fillColor="@color/DrawableColor"
-        android:pathData="M24 9.6c7.95 0 14.4 6.45 14.4 14.4S31.95 38.4 24 38.4 9.6 31.95 9.6 24 16.05 9.6 24 9.6z" />
+        android:pathData="M24 9.6c8 0 14.4 6.5 14.4 14.4S32 38.4 24 38.4 9.6 32 9.6 24 16.1 9.6 24 9.6z" />
 </vector>

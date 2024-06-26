@@ -4,23 +4,19 @@
 package pro.themed.manager.comps
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -41,26 +37,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.AdmobBanner
+import pro.themed.manager.CookieCard
 import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.overlayEnable
+import pro.themed.manager.ui.theme.background
 import pro.themed.manager.ui.theme.bordercol
-import pro.themed.manager.ui.theme.cardcol
 
 @Composable
 fun IconsTab() {
     Surface(
-        modifier = Modifier.fillMaxSize(), color = cardcol
+        modifier = Modifier.fillMaxSize(), color = background
     ) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Spacer(Modifier.height(16.dp))
             AdmobBanner()
 
-            NavbarCard()
-            IconPackCard()
+            CookieCard {
+
+                NavbarCard()
+            }
+            CookieCard {
+
+                IconPackCard()
+            }
 
         }
     }
@@ -70,16 +75,7 @@ fun IconsTab() {
 //@Preview
 @Composable
 fun NavbarCard() {
-    Card(
-        border = BorderStroke(width = 1.dp, color = bordercol),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(8.dp),
-        elevation = (CardDefaults.cardElevation(0.dp)),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(cardcol)
-    ) {
+
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 8
 
         var expanded by remember { mutableStateOf(true) }
@@ -108,7 +104,7 @@ fun NavbarCard() {
 
             HorizontalDivider(thickness = 1.dp, color = bordercol)
             AnimatedVisibility(expanded) {
-                Surface {
+
                     Column {
                         Navbar(
                             testdp,
@@ -175,9 +171,9 @@ fun NavbarCard() {
                         )
 
                     }
-                }
+
             }
-        }
+
     }
 }
 
@@ -216,20 +212,12 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
 fun IconPackCard() {
     val context = LocalContext.current
 
-    Card(
-        border = BorderStroke(width = 1.dp, color = bordercol),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(0.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(cardcol)
-    ) {
+
         val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 12
 
         var expanded by remember { mutableStateOf(true) }
-        Column(modifier = Modifier.clickable { expanded = !expanded }) {
+        Column(modifier = Modifier.clickable { expanded = !expanded },
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -255,484 +243,183 @@ fun IconPackCard() {
             HorizontalDivider(thickness = 1.dp, color = bordercol)
 
             AnimatedVisibility(expanded) {
-                Surface {
-                    Column {
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.acherus.android")
-                            overlayEnable("iconpack.acherus.systemui")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Archeous", fontSize = 18.sp)
+
+                @Composable
+                fun IconPackRow(
+                    label: String,
+                    overlayCommands: List<String>,
+                    iconResIds: List<Int>,
+                    modifier: Modifier = Modifier
+                ) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(testdp.dp + 8.dp)
+                                .padding(2.dp)
+                                .clickable { overlayCommands.forEach { overlayEnable(it) } }
+                        ) {
+                            Text(text = label, fontSize = 18.sp)
+                            iconResIds.forEach { resId ->
                                 Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_archerus_airplane),
+                                    imageVector = ImageVector.vectorResource(id = resId),
                                     contentDescription = null,
                                     Modifier.size(testdp.dp)
                                 )
                             }
                         }
 
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.circular.android")
-                            overlayEnable("iconpack.circular.launcher")
-                            overlayEnable("iconpack.circular.settings")
-                            overlayEnable("iconpack.circular.systemui")
-                            overlayEnable("iconpack.circular.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Circular   ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_circular_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
+                }
 
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.filled.android")
-                            overlayEnable("iconpack.filled.launcher")
-                            overlayEnable("iconpack.filled.settings")
-                            overlayEnable("iconpack.filled.systemui")
-                            overlayEnable("iconpack.filled.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Filled       ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_filled_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.kai.android")
-                            overlayEnable("iconpack.kai.launcher")
-                            overlayEnable("iconpack.kai.settings")
-                            overlayEnable("iconpack.kai.systemui")
-                            overlayEnable("iconpack.kai.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Kai           ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_kai_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.outline.android")
-                            overlayEnable("iconpack.outline.launcher")
-                            overlayEnable("iconpack.outline.settings")
-                            overlayEnable("iconpack.outline.systemui")
-                            overlayEnable("iconpack.outline.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Outline    ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_outline_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.oos.android")
-                            overlayEnable("iconpack.oos.launcher")
-                            overlayEnable("iconpack.oos.settings")
-                            overlayEnable("iconpack.oos.systemui")
-                            overlayEnable("iconpack.oos.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "OOS         ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_oos_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.pui.android")
-                            overlayEnable("iconpack.pui.launcher")
-                            overlayEnable("iconpack.pui.settings")
-                            overlayEnable("iconpack.pui.systemui")
-                            overlayEnable("iconpack.pui.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "PUI           ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_pui_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
 
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.rounded.android")
-                            overlayEnable("iconpack.rounded.launcher")
-                            overlayEnable("iconpack.rounded.settings")
-                            overlayEnable("iconpack.rounded.systemui")
-                            overlayEnable("iconpack.rounded.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Rounded ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_rounded_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
+                    val iconPacks = listOf(
+                        Triple("Archeous", listOf("iconpack.acherus.android", "iconpack.acherus.systemui"), listOf(
+                            R.drawable.iconpack_archerus_wifi_signal_3,
+                            R.drawable.iconpack_archerus_bluetooth_transient_animation,
+                            R.drawable.iconpack_archerus_dnd,
+                            R.drawable.iconpack_archerus_flashlight,
+                            R.drawable.iconpack_archerus_auto_rotate,
+                            R.drawable.iconpack_archerus_airplane
+                        )),
+                        Triple("Circular   ", listOf(
+                            "iconpack.circular.android",
+                            "iconpack.circular.launcher",
+                            "iconpack.circular.settings",
+                            "iconpack.circular.systemui",
+                            "iconpack.circular.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_circular_wifi_signal_3,
+                            R.drawable.iconpack_circular_bluetooth_transient_animation,
+                            R.drawable.iconpack_circular_dnd,
+                            R.drawable.iconpack_circular_flashlight,
+                            R.drawable.iconpack_circular_auto_rotate,
+                            R.drawable.iconpack_circular_airplane
+                        )),
+                        Triple("Filled       ", listOf(
+                            "iconpack.filled.android",
+                            "iconpack.filled.launcher",
+                            "iconpack.filled.settings",
+                            "iconpack.filled.systemui",
+                            "iconpack.filled.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_filled_wifi_signal_3,
+                            R.drawable.iconpack_filled_bluetooth_transient_animation,
+                            R.drawable.iconpack_filled_dnd,
+                            R.drawable.iconpack_filled_flashlight,
+                            R.drawable.iconpack_filled_auto_rotate,
+                            R.drawable.iconpack_filled_airplane
+                        )),
+                        Triple("Kai           ", listOf(
+                            "iconpack.kai.android",
+                            "iconpack.kai.launcher",
+                            "iconpack.kai.settings",
+                            "iconpack.kai.systemui",
+                            "iconpack.kai.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_kai_wifi_signal_3,
+                            R.drawable.iconpack_kai_bluetooth_transient_animation,
+                            R.drawable.iconpack_kai_dnd,
+                            R.drawable.iconpack_kai_flashlight,
+                            R.drawable.iconpack_kai_auto_rotate,
+                            R.drawable.iconpack_kai_airplane
+                        )),
+                        Triple("Outline    ", listOf(
+                            "iconpack.outline.android",
+                            "iconpack.outline.launcher",
+                            "iconpack.outline.settings",
+                            "iconpack.outline.systemui",
+                            "iconpack.outline.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_outline_wifi_signal_3,
+                            R.drawable.iconpack_outline_bluetooth_transient_animation,
+                            R.drawable.iconpack_outline_dnd,
+                            R.drawable.iconpack_outline_flashlight,
+                            R.drawable.iconpack_outline_auto_rotate,
+                            R.drawable.iconpack_outline_airplane
+                        )),
+                        Triple("OOS         ", listOf(
+                            "iconpack.oos.android",
+                            "iconpack.oos.launcher",
+                            "iconpack.oos.settings",
+                            "iconpack.oos.systemui",
+                            "iconpack.oos.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_oos_wifi_signal_3,
+                            R.drawable.iconpack_oos_bluetooth_transient_animation,
+                            R.drawable.iconpack_oos_dnd,
+                            R.drawable.iconpack_oos_flashlight,
+                            R.drawable.iconpack_oos_auto_rotate,
+                            R.drawable.iconpack_oos_airplane
+                        )),
+                        Triple("PUI           ", listOf(
+                            "iconpack.pui.android",
+                            "iconpack.pui.launcher",
+                            "iconpack.pui.settings",
+                            "iconpack.pui.systemui",
+                            "iconpack.pui.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_pui_wifi_signal_3,
+                            R.drawable.iconpack_pui_bluetooth_transient_animation,
+                            R.drawable.iconpack_pui_dnd,
+                            R.drawable.iconpack_pui_flashlight,
+                            R.drawable.iconpack_pui_auto_rotate,
+                            R.drawable.iconpack_pui_airplane
+                        )),
+                        Triple("Rounded ", listOf(
+                            "iconpack.rounded.android",
+                            "iconpack.rounded.launcher",
+                            "iconpack.rounded.settings",
+                            "iconpack.rounded.systemui",
+                            "iconpack.rounded.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_rounded_wifi_signal_3,
+                            R.drawable.iconpack_rounded_bluetooth_transient_animation,
+                            R.drawable.iconpack_rounded_dnd,
+                            R.drawable.iconpack_rounded_flashlight,
+                            R.drawable.iconpack_rounded_auto_rotate,
+                            R.drawable.iconpack_rounded_airplane
+                        )),
+                        Triple("Sam         ", listOf(
+                            "iconpack.sam.android",
+                            "iconpack.sam.launcher",
+                            "iconpack.sam.settings",
+                            "iconpack.sam.systemui",
+                            "iconpack.sam.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_sam_wifi_signal_3,
+                            R.drawable.iconpack_sam_bluetooth_transient_animation,
+                            R.drawable.iconpack_sam_dnd,
+                            R.drawable.iconpack_sam_flashlight,
+                            R.drawable.iconpack_sam_auto_rotate,
+                            R.drawable.iconpack_sam_airplane
+                        )),
+                        Triple("Victor      ", listOf(
+                            "iconpack.victor.android",
+                            "iconpack.victor.launcher",
+                            "iconpack.victor.settings",
+                            "iconpack.victor.systemui",
+                            "iconpack.victor.themepicker"
+                        ), listOf(
+                            R.drawable.iconpack_victor_wifi_signal_3,
+                            R.drawable.iconpack_victor_bluetooth_transient_animation,
+                            R.drawable.iconpack_victor_dnd,
+                            R.drawable.iconpack_victor_flashlight,
+                            R.drawable.iconpack_victor_auto_rotate,
+                            R.drawable.iconpack_victor_airplane
+                        ))
+                    )
 
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.sam.android")
-                            overlayEnable("iconpack.sam.launcher")
-                            overlayEnable("iconpack.sam.settings")
-                            overlayEnable("iconpack.sam.systemui")
-                            overlayEnable("iconpack.sam.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Sam         ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_sam_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
-                        Surface(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(testdp.dp + 8.dp)
-                            .padding(2.dp), color = cardcol, onClick = {
-                            overlayEnable("iconpack.victor.android")
-                            overlayEnable("iconpack.victor.launcher")
-                            overlayEnable("iconpack.victor.settings")
-                            overlayEnable("iconpack.victor.systemui")
-                            overlayEnable("iconpack.victor.themepicker")
-                        }) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Victor      ", fontSize = 18.sp)
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_wifi_signal_3),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_bluetooth_transient_animation),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_dnd),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_flashlight),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_auto_rotate),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.iconpack_victor_airplane),
-                                    contentDescription = null,
-                                    Modifier.size(testdp.dp)
-                                )
-                            }
-                        }
+                Column {
 
+                    iconPacks.forEach { (label, commands, icons) ->
+                        IconPackRow(label, commands, icons)
                     }
                 }
+
+
             }
         }
-    }
+
 }
 
