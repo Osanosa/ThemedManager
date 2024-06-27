@@ -49,7 +49,7 @@ firebase-inappmessaging-display = { group = "com.google.firebase", name = "fireb
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
 
 [plugins]
-android-application = { id = "com.android.application", version = "8.6.0-alpha07" }
+android-application = { id = "com.android.application", version.ref = "gradle" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
