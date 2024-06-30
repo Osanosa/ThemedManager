@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
+import pro.themed.manager.components.HeaderRow
 
 @Composable
 fun SettingsPage() {
@@ -34,8 +35,10 @@ fun SettingsPage() {
             context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp),
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Spacer(Modifier.height(32.dp))

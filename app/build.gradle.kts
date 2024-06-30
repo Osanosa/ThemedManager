@@ -23,7 +23,12 @@ android {
             variant.outputs.all { output ->
                 val appName = "ThemedManager"
                 val versionName = defaultConfig.versionName
-                output.outputFile.renameTo(File(output.outputFile.parent, "${appName}-v${versionName}-${variant.buildType.name}.apk"))
+                output.outputFile.renameTo(
+                    File(
+                        output.outputFile.parent,
+                        "${appName}-v${versionName}-${variant.buildType.name}.apk"
+                    )
+                )
             }
         }
     }
@@ -50,7 +55,10 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("release")
             //isDebuggable = true
             // isJniDebuggable = true
@@ -105,10 +113,19 @@ dependencies {
 
     implementation(libs.ktsh)
     // Splash API
-    implementation (libs.androidx.core.splashscreen)
+    implementation(libs.androidx.core.splashscreen)
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
     testImplementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+
+    // For interop APIs with Material 3
+    implementation("androidx.glance:glance-material3:1.1.0")
+
+    // For interop APIs with Material 2
+    implementation("androidx.glance:glance-material:1.1.0")
 }

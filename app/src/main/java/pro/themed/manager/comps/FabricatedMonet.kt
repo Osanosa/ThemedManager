@@ -254,8 +254,7 @@ fun FabricatedMonet(
         onClick = { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = contentcol.copy(alpha = 0.05f),
-            contentColor = contentcol
+            containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol
         ),
         modifier = Modifier.animateContentSize()
     ) {
@@ -324,7 +323,7 @@ fun FabricatedMonet(
                 } else {
                     12
                 }
-                val tilesize = (((configuration.screenWidthDp - 16 - 64 -16) / divisor)).dp
+                val tilesize = (((configuration.screenWidthDp - 16 - 64 - 16) / divisor)).dp
                 tilesize.log()
                 HorizontalDivider()
 

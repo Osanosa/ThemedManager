@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.components.HeaderRow
 import pro.themed.manager.log
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
@@ -397,7 +398,7 @@ fun ToolboxPage() {
 
 }
 
-private fun downscalebydivisor(divisor: String) {
+fun downscalebydivisor(divisor: String) {
     Shell("su").run(
         command = """
                 # Set the number of division

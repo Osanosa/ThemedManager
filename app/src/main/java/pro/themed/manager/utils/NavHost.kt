@@ -153,7 +153,10 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                             Row(modifier = Modifier
                                 .weight(1f)
                                 .clip(CircleShape)
-                                .background(if (isDark == "") contentcol.copy(alpha = 0.05f) else Color.Transparent, shape = CircleShape)
+                                .background(
+                                    if (isDark == "") contentcol.copy(alpha = 0.05f) else Color.Transparent,
+                                    shape = CircleShape
+                                )
 
                                 .clickable { isDark = "" }
                                 .padding(16.dp),

@@ -78,7 +78,7 @@ fun NavigationRailSample(
         }, verticalArrangement = Arrangement.Top) {
             itemstop.forEachIndexed { _, item ->
                 CustomNavigationRailItem(
-                 item = item,
+                    item = item,
                     navController = navController
                 )
             }
@@ -129,7 +129,7 @@ fun CustomNavigationRailItem(item: NavigationItems, navController: NavController
                 modifier = Modifier.size(24.dp)
             )
         },
-        label = { Text( item.title) },
+        label = { Text(item.title) },
         selected = isSelected,
         onClick = {
             navController.navigate(item.route) {

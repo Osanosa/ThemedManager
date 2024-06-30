@@ -74,7 +74,10 @@ fun AccentsAAPT() {
     Card(
         onClick = { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol),
+        colors = CardDefaults.cardColors(
+            containerColor = contentcol.copy(alpha = 0.05f),
+            contentColor = contentcol
+        ),
         modifier = Modifier.animateContentSize()
     ) {
         Card(
@@ -127,7 +130,7 @@ fun AccentsAAPT() {
                         )
                     }
                 }
-HorizontalDivider()
+                HorizontalDivider()
                 var hue by rememberSaveable { mutableFloatStateOf(0.5f) }
                 var saturation by rememberSaveable { mutableFloatStateOf(100f) }
                 var lightness by rememberSaveable { mutableFloatStateOf(50f) }

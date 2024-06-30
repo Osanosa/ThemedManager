@@ -1,39 +1,27 @@
 package pro.themed.manager
 
-import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -42,33 +30,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -82,11 +59,10 @@ import com.jaredrummler.ktsh.Shell.Companion.SH
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import pro.themed.manager.components.OnBoarding
 import pro.themed.manager.comps.NavigationRailSample
 import pro.themed.manager.ui.theme.ThemedManagerTheme
 import pro.themed.manager.ui.theme.contentcol
-import pro.themed.manager.ui.theme.cookieBackdrop
-import pro.themed.manager.ui.theme.cookieForeground
 import pro.themed.manager.utils.GlobalVariables.magiskVersion
 import pro.themed.manager.utils.GlobalVariables.themedId
 import pro.themed.manager.utils.GlobalVariables.whoami
@@ -104,62 +80,6 @@ data class OverlayListData(
     val disabledOverlays: List<String>,
 )
 
-@Composable
-fun CookieCard(
-    modifier: Modifier = Modifier,  onClick: () -> Unit = {}, content: @Composable () -> Unit,
-) {
-    Card(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = cookieBackdrop, contentColor = contentcol
-        ),
-        modifier = Modifier.animateContentSize()
-    ) {
-        Card(
-            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                containerColor = cookieForeground, contentColor = contentcol
-            ), modifier = Modifier
-                .animateContentSize()
-                .padding(8.dp)
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-fun AdmobBanner() {
-    if (!MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-            .getBoolean("isContributor", false)
-    ) {
-        val isAdLoaded = remember { mutableStateOf(false) }
-
-        AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
-            AdView(context).apply {
-                setAdSize(AdSize.LARGE_BANNER)
-                adUnitId = "ca-app-pub-5920419856758740/9976311451"
-                adListener = object : AdListener() {
-                    override fun onAdLoaded() {
-                        super.onAdLoaded()
-                        isAdLoaded.value = true
-                    }
-
-                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                        super.onAdFailedToLoad(loadAdError)
-                        isAdLoaded.value = false
-                    }
-                }
-                loadAd(AdRequest.Builder().build())
-            }
-        })
-
-        if (isAdLoaded.value) {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-    }
-}
 
 fun fetchOverlayList(): OverlayListData {
     return try {
@@ -485,64 +405,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun OnBoarding(image: Int, text: String) {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.smallestScreenWidthDp.dp
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    if (isLandscape) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = null,
-                modifier = Modifier.size(screenWidth)
-            )
-
-            Text(
-                text = text,
-                modifier = Modifier.padding(horizontal = 30.dp),
-                textAlign = TextAlign.Start,
-                fontSize = 16.sp,
-                color = contentcol
-            )
-        }
-    } else {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(horizontal = 80.dp)
-                    .aspectRatio(1f)
-                    .weight(0.8f)
-                    .fillMaxSize()
-            )
-            Text(
-                text = text,
-                modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                    .weight(0.2f),
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                color = contentcol
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
 //@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Main() {
     Column {

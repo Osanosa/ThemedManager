@@ -1,3 +1,10 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:tint="@color/DrawableColor" android:viewportWidth="960" android:viewportHeight="960">
-    <path android:fillColor="@color/DrawableColor" android:pathData="M480 840q-151 0-255-104-105-105-105-256 0-138 90-239 90-102 230-119 13-2 23 4 10 5 16 14t7 21q0 12-8 23-17 26-25 55-9 29-9 61 0 90 63 153t153 63q31 0 62-9 30-9 54-25 11-7 23-6 11 0 20 5 10 5 16 15 5 10 3 24-14 138-117 229-104 91-241 91zm0-80q88 0 158-48 70-49 102-127-20 5-40 8t-40 3q-123 0-209-86-87-87-87-210 0-20 3-40t8-40q-78 32-126 102-49 70-49 158 0 116 82 198t198 82z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/DrawableColor"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <path
+        android:fillColor="@color/DrawableColor"
+        android:pathData="M480 840q-151 0-255-104-105-105-105-256 0-138 90-239 90-102 230-119 13-2 23 4 10 5 16 14t7 21q0 12-8 23-17 26-25 55-9 29-9 61 0 90 63 153t153 63q31 0 62-9 30-9 54-25 11-7 23-6 11 0 20 5 10 5 16 15 5 10 3 24-14 138-117 229-104 91-241 91zm0-80q88 0 158-48 70-49 102-127-20 5-40 8t-40 3q-123 0-209-86-87-87-87-210 0-20 3-40t8-40q-78 32-126 102-49 70-49 158 0 116 82 198t198 82z" />
 </vector>

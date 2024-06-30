@@ -7,7 +7,7 @@ import pro.themed.manager.utils.GlobalVariables
 
 class DownloadBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-        if (intent.action == "android.intent.action.DOWNLOAD_COMPLETE" ) {
+        if (intent.action == "android.intent.action.DOWNLOAD_COMPLETE") {
             GlobalVariables.isdownloaded = true
 
         }

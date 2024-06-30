@@ -1,371 +1,48 @@
 package pro.themed.manager.comps
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import pro.themed.manager.AdmobBanner
-import pro.themed.manager.CookieCard
 import pro.themed.manager.MainActivity.Companion.overlayList
 import pro.themed.manager.R
-import pro.themed.manager.buildOverlay
-import pro.themed.manager.log
-import pro.themed.manager.overlayEnable
+import pro.themed.manager.components.AdmobBanner
+import pro.themed.manager.components.CookieCard
+import pro.themed.manager.components.HeaderRow
+import pro.themed.manager.components.MiscTextField
+import pro.themed.manager.components.Slideritem
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
-import kotlin.math.roundToInt
 
-@Stable
-@ExperimentalMaterial3Api
-@Composable
-fun Slideritem(
-    drawable: Int,
-    header: String,
-    sliderSteps: Int,
-    sliderStepValue: Int,
-    minSliderValue: Float,
-    maxSliderValue: Float,
-    overlayName: String
-) {
-    val context = LocalContext.current
-    var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
-    var intvalue by rememberSaveable { mutableIntStateOf(sliderPosition.roundToInt()) }
-
-    sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
-    intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
-    if (overlayList.overlayList.any { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
-            it.contains(
-                overlayName
-            )
-        }) {
-
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    // horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painterResource(id = drawable),
-                        contentDescription = "",
-                        Modifier
-                            .padding(horizontal = 16.dp)
-                            .size(24.dp)
-                    )
-                    Column {
-                        Text(
-                            text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp
-                        )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "Value: $intvalue")
-
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(modifier = Modifier, onClick = {
-                        intvalue = 0; sliderPosition = intvalue.toFloat()
-                        Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
-                    }) {
-                        Image(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .size(24.dp),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.reset),
-                            contentDescription = null,
-                        )
-                    }
-
-                }
-                Row(
-                    Modifier, verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .clickable {
-                                intvalue -= sliderStepValue; sliderPosition = intvalue.toFloat()
-                                Toast
-                                    .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                    .show()
-                                overlayEnable("$overlayName$intvalue")
-
-                            },
-                        imageVector = ImageVector.vectorResource(id = R.drawable.remove_48px),
-                        contentDescription = null,
-                    )
-
-                    Slider(modifier = Modifier
-                        .height(16.dp)
-                        .weight(1f)
-                        .padding(0.dp),
-                        value = sliderPosition,
-                        onValueChange = { sliderPosition = it; intvalue = it.roundToInt() },
-                        valueRange = minSliderValue..maxSliderValue,
-                        onValueChangeFinished = {
-                            Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
-                            overlayEnable("$overlayName$intvalue")
-                        },
-                        steps = sliderSteps,
-                        thumb = {
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.fiber_manual_record_48px),
-                                contentDescription = null,
-                            )
-
-                        })
-
-                    Image(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .clickable {
-                                intvalue += sliderStepValue; sliderPosition = intvalue.toFloat()
-                                Toast
-                                    .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                    .show()
-                                overlayEnable("$overlayName$intvalue")
-                            },
-                        imageVector = ImageVector.vectorResource(id = R.drawable.add_48px),
-                        contentDescription = null,
-                    )
-
-                }
-            }
-
-        }
-    }
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Stable
-@Preview
-@Composable
-fun HeaderRow(
-    header: String = "",
-    subHeader: String = "",
-    button1text: String = "",
-    button1onClick: () -> Unit = {},
-    button1weight: Float = 1f,
-    button2text: String = "",
-    button2onClick: () -> Unit = {},
-    button2weight: Float = 1f,
-    button3text: String = "",
-    button3onClick: () -> Unit = {},
-    button3weight: Float = 1f,
-    button4text: String = "",
-    button4onClick: () -> Unit = {},
-    button4weight: Float = 1f,
-    switchDescription: String = "",
-    onCheckedChange: (Boolean) -> Unit = {},
-    isChecked: Boolean = false,
-    showSwitch: Boolean = false,
-    content: @Composable () -> Unit = {}
-) {
-    val scope = rememberCoroutineScope()
-    var checkedState by remember { mutableStateOf(isChecked) }
-
-    LaunchedEffect(isChecked) {
-        checkedState = isChecked
-    }
-    val context = LocalContext.current
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
-            contentColor = pro.themed.manager.ui.theme.contentcol
-        ),
-    ) {
-        Card(
-            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
-                contentColor = pro.themed.manager.ui.theme.contentcol
-            ), modifier = Modifier.padding(8.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                // verticalAlignment = Alignment.CenterVertically,
-                // horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (showSwitch && switchDescription.isEmpty()) {
-                    Text(
-                        text = header,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        if (subHeader.isNotEmpty()) {
-                            Text(
-                                text = subHeader,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-
-
-                        Switch(
-                            checked = checkedState, onCheckedChange = {
-                                checkedState = it
-                                onCheckedChange(it)
-                            }, modifier = Modifier
-                        )
-                    }
-                } else if (showSwitch && switchDescription.isNotEmpty()) {
-                    Column(Modifier) {
-                        Text(
-                            text = header,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = subHeader,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = switchDescription,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Switch(
-                                checked = checkedState, onCheckedChange = {
-                                    checkedState = it
-                                    onCheckedChange(it)
-                                }, modifier = Modifier
-                            )
-                        }
-                    }
-                } else {
-                    Text(
-                        text = header,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = subHeader,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                content()
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (button1text.isNotEmpty()) {
-                        Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
-                            modifier = Modifier.weight(button1weight),
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
-                    }
-
-                    if (button2text.isNotEmpty()) {
-                        Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
-                            modifier = Modifier.weight(button2weight),
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
-                    }
-                    if (button3text.isNotEmpty()) {
-                        Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
-                            modifier = Modifier.weight(button3weight),
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
-                    }
-                    if (button4text.isNotEmpty()) {
-                        Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
-                            modifier = Modifier.weight(button4weight),
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
-                    }
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterial3Api
@@ -384,48 +61,6 @@ fun MiscTab() {
             Spacer(Modifier.height(32.dp))
 
             AdmobBanner()
-            @Composable
-            fun MiscTextField(
-                input: String,
-                path: String,
-                resource: String,
-                file: String,
-                overlay: String,
-                modifier: Modifier,
-            ) {
-                var input by remember { mutableStateOf(input) }
-                OutlinedTextField(modifier = modifier.padding(bottom = 2.dp),
-                    value = input,
-                    singleLine = true,
-                    onValueChange = {
-                        if (file == "integers") {
-                            Shell("su").run(
-                                """sed -i 's/<integer name="$resource">[^<]*/<integer name="$resource">${it}/g' $path/res/values/$file.xml"""
-                            ).log(); input = it
-                        } else if (file == "dimens") {
-                            Shell("su").run(
-                                """sed -i 's/<dimens name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
-                            ).log(); input = it
-                        }
-                    },
-                    placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            buildOverlay(path)
-                            Shell("su").run("""cmd overlay enable $overlay""")
-
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.move_up_24px),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    label = { Text(resource, Modifier.basicMarquee()) })
-            }
 
             val cornersPath = "${GlobalVariables.modulePath}/onDemandCompiler/corners"
             val qsGridGenericPath = "${GlobalVariables.modulePath}/onDemandCompiler/qsGrid"
@@ -472,8 +107,7 @@ fun MiscTab() {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.rounded_corner_48px),
                         null,
-                        Modifier
-                            .size(24.dp)
+                        Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(8.dp))
                     MiscTextField(
@@ -483,22 +117,40 @@ fun MiscTab() {
                         file = """dimens""",
                         overlay = """themed.corners.generic""",
                         modifier = Modifier.weight(1f),
+                        label = "Rounded Corner Radius"
                     )
 
                 }
             }
             CookieCard {
-
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.view_week_48px),
                         null,
                         Modifier
+                            .padding(4.dp)
                             .size(24.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Text("Qs Grid Columns", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.weight(1f))
+                    Icon(imageVector = ImageVector.vectorResource(R.drawable.reset),
+                        null,
+                        Modifier
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                            .size(24.dp)
+                            .clickable {
+                                Shell("su").run("cmd overlay disable themed.qsgrid.columnsportrait.generic")
+                                Shell("su").run("cmd overlay disable themed.qsgrid.columnslandscape.generic")
+                            })
+
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+
 
                     //columns portrait
                     MiscTextField(
@@ -507,7 +159,8 @@ fun MiscTab() {
                         resource = "config_qs_columns_portrait",
                         file = "integers",
                         overlay = "themed.qsgrid.columnsportrait.generic",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        label = "Portrait"
                     )
                     Spacer(Modifier.width(8.dp))
 
@@ -518,22 +171,44 @@ fun MiscTab() {
                         resource = "config_qs_columns_landscape",
                         file = "integers",
                         overlay = "themed.qsgrid.columnslandscape.generic",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        label = "Landscape"
                     )
 
                 }
+                Spacer(Modifier.height(8.dp))
             }
             CookieCard {
-
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.table_rows_48px),
                         null,
                         Modifier
+                            .padding(4.dp)
+
                             .size(24.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Text("Qs Grid Rows", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.weight(1f))
+                    Icon(imageVector = ImageVector.vectorResource(R.drawable.reset),
+                        null,
+                        Modifier
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                            .size(24.dp)
+                            .clickable {
+                                Shell("su").run("cmd overlay disable themed.qsgrid.rowslandscape.generic")
+                                Shell("su").run("cmd overlay disable themed.qsgrid.rowsportrait.generic")
+                            })
+
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+
 
                     //rows portrait
                     MiscTextField(
@@ -542,7 +217,8 @@ fun MiscTab() {
                         resource = "config_qs_rows_portrait",
                         file = "integers",
                         overlay = "themed.qsgrid.rowsportrait.generic",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        label = "Portrait"
                     )
                     Spacer(Modifier.width(8.dp))
 
@@ -553,9 +229,11 @@ fun MiscTab() {
                         resource = "config_qs_rows_landscape",
                         file = "integers",
                         overlay = "themed.qsgrid.rowslandscape.generic",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        label = "Landscape"
                     )
                 }
+                Spacer(Modifier.height(8.dp))
             }
 
             CookieCard {

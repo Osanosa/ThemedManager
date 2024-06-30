@@ -45,10 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.CookieCard
 import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.components.CookieCard
 import pro.themed.manager.fetchOverlayList
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.ui.theme.bordercol
@@ -277,19 +277,27 @@ fun DebugPage() {
                                 overlayList.unsupportedOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier.combinedClickable(onClick = {
-                                            dialogname =
-                                                overlay.removePrefix("[x] ").removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                            dialogtext = Shell("su").run(
-                                                "cmd overlay dump ${
-                                                    overlay.removePrefix("[x] ")
-                                                        .removePrefix("[ ] ").removePrefix("--- ")
-                                                }"
-                                            ).stdout()
-                                            showOverlayDialog = true
+                                        modifier = Modifier
+                                            .combinedClickable(onClick = {
+                                                dialogname =
+                                                    overlay
+                                                        .removePrefix("[x] ")
+                                                        .removePrefix("[ ] ")
+                                                        .removePrefix("--- ")
+                                                dialogtext = Shell("su")
+                                                    .run(
+                                                        "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                    )
+                                                    .stdout()
+                                                showOverlayDialog = true
 
-                                        }).basicMarquee()
+                                            })
+                                            .basicMarquee()
                                     )
                                 }
                             }
@@ -299,19 +307,27 @@ fun DebugPage() {
                                 overlayList.enabledOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier.combinedClickable(onClick = {
-                                            dialogname =
-                                                overlay.removePrefix("[x] ").removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                            dialogtext = Shell("su").run(
-                                                "cmd overlay dump ${
-                                                    overlay.removePrefix("[x] ")
-                                                        .removePrefix("[ ] ").removePrefix("--- ")
-                                                }"
-                                            ).stdout()
-                                            showOverlayDialog = true
+                                        modifier = Modifier
+                                            .combinedClickable(onClick = {
+                                                dialogname =
+                                                    overlay
+                                                        .removePrefix("[x] ")
+                                                        .removePrefix("[ ] ")
+                                                        .removePrefix("--- ")
+                                                dialogtext = Shell("su")
+                                                    .run(
+                                                        "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                    )
+                                                    .stdout()
+                                                showOverlayDialog = true
 
-                                        }).basicMarquee()
+                                            })
+                                            .basicMarquee()
                                     )
                                 }
                             }
@@ -321,19 +337,27 @@ fun DebugPage() {
                                 overlayList.disabledOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier.combinedClickable(onClick = {
-                                            dialogname =
-                                                overlay.removePrefix("[x] ").removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                            dialogtext = Shell("su").run(
-                                                "cmd overlay dump ${
-                                                    overlay.removePrefix("[x] ")
-                                                        .removePrefix("[ ] ").removePrefix("--- ")
-                                                }"
-                                            ).stdout()
-                                            showOverlayDialog = true
+                                        modifier = Modifier
+                                            .combinedClickable(onClick = {
+                                                dialogname =
+                                                    overlay
+                                                        .removePrefix("[x] ")
+                                                        .removePrefix("[ ] ")
+                                                        .removePrefix("--- ")
+                                                dialogtext = Shell("su")
+                                                    .run(
+                                                        "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                    )
+                                                    .stdout()
+                                                showOverlayDialog = true
 
-                                        }).basicMarquee()
+                                            })
+                                            .basicMarquee()
                                     )
                                 }
                             }
