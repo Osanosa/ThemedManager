@@ -71,7 +71,6 @@ import pro.themed.manager.utils.Navigation
 import pro.themed.manager.utils.loadInterstitial
 import pro.themed.manager.utils.loadRewarded
 import pro.themed.manager.utils.removeInterstitial
-import java.io.IOException
 
 data class OverlayListData(
     val overlayList: List<String>,
@@ -90,17 +89,13 @@ fun fetchOverlayList(): OverlayListData {
         val disabledOverlays = overlayList.filter { it.contains("[ ]") }
         "overlay list".log()
         OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
-    } catch (e: IOException) {
-        OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {
-            Toast.makeText(
-                MainActivity.appContext,
-                "Error while reading overlay list. \n check su access",
-                Toast.LENGTH_SHORT
-            ).show()
+    } catch (e: Exception) {
+        return OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {
         }
     }
 
 }
+
 
 object SharedPreferencesManager {
     private lateinit var sharedPreferences: SharedPreferences
@@ -128,6 +123,7 @@ object SharedPreferencesManager {
     )
 }*/
 class MainActivity : ComponentActivity() {
+
     companion object {
         lateinit var appContext: Context
             private set
@@ -137,6 +133,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         SharedPreferencesManager.initialize(applicationContext)
         Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
         val splashScreen = installSplashScreen()
@@ -146,10 +143,10 @@ class MainActivity : ComponentActivity() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             val stackTrace = Log.getStackTraceString(throwable)
             shareStackTrace(stackTrace)
-        }
+}
 
         fun foregroundServiceRunning(): Boolean {
-            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
                 if (MyForegroundService::class.java.name == service.service.className) {
                     return true
@@ -240,7 +237,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun shareStackTrace(stackTrace: String) {
+     fun shareStackTrace(stackTrace: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, stackTrace)

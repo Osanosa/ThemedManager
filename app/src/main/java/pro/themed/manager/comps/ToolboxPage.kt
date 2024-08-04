@@ -1,14 +1,20 @@
 package pro.themed.manager.comps
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +24,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,31 +37,312 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.drawable.toBitmap
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pro.themed.manager.R
 import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.components.CookieCard
 import pro.themed.manager.components.HeaderRow
 import pro.themed.manager.log
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
+
+import pro.themed.manager.utils.showInterstitial
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
+
+@Preview
+@Composable
+fun PerAppDownscale(modifier: Modifier = Modifier) {
+
+    val context = LocalContext.current
+    val pm = context.packageManager
+    val mainIntent = Intent(Intent.ACTION_MAIN, null)
+    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+
+    var resolvedInfos by remember {
+        mutableStateOf(emptyList<ResolveInfo>())
+
+    }
+
+    LaunchedEffect(key1 = Unit) {
+
+        resolvedInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.queryIntentActivities(
+                mainIntent, PackageManager.ResolveInfoFlags.of(0L)
+            )
+        } else {
+            pm.queryIntentActivities(mainIntent, 0)
+        }
+    }
+
+    val shell = Shell("su")
+    shell.addOnStderrLineListener(object : Shell.OnLineListener {
+        override fun onLine(line: String) {
+            CoroutineScope(Dispatchers.Main).launch {
+                // do something
+                Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+            }
+        }
+    })
+    shell.addOnStdoutLineListener(object : Shell.OnLineListener {
+        override fun onLine(line: String) {
+            CoroutineScope(Dispatchers.Main).launch {
+                // do something
+                if (line.contains("set")) showInterstitial(context) {}
+                line.log()
+                if (line.contains("not supported")) Toast.makeText(
+                    context, line, Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    })
+
+    LazyColumn(Modifier.fillMaxWidth()) {
+        if (resolvedInfos.isEmpty()) item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CircularProgressIndicator()
+                Text(text = "Loading...")
+            }
+        }
+        resolvedInfos.sortedBy { it.activityInfo.applicationInfo.loadLabel(pm).toString() }
+            .forEach { resolveInfo ->
+
+                item {
+                    val resources =
+                        pm.getResourcesForApplication(resolveInfo.activityInfo.applicationInfo)
+
+
+                    val label by rememberSaveable {
+                        mutableStateOf(
+                            if (resolveInfo.activityInfo.labelRes != 0) {
+                                // getting proper label from resources
+                                resources.getString(resolveInfo.activityInfo.labelRes)
+                            } else {
+                                // getting it out of app info - equivalent to context.packageManager.getApplicationInfo
+                                resolveInfo.activityInfo.applicationInfo.loadLabel(pm).toString()
+                            }
+                        )
+                    }
+                    val icon = resolveInfo.loadIcon(pm).toBitmap().asImageBitmap()
+                    val packageName by rememberSaveable {
+                        mutableStateOf(resolveInfo.activityInfo.packageName)
+                    }
+
+                    Column {
+
+
+                        var expanded by rememberSaveable {
+                            mutableStateOf(false)
+                        }
+                        var interventions by rememberSaveable {
+                            mutableStateOf(
+                                shell.run("cmd game list-configs $packageName").stdout()
+
+                            )
+                        }
+                        Row(Modifier.clickable { expanded = !expanded }) {
+
+                            Image(
+                                bitmap = icon,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(8.dp)
+                            )
+                            Column {
+
+                                Text(
+                                    text = label
+                                )
+                                Text(text = packageName, maxLines = 1)
+                            }
+                            if (interventions.contains("Name")) Icon(
+                                painter = painterResource(id = R.drawable.qscookie),
+                                contentDescription = null,
+                                tint = Color.Yellow,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        }
+                        AnimatedVisibility(visible = expanded) {
+                            var gameMode =
+                                interventions.substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                    .substringBefore(",", "UNSET/UNKNOWN")
+                            var scaling = interventions.substringAfter("Scaling:", "UNSET/UNKNOWN")
+                                .substringBefore(",", "UNSET/UNKNOWN")
+                            var useAngle = interventions.substringAfter("Use Angle:")
+                                .substringBefore(",", "UNSET/UNKNOWN")
+                            var fps = interventions.substringAfter("Fps:", "UNSET/UNKNOWN")
+                                .substringBefore(",", "UNSET/UNKNOWN")
+
+
+                            Column(Modifier.padding(8.dp)) {
+
+
+                                Text(
+                                    text = "Gamemode: " + when (gameMode) {
+                                        "1" -> "standard"
+                                        "2" -> "performance"
+                                        "3" -> "battery"
+                                        "4" -> "custom"
+                                        else -> "UNSET/UNKNOWN"
+                                    }
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+
+                                    Button(onClick = {
+                                        shell.run("cmd game mode 1 $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                        gameMode = interventions.substringAfter(
+                                            "Game Mode:", "UNSET/UNKNOWN"
+                                        ).substringBefore(",", "UNSET/UNKNOWN")
+                                    }) {
+                                        Text(text = "Standard")
+                                    }
+                                    Button(onClick = {
+                                        shell.run("cmd game mode 2 $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                        gameMode = interventions.substringAfter(
+                                            "Game Mode:", "UNSET/UNKNOWN"
+                                        ).substringBefore(",", "UNSET/UNKNOWN")
+                                    }) {
+                                        Text(text = "Performance")
+                                    }
+                                    Button(onClick = {
+                                        shell.run("cmd game mode 3 $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+
+                                        gameMode = interventions.substringAfter(
+                                            "Game Mode:", "UNSET/UNKNOWN"
+                                        ).substringBefore(",", "UNSET/UNKNOWN")
+                                    }) {
+                                        Text(text = "Battery")
+                                    }
+                                    Button(onClick = {
+                                        shell.run("cmd game mode 4 $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                        gameMode = interventions.substringAfter(
+                                            "Game Mode:", "UNSET/UNKNOWN"
+                                        ).substringBefore(",", "UNSET/UNKNOWN")
+                                    }) {
+                                        Text(text = "Custom")
+                                    }
+
+                                }
+                                var floatDownscale by remember {
+                                    mutableFloatStateOf(scaling.toFloatOrNull().takeIf {
+                                        (it ?: 1f) >= 0f
+                                    } ?: 1f)
+                                }
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+                                    Text(text = "Scaling: $floatDownscale")
+                                    Button(onClick = {
+                                        shell.run("cmd game set --downscale 1.0 $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                        floatDownscale = interventions.substringAfter(
+                                            "Scaling:", "UNSET/UNKNOWN"
+                                        ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull()
+                                            ?: 1f
+                                    }) { Text(text = "Reset") }
+                                }
+                                Slider(value = floatDownscale, onValueChange = {
+                                    floatDownscale = ((it * 100).toInt()).toFloat() / 100
+                                }, onValueChangeFinished = {
+                                    shell.run("cmd game set --downscale $floatDownscale $packageName")
+                                    interventions =
+                                        shell.run("cmd game list-configs $packageName").stdout()
+
+
+                                }, valueRange = 0f..2f, steps = 199
+                                )
+                                Text(text = "Use Angle: $useAngle")
+                                var floatFps by remember {
+                                    mutableFloatStateOf(fps.toFloatOrNull() ?: 1f)
+                                }
+                                Text(
+                                    text = "FPS: ${
+                                        if (fps == "UNSET/UNKNOWN") {
+                                            "UNSET/UNKNOWN"
+                                        } else {
+                                            floatFps.toInt()
+                                        }
+                                    }"
+                                )
+                                Slider(value = floatFps, onValueChange = {
+                                    floatFps = ((it * 100).toInt()).toFloat() / 100
+                                }, onValueChangeFinished = {
+                                    shell.run("cmd game set --fps ${floatFps.toInt()} $packageName")
+                                    interventions =
+                                        shell.run("cmd game list-configs $packageName").stdout()
+
+
+                                }, valueRange = 0f..500f, steps = 499
+                                )
+
+
+                                Button(onClick = {
+                                    shell.run("cmd game reset $packageName")
+                                    interventions =
+                                        shell.run("cmd game list-configs $packageName").stdout()
+                                    floatDownscale = interventions.substringAfter(
+                                        "Scaling:", "UNSET/UNKNOWN"
+                                    ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull() ?: 1f
+                                    floatFps = interventions.substringAfter(
+                                        "Fps:", "UNSET/UNKNOWN"
+                                    ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull() ?: 1f
+
+                                }) {
+                                    Text(text = "Reset all")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -290,7 +579,16 @@ fun ToolboxPage() {
 
                         },
                     )
+                    var showdialog by remember {
+                        mutableStateOf(false)
+                    }
+                    SectionDialogHeader(header = "PerAppDownscale", onClick = { showdialog = true })
+                    if (showdialog) Dialog(onDismissRequest = { showdialog = false }) {
+                        CookieCard {
 
+                            PerAppDownscale()
+                        }
+                    }
                     HeaderRow(header = "AutoRefreshRate ForegroundService",
                         subHeader = "Dynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
                         button1text = "Stop",

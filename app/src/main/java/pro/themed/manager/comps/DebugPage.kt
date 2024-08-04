@@ -268,9 +268,13 @@ fun DebugPage() {
                         Column(
                             modifier = Modifier
                                 .verticalScroll(rememberScrollState())
-                                .padding(8.dp),
+                                ,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            if (overlayList.overlayList.isEmpty()) {
 
+                                Text(text = "Overlay list is empty")
+                            }
 
                             if (overlayList.unsupportedOverlays.isNotEmpty()) {
                                 Text(text = "Unsupported")
@@ -279,11 +283,10 @@ fun DebugPage() {
                                         text = overlay,
                                         modifier = Modifier
                                             .combinedClickable(onClick = {
-                                                dialogname =
-                                                    overlay
-                                                        .removePrefix("[x] ")
-                                                        .removePrefix("[ ] ")
-                                                        .removePrefix("--- ")
+                                                dialogname = overlay
+                                                    .removePrefix("[x] ")
+                                                    .removePrefix("[ ] ")
+                                                    .removePrefix("--- ")
                                                 dialogtext = Shell("su")
                                                     .run(
                                                         "cmd overlay dump ${
@@ -301,7 +304,7 @@ fun DebugPage() {
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+
                             if (overlayList.enabledOverlays.isNotEmpty()) {
                                 Text(text = "Enabled")
                                 overlayList.enabledOverlays.forEach { overlay ->
@@ -309,11 +312,10 @@ fun DebugPage() {
                                         text = overlay,
                                         modifier = Modifier
                                             .combinedClickable(onClick = {
-                                                dialogname =
-                                                    overlay
-                                                        .removePrefix("[x] ")
-                                                        .removePrefix("[ ] ")
-                                                        .removePrefix("--- ")
+                                                dialogname = overlay
+                                                    .removePrefix("[x] ")
+                                                    .removePrefix("[ ] ")
+                                                    .removePrefix("--- ")
                                                 dialogtext = Shell("su")
                                                     .run(
                                                         "cmd overlay dump ${
@@ -331,7 +333,7 @@ fun DebugPage() {
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+
                             if (overlayList.disabledOverlays.isNotEmpty()) {
                                 Text(text = "Disabled")
                                 overlayList.disabledOverlays.forEach { overlay ->
@@ -339,11 +341,10 @@ fun DebugPage() {
                                         text = overlay,
                                         modifier = Modifier
                                             .combinedClickable(onClick = {
-                                                dialogname =
-                                                    overlay
-                                                        .removePrefix("[x] ")
-                                                        .removePrefix("[ ] ")
-                                                        .removePrefix("--- ")
+                                                dialogname = overlay
+                                                    .removePrefix("[x] ")
+                                                    .removePrefix("[ ] ")
+                                                    .removePrefix("--- ")
                                                 dialogtext = Shell("su")
                                                     .run(
                                                         "cmd overlay dump ${

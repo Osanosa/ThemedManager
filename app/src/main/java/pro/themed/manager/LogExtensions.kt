@@ -2,12 +2,11 @@ package pro.themed.manager// Create a LogExtensions.kt file or add this code to 
 
 import android.util.Log
 
-private const val TAG = "SimpleLog" // Replace with your desired tag
 
-fun Any.log() {
+fun Any.log(TAG: String = "Simple Log") {
     Log.d(TAG, this.toString())
 }
 
-fun Any.logError() {
+fun Any.logError(TAG: String = "Simple Log") {
     Log.e(TAG, this.toString())
 }

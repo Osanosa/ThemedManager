@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission
@@ -114,15 +117,15 @@
                 android:resource="@xml/systemui_widget" />
         </receiver>
         <receiver
-            android:name=".widgets.DownscaleWidget1x3Receiver"
+            android:name=".widgets.DownscaleWidget1x4Receiver"
             android:exported="true"
-            android:label="1/3">
+            android:label="1/4">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/downscale_1x3" />
+                android:resource="@xml/downscale_1x4" />
         </receiver>
 
     </application>
