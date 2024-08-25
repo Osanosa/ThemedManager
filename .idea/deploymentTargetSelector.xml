@@ -13,10 +13,7 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="PerAppDownscale">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="test">
+      <SelectionState runConfigName="autorefreshrate">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

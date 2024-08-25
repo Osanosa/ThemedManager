@@ -1,5 +1,5 @@
 [versions]
-gradle = "8.7.0-alpha03"
+gradle = "8.7.0-alpha07"
 kotlin = "2.0.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
