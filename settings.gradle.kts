@@ -20,5 +20,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Themed Manager"
-include(":manager")
+include(":app")
 include(":autorefreshrate")
+include(":PerAppDownscale")

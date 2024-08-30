@@ -10,8 +10,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/PerAppDownscale" />
+            <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/autorefreshrate" />
-            <option value="$PROJECT_DIR$/manager" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
