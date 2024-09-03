@@ -83,19 +83,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColor
 import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pro.themed.manager.MainActivity
 import pro.themed.manager.MainActivity.Companion.isDark
 import pro.themed.manager.R
-import pro.themed.manager.buildOverlay
 import pro.themed.manager.getContrastColor
-import pro.themed.manager.log
-import pro.themed.manager.overlayEnable
 import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.GlobalVariables
+import pro.themed.manager.utils.buildOverlay
+import pro.themed.manager.utils.log
+import pro.themed.manager.utils.overlayEnable
 import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
-annotation class Composable
 
 @Preview
 @OptIn(
@@ -109,7 +111,7 @@ fun FabricatedMonet(
         context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
 
     var selectedColorReference by remember { mutableStateOf("") }
-    var selectedMonetColor by remember { mutableStateOf("") }
+    var selectedMonetColor by remember { mutableStateOf("system_accent1_500") }
     var isGridExpanded by remember { mutableStateOf(false) }
     var expanded by rememberSaveable { mutableStateOf(true) }
 
@@ -117,6 +119,15 @@ fun FabricatedMonet(
 
     val colorsPath = """${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet"""
     val colorsShell = Shell("su")
+    colorsShell.addOnStderrLineListener(object : Shell.OnLineListener {
+        override fun onLine(line: String) {
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(MainActivity.appContext, line, Toast.LENGTH_SHORT).show()
+                line.log("FM ERROR")
+            }
+        }
+    })
+
     colorsShell.run("cd $colorsPath")
 
     var colorsXmlContent by remember { mutableStateOf(colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
@@ -127,22 +138,22 @@ fun FabricatedMonet(
     }
     LaunchedEffect(isDark) {
         colorsXmlContent =
-            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout.also { it.log() }
+            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
     }
 
     LaunchedEffect(selectedColorReference) {
         val colorValue =
             colorsXmlContent.find { it.contains("<color name=\"$selectedColorReference\">") }
                 ?.substringAfter("@color/")?.substringBefore("</color>") ?: ""
-        selectedMonetColor = colorValue
+       if (selectedColorReference.isNotBlank()) selectedMonetColor = colorValue
     }
 
     LaunchedEffect(selectedMonetColor) {
         val sedCommand = """
         sed -i 's|<color name="$selectedColorReference">@color/[^<]*</color>|<color name="$selectedColorReference">@color/$selectedMonetColor</color>|' /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml
     """.trimIndent()
-        if (selectedMonetColor.isNotBlank()) {
-            colorsShell.run(sedCommand).log()
+        if (selectedMonetColor.isNotBlank() && selectedColorReference.isNotBlank()) {
+            colorsShell.run(sedCommand)
         }
         resetColorsXmlContent()
     }
@@ -169,70 +180,9 @@ fun FabricatedMonet(
                     colorValue ?: 0
                 )
             }</g' res/values$isDark/colors.xml"""
-        ).log()
+        )
 
     }
-
-    val sn1_10: Int = getColorValue("system_neutral1_10")
-    val sn1_50: Int = getColorValue("system_neutral1_50")
-    val sn1_100: Int = getColorValue("system_neutral1_100")
-    val sn1_200: Int = getColorValue("system_neutral1_200")
-    val sn1_300: Int = getColorValue("system_neutral1_300")
-    val sn1_400: Int = getColorValue("system_neutral1_400")
-    val sn1_500: Int = getColorValue("system_neutral1_500")
-    val sn1_600: Int = getColorValue("system_neutral1_600")
-    val sn1_700: Int = getColorValue("system_neutral1_700")
-    val sn1_800: Int = getColorValue("system_neutral1_800")
-    val sn1_900: Int = getColorValue("system_neutral1_900")
-
-    val sn2_10: Int = getColorValue("system_neutral2_10")
-    val sn2_50: Int = getColorValue("system_neutral2_50")
-    val sn2_100: Int = getColorValue("system_neutral2_100")
-    val sn2_200: Int = getColorValue("system_neutral2_200")
-    val sn2_300: Int = getColorValue("system_neutral2_300")
-    val sn2_400: Int = getColorValue("system_neutral2_400")
-    val sn2_500: Int = getColorValue("system_neutral2_500")
-    val sn2_600: Int = getColorValue("system_neutral2_600")
-    val sn2_700: Int = getColorValue("system_neutral2_700")
-    val sn2_800: Int = getColorValue("system_neutral2_800")
-    val sn2_900: Int = getColorValue("system_neutral2_900")
-
-    val sa1_10: Int = getColorValue("system_accent1_10")
-    val sa1_50: Int = getColorValue("system_accent1_50")
-    val sa1_100: Int = getColorValue("system_accent1_100")
-    val sa1_200: Int = getColorValue("system_accent1_200")
-    val sa1_300: Int = getColorValue("system_accent1_300")
-    val sa1_400: Int = getColorValue("system_accent1_400")
-    val sa1_500: Int = getColorValue("system_accent1_500")
-    val sa1_600: Int = getColorValue("system_accent1_600")
-    val sa1_700: Int = getColorValue("system_accent1_700")
-    val sa1_800: Int = getColorValue("system_accent1_800")
-    val sa1_900: Int = getColorValue("system_accent1_900")
-    val sa1_1000: Int = getColorValue("system_accent1_1000")
-
-    val sa2_10: Int = getColorValue("system_accent2_10")
-    val sa2_50: Int = getColorValue("system_accent2_50")
-    val sa2_100: Int = getColorValue("system_accent2_100")
-    val sa2_200: Int = getColorValue("system_accent2_200")
-    val sa2_300: Int = getColorValue("system_accent2_300")
-    val sa2_400: Int = getColorValue("system_accent2_400")
-    val sa2_500: Int = getColorValue("system_accent2_500")
-    val sa2_600: Int = getColorValue("system_accent2_600")
-    val sa2_700: Int = getColorValue("system_accent2_700")
-    val sa2_800: Int = getColorValue("system_accent2_800")
-    val sa2_900: Int = getColorValue("system_accent2_900")
-
-    val sa3_10: Int = getColorValue("system_accent3_10")
-    val sa3_50: Int = getColorValue("system_accent3_50")
-    val sa3_100: Int = getColorValue("system_accent3_100")
-    val sa3_200: Int = getColorValue("system_accent3_200")
-    val sa3_300: Int = getColorValue("system_accent3_300")
-    val sa3_400: Int = getColorValue("system_accent3_400")
-    val sa3_500: Int = getColorValue("system_accent3_500")
-    val sa3_600: Int = getColorValue("system_accent3_600")
-    val sa3_700: Int = getColorValue("system_accent3_700")
-    val sa3_800: Int = getColorValue("system_accent3_800")
-    val sa3_900: Int = getColorValue("system_accent3_900")
 
     var hue by rememberSaveable { mutableFloatStateOf(0.5f) }
     var saturation by rememberSaveable { mutableFloatStateOf(100f) }
@@ -249,6 +199,26 @@ fun FabricatedMonet(
     val C_700 = hsl(hue, saturation / 100, 0.30f + lightness / 100)
     val C_800 = hsl(hue, saturation / 100, 0.20f + lightness / 100)
     val C_900 = hsl(hue, saturation / 100, 0.10f + lightness / 100)
+
+
+    @Composable
+    fun ThemedColor(
+        colorName: String
+    ) = when {
+        colorName.endsWith("10") -> C_10
+        colorName.endsWith("50") -> C_50
+        colorName.endsWith("100") -> C_100
+        colorName.endsWith("200") -> C_200
+        colorName.endsWith("300") -> C_300
+        colorName.endsWith("400") -> C_400
+        colorName.endsWith("500") -> C_500
+        colorName.endsWith("600") -> C_600
+        colorName.endsWith("700") -> C_700
+        colorName.endsWith("800") -> C_800
+        colorName.endsWith("900") -> C_900
+        else -> White
+    }
+
 
     Card(
         onClick = { expanded = !expanded },
@@ -324,7 +294,6 @@ fun FabricatedMonet(
                     12
                 }
                 val tilesize = (((configuration.screenWidthDp - 16 - 64 - 16) / divisor)).dp
-                tilesize.log()
                 HorizontalDivider()
 
                 Box {
@@ -374,16 +343,13 @@ fun FabricatedMonet(
                                             .aspectRatio(2f)
 
                                             .combinedClickable(onClick = {
-                                                val fullName = colorName
-                                                    .replace("sn", "system_neutral")
-                                                    .replace("sa", "system_accent")
 
                                                 val hex = "%08x".format(themedColor.toArgb())
 
                                                 colorsShell.run("cd $colorsPath")
 
                                                 colorsShell.run(
-                                                    """sed -i '/$fullName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml"""
+                                                    """sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml"""
                                                 )
                                                 resetColorsXmlContent()
 
@@ -401,13 +367,30 @@ fun FabricatedMonet(
 
                                         Box(contentAlignment = Alignment.Center) {
                                             Text(
-                                                text = colorName.substringAfter("_"),
+                                                text = colorName.substringAfter("_")
+                                                    .substringAfter("_"),
                                                 color = textColor,
                                                 fontSize = 14.sp
                                             )
                                         }
                                     }
                                 }
+                            }
+
+                            val values = listOf(10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
+
+                            @Composable
+                            fun tiles(name: String) {
+                                listOf(name) + values.map { "$name$it" }.forEach { colorName ->
+                                    M3Tile(
+                                        color = getColorValue(colorName),
+                                        colorName = colorName,
+                                        themedColor = ThemedColor(
+                                            colorName
+                                        )
+                                    )
+                                }
+
                             }
 
                             val configuration = LocalConfiguration.current
@@ -424,63 +407,8 @@ fun FabricatedMonet(
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(4.dp)
                                             )
-                                            M3Tile(
-                                                color = sn1_10,
-                                                colorName = "sn1_10",
-                                                themedColor = C_10,
-                                                topStart = 25f
-                                            )
-                                            M3Tile(
-                                                color = sn1_50,
-                                                colorName = "sn1_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sn1_100,
-                                                colorName = "sn1_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sn1_200,
-                                                colorName = "sn1_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sn1_300,
-                                                colorName = "sn1_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sn1_400,
-                                                colorName = "sn1_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sn1_500,
-                                                colorName = "sn1_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sn1_600,
-                                                colorName = "sn1_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sn1_700,
-                                                colorName = "sn1_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sn1_800,
-                                                colorName = "sn1_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sn1_900,
-                                                colorName = "sn1_900",
-                                                themedColor = C_900,
-                                                bottomStart = 25f
-                                            )
+                                            tiles("system_neutral1_")
+
                                         }
 
                                         Column(horizontalAlignment = CenterHorizontally) {
@@ -489,62 +417,7 @@ fun FabricatedMonet(
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(4.dp)
                                             )
-                                            M3Tile(
-                                                color = sn2_10,
-                                                colorName = "sn2_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sn2_50,
-                                                colorName = "sn2_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sn2_100,
-                                                colorName = "sn2_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sn2_200,
-                                                colorName = "sn2_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sn2_300,
-                                                colorName = "sn2_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sn2_400,
-                                                colorName = "sn2_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sn2_500,
-                                                colorName = "sn2_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sn2_600,
-                                                colorName = "sn2_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sn2_700,
-                                                colorName = "sn2_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sn2_800,
-                                                colorName = "sn2_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sn2_900,
-                                                colorName = "sn2_900",
-                                                themedColor = C_900
-                                            )
-
+                                            tiles("system_neutral2_")
                                         }
 
                                         Column(horizontalAlignment = CenterHorizontally) {
@@ -553,62 +426,8 @@ fun FabricatedMonet(
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(4.dp)
                                             )
-                                            M3Tile(
-                                                color = sa1_10,
-                                                colorName = "sa1_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sa1_50,
-                                                colorName = "sa1_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa1_100,
-                                                colorName = "sa1_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa1_200,
-                                                colorName = "sa1_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa1_300,
-                                                colorName = "sa1_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa1_400,
-                                                colorName = "sa1_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa1_500,
-                                                colorName = "sa1_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa1_600,
-                                                colorName = "sa1_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa1_700,
-                                                colorName = "sa1_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa1_800,
-                                                colorName = "sa1_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa1_900,
-                                                colorName = "sa1_900",
-                                                themedColor = C_900
-                                            )
 
+                                            tiles("system_accent1_")
                                         }
 
                                         Column(horizontalAlignment = CenterHorizontally) {
@@ -617,62 +436,8 @@ fun FabricatedMonet(
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(4.dp)
                                             )
-                                            M3Tile(
-                                                color = sa2_10,
-                                                colorName = "sa2_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sa2_50,
-                                                colorName = "sa2_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa2_100,
-                                                colorName = "sa2_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa2_200,
-                                                colorName = "sa2_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa2_300,
-                                                colorName = "sa2_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa2_400,
-                                                colorName = "sa2_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa2_500,
-                                                colorName = "sa2_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa2_600,
-                                                colorName = "sa2_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa2_700,
-                                                colorName = "sa2_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa2_800,
-                                                colorName = "sa2_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa2_900,
-                                                colorName = "sa2_900",
-                                                themedColor = C_900
-                                            )
 
+                                            tiles("system_accent2_")
                                         }
 
                                         Column(horizontalAlignment = CenterHorizontally) {
@@ -681,64 +446,8 @@ fun FabricatedMonet(
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(4.dp)
                                             )
-                                            M3Tile(
-                                                color = sa3_10,
-                                                colorName = "sa3_10",
-                                                themedColor = C_10,
-                                                topEnd = 25f
-                                            )
-                                            M3Tile(
-                                                color = sa3_50,
-                                                colorName = "sa3_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa3_100,
-                                                colorName = "sa3_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa3_200,
-                                                colorName = "sa3_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa3_300,
-                                                colorName = "sa3_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa3_400,
-                                                colorName = "sa3_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa3_500,
-                                                colorName = "sa3_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa3_600,
-                                                colorName = "sa3_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa3_700,
-                                                colorName = "sa3_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa3_800,
-                                                colorName = "sa3_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa3_900,
-                                                colorName = "sa3_900",
-                                                themedColor = C_900,
-                                                bottomEnd = 25f
-                                            )
 
+                                            tiles("system_accent3_")
                                         }
 
                                     }
@@ -750,294 +459,23 @@ fun FabricatedMonet(
                                             .clip(RoundedCornerShape(12.dp))
                                     ) {
                                         Row {
-                                            M3Tile(
-                                                color = sn1_10,
-                                                colorName = "sn1_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sn1_50,
-                                                colorName = "sn1_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sn1_100,
-                                                colorName = "sn1_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sn1_200,
-                                                colorName = "sn1_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sn1_300,
-                                                colorName = "sn1_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sn1_400,
-                                                colorName = "sn1_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sn1_500,
-                                                colorName = "sn1_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sn1_600,
-                                                colorName = "sn1_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sn1_700,
-                                                colorName = "sn1_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sn1_800,
-                                                colorName = "sn1_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sn1_900,
-                                                colorName = "sn1_900",
-                                                themedColor = C_900
-                                            )
-
+                                            tiles("system_neutral1_")
                                         }
 
                                         Row {
-                                            M3Tile(
-                                                color = sn2_10,
-                                                colorName = "sn2_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sn2_50,
-                                                colorName = "sn2_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sn2_100,
-                                                colorName = "sn2_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sn2_200,
-                                                colorName = "sn2_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sn2_300,
-                                                colorName = "sn2_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sn2_400,
-                                                colorName = "sn2_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sn2_500,
-                                                colorName = "sn2_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sn2_600,
-                                                colorName = "sn2_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sn2_700,
-                                                colorName = "sn2_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sn2_800,
-                                                colorName = "sn2_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sn2_900,
-                                                colorName = "sn2_900",
-                                                themedColor = C_900
-                                            )
+                                            tiles("system_neutral2_")
                                         }
 
                                         Row {
-                                            M3Tile(
-                                                color = sa1_10,
-                                                colorName = "sa1_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sa1_50,
-                                                colorName = "sa1_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa1_100,
-                                                colorName = "sa1_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa1_200,
-                                                colorName = "sa1_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa1_300,
-                                                colorName = "sa1_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa1_400,
-                                                colorName = "sa1_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa1_500,
-                                                colorName = "sa1_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa1_600,
-                                                colorName = "sa1_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa1_700,
-                                                colorName = "sa1_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa1_800,
-                                                colorName = "sa1_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa1_900,
-                                                colorName = "sa1_900",
-                                                themedColor = C_900
-                                            )
+                                            tiles("system_accent1_")
                                         }
 
                                         Row {
-                                            M3Tile(
-                                                color = sa2_10,
-                                                colorName = "sa2_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sa2_50,
-                                                colorName = "sa2_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa2_100,
-                                                colorName = "sa2_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa2_200,
-                                                colorName = "sa2_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa2_300,
-                                                colorName = "sa2_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa2_400,
-                                                colorName = "sa2_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa2_500,
-                                                colorName = "sa2_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa2_600,
-                                                colorName = "sa2_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa2_700,
-                                                colorName = "sa2_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa2_800,
-                                                colorName = "sa2_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa2_900,
-                                                colorName = "sa2_900",
-                                                themedColor = C_900
-                                            )
+                                            tiles("system_accent2_")
                                         }
 
                                         Row {
-                                            M3Tile(
-                                                color = sa3_10,
-                                                colorName = "sa3_10",
-                                                themedColor = C_10
-                                            )
-                                            M3Tile(
-                                                color = sa3_50,
-                                                colorName = "sa3_50",
-                                                themedColor = C_50
-                                            )
-                                            M3Tile(
-                                                color = sa3_100,
-                                                colorName = "sa3_100",
-                                                themedColor = C_100
-                                            )
-                                            M3Tile(
-                                                color = sa3_200,
-                                                colorName = "sa3_200",
-                                                themedColor = C_200
-                                            )
-                                            M3Tile(
-                                                color = sa3_300,
-                                                colorName = "sa3_300",
-                                                themedColor = C_300
-                                            )
-                                            M3Tile(
-                                                color = sa3_400,
-                                                colorName = "sa3_400",
-                                                themedColor = C_400
-                                            )
-                                            M3Tile(
-                                                color = sa3_500,
-                                                colorName = "sa3_500",
-                                                themedColor = C_500
-                                            )
-                                            M3Tile(
-                                                color = sa3_600,
-                                                colorName = "sa3_600",
-                                                themedColor = C_600
-                                            )
-                                            M3Tile(
-                                                color = sa3_700,
-                                                colorName = "sa3_700",
-                                                themedColor = C_700
-                                            )
-                                            M3Tile(
-                                                color = sa3_800,
-                                                colorName = "sa3_800",
-                                                themedColor = C_800
-                                            )
-                                            M3Tile(
-                                                color = sa3_900,
-                                                colorName = "sa3_900",
-                                                themedColor = C_900
-                                            )
+                                            tiles("system_accent3_")
                                         }
                                     }
                                 }
@@ -1050,7 +488,7 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sn1_500.toInt())
+                                                containerColor = Color(getColorValue("system_neutral1_500")),
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1093,7 +531,7 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sn2_500.toInt())
+                                                containerColor = Color(getColorValue("system_neutral2_500")),
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1136,7 +574,7 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_500.toInt())
+                                                containerColor = Color(getColorValue("system_accent1_500")),
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1179,7 +617,7 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa2_500.toInt())
+                                                containerColor = Color(getColorValue("system_accent2_500")),
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1222,7 +660,7 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa3_500.toInt())
+                                                containerColor = Color(getColorValue("system_accent3_500")),
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1281,7 +719,7 @@ fun FabricatedMonet(
                                             },
                                             valueRange = 0f..360f,
                                             onValueChangeFinished = {},
-                                            steps = 0,
+                                            steps = 71,
                                             thumb = {
                                                 Image(
                                                     imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
@@ -1316,7 +754,7 @@ fun FabricatedMonet(
                                             },
                                             valueRange = 0f..100f,
                                             onValueChangeFinished = {},
-                                            steps = 0,
+                                            steps = 19,
                                             thumb = {
                                                 Image(
                                                     imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
@@ -1426,16 +864,16 @@ fun FabricatedMonet(
 
                                 val colorReferences = colorsXmlContent.map { it.trim() }
                                     .filter { it.contains("@color/") }.map {
-                                        it.log()
+
                                         val colorName = it.substringAfter("<color name=\"")
                                             .substringBefore("\">@color/")
-                                        colorName.log()
+
                                         val colorReference =
                                             it.substringAfter("@color/").substringBefore("</color>")
                                                 .trim() // trim to remove leading and trailing spaces
-                                        colorReference.log()
+
                                         val colorValue = getColorValue(colorReference)
-                                        colorValue.log()
+
                                         Triple(colorName, colorReference, colorValue)
                                     }
                                 Column {
@@ -1460,7 +898,13 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sn1_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        "system_neutral1_" + selectedMonetColor.substringAfter(
+                                                            "_"
+                                                        ).substringAfter("_")
+                                                    )
+                                                )
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1480,7 +924,13 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sn2_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        "system_neutral2_" + selectedMonetColor.substringAfter(
+                                                            "_"
+                                                        ).substringAfter("_")
+                                                    )
+                                                )
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1498,7 +948,13 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        "system_accent1_" + selectedMonetColor.substringAfter(
+                                                            "_"
+                                                        ).substringAfter("_")
+                                                    )
+                                                )
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1516,7 +972,13 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa2_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        "system_accent2_" + selectedMonetColor.substringAfter(
+                                                            "_"
+                                                        ).substringAfter("_")
+                                                    )
+                                                )
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1534,7 +996,13 @@ fun FabricatedMonet(
                                             .padding(2.dp),
                                             shape = CircleShape,
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa3_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        "system_accent3_" + selectedMonetColor.substringAfter(
+                                                            "_"
+                                                        ).substringAfter("_")
+                                                    )
+                                                )
                                             ),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
@@ -1548,7 +1016,10 @@ fun FabricatedMonet(
                                             Text(text = "A3")
                                         }
                                     }
-                                    FlowRow {
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.SpaceAround,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
                                         Button(
                                             contentPadding = PaddingValues(0.dp), onClick = {
                                                 selectedMonetColor = selectedMonetColor.replace(
@@ -1556,7 +1027,11 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_10.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_10"
+                                                    )
+                                                )
                                             )
                                         ) {
                                             Text(text = "10")
@@ -1568,7 +1043,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_50.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_50"
+                                                    )
+
+                                                )
                                             )
                                         ) {
                                             Text(text = "50")
@@ -1580,7 +1060,11 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_100.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_100"
+                                                    )
+                                                )
                                             )
                                         ) {
                                             Text(text = "100")
@@ -1592,7 +1076,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_200.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_200"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "200")
@@ -1604,7 +1093,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_300.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_300"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "300")
@@ -1616,7 +1110,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_400.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_400"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "400")
@@ -1628,7 +1127,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_500.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_500"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "500")
@@ -1640,7 +1144,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_600.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_600"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "600")
@@ -1652,7 +1161,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_700.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_700"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "700")
@@ -1664,7 +1178,12 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_800.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_800"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "800")
@@ -1676,23 +1195,17 @@ fun FabricatedMonet(
                                                 )
                                                 resetColorsXmlContent()
                                             }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_900.toInt())
+                                                containerColor = Color(
+                                                    getColorValue(
+                                                        selectedMonetColor.substringBeforeLast("_") + "_900"
+                                                    )
+                                                )
+
                                             )
                                         ) {
                                             Text(text = "900")
                                         }
-                                        Button(
-                                            contentPadding = PaddingValues(0.dp), onClick = {
-                                                selectedMonetColor = selectedMonetColor.replace(
-                                                    "_\\d{1,4}".toRegex(), "_1000"
-                                                )
-                                                resetColorsXmlContent()
-                                            }, colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(sa1_1000.toInt())
-                                            )
-                                        ) {
-                                            Text(text = "1000")
-                                        }
+
 
                                     }
 

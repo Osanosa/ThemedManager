@@ -19,8 +19,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.R
-import pro.themed.manager.buildOverlay
-import pro.themed.manager.log
+import pro.themed.manager.utils.buildOverlay
+import pro.themed.manager.utils.log
 
 @Composable
 fun MiscTextField(

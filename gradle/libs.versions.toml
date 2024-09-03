@@ -1,7 +1,7 @@
 [versions]
 firebaseBom = "33.2.0"
-gradle = "8.7.0-alpha08"
-kotlin = "2.0.0"
+gradle = "8.7.0-alpha09"
+kotlin = "2.0.20"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"

@@ -13,14 +13,21 @@ plugins {
 android {
     namespace = "pro.themed.manager.autorefreshrate"
     compileSdk = 34
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\Osanosa\\Key.jks")
+            storePassword = "HolyLumi"
+            keyAlias = "key0"
+            keyPassword = "HolyLumi"
+        }
+    }
     defaultConfig {
         applicationId = "pro.themed.manager.autorefreshrate"
         minSdk = 26
         targetSdk = 35
         versionCode = 2// SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
-        signingConfig = signingConfigs.getByName("debug")
+        signingConfig = signingConfigs.getByName("release")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -31,10 +38,10 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

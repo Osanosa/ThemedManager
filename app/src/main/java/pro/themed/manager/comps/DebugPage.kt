@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -47,9 +46,9 @@ import androidx.compose.ui.window.DialogProperties
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.MainActivity
 import pro.themed.manager.R
-import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.utils.SharedPreferencesManager
 import pro.themed.manager.components.CookieCard
-import pro.themed.manager.fetchOverlayList
+import pro.themed.manager.utils.fetchOverlayList
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.contentcol

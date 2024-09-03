@@ -40,7 +40,7 @@ import pro.themed.manager.MainActivity
 import pro.themed.manager.R
 import pro.themed.manager.components.AdmobBanner
 import pro.themed.manager.components.CookieCard
-import pro.themed.manager.overlayEnable
+import pro.themed.manager.utils.overlayEnable
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.ui.theme.bordercol
 

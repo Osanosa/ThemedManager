@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.MainActivity.Companion.overlayList
 import pro.themed.manager.R
-import pro.themed.manager.overlayEnable
+import pro.themed.manager.utils.overlayEnable
 import kotlin.math.roundToInt
 
 

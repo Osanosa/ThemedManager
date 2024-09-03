@@ -68,10 +68,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.R
-import pro.themed.manager.SharedPreferencesManager
+import pro.themed.manager.utils.SharedPreferencesManager
 import pro.themed.manager.components.CookieCard
 import pro.themed.manager.components.HeaderRow
-import pro.themed.manager.log
+import pro.themed.manager.utils.log
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
 

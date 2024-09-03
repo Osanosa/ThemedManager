@@ -57,14 +57,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pro.themed.manager.MainActivity.Companion.isDark
 import pro.themed.manager.R
-import pro.themed.manager.buildOverlay
-import pro.themed.manager.log
+import pro.themed.manager.utils.buildOverlay
+import pro.themed.manager.utils.log
 import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.showInterstitial
 import kotlin.math.roundToInt
 
-@SuppressLint("CommitPrefEdits")
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccentsAAPT() {

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -65,10 +66,10 @@ class AutoRefreshRateActivity : ComponentActivity() {
             val stackTrace = Log.getStackTraceString(throwable)
             shareStackTrace(stackTrace)
         }
-        val magiskVersion by lazy {
-            Shell.SH.run("magisk -v").stdout()
+        val suVersion by lazy {
+            Shell.SH.run("su -v").stdout()
         }
-        Firebase.crashlytics.setCustomKey("magisk version", magiskVersion)
+        Firebase.crashlytics.setCustomKey("su version", suVersion)
 
 
         super.onCreate(savedInstanceState)
@@ -83,7 +84,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                     val testCommand = "service call SurfaceFlinger 1035 i32"
                     val displayManager =
                         this.getSystemService(DisplayManager::class.java).displays[0]
-                    var unsupportedModes by remember { mutableStateOf(displayManager.supportedModes.size < 2) }
+                    val unsupportedModes by remember { mutableStateOf(displayManager.supportedModes.size < 2) }
 
                     var currentRefreshRate by remember { mutableStateOf(displayManager.refreshRate) }
 
@@ -147,15 +148,29 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         val shell = Shell.SH.addOnStderrLineListener(object : Shell.OnLineListener {
                             override fun onLine(line: String) {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    if (line.contains(
-                                            "su: inaccessible or not found",
-                                            ignoreCase = true
+                                    when {
+                                        line.contains(
+                                            "su: inaccessible or not found", ignoreCase = true
                                         ) || line.contains(
                                             "permission denied", ignoreCase = true
-                                        )
-                                    ) {
-                                        noRoot = true
-                                    } else shareStackTrace(line)
+                                        ) -> {
+                                            noRoot = true
+                                        }
+
+                                        line.contains("service stopped", ignoreCase = true) -> {
+                                            Toast.makeText(
+                                                context, line, Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+
+                                        line.contains("not stopped", ignoreCase = true) -> {
+                                            Toast.makeText(
+                                                context, line, Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+
+                                        else -> shareStackTrace(line)
+                                    }
                                 }
                             }
                         })
@@ -190,21 +205,25 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         Text("Test supported modes:")
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
-                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
                         ) {
+                            repeat(5) {
 
-                            for ((index, mode) in supportedModesArray) {
-                                Button(onClick = {
-                                    //coroutine
+                                for ((index, mode) in supportedModesArray) {
+                                    Button(onClick = {
+                                        //coroutine
 
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        shell.run("$testCommand $index")
-                                        Thread.sleep(100)
-                                        currentRefreshRate = displayManager.refreshRate
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            shell.run("$testCommand $index")
+                                            Thread.sleep(100)
+                                            currentRefreshRate = displayManager.refreshRate
+                                        }
+
+                                    }) {
+                                        Text(index.toString() + ": " + mode.refreshRate.roundToInt())
                                     }
-
-                                }) {
-                                    Text(index.toString() + ": " + mode.refreshRate.roundToInt())
                                 }
                             }
                         }
@@ -223,7 +242,9 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         }
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
-                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
                         ) {
 
                             for ((index, mode) in supportedModesArray) {
@@ -255,7 +276,9 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         }
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
-                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
                         ) {
 
                             for ((index, mode) in supportedModesArray) {

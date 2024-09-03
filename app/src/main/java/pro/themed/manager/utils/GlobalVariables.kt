@@ -20,8 +20,8 @@ object GlobalVariables {
         Shell.SH.run("su -c whoami").stdout()
     }
 
-    val magiskVersion by lazy {
-        Shell.SH.run("magisk -v").stdout()
+    val suVersion by lazy {
+        Shell.SH.run("su -v").stdout()
     }
 
     val themedId by lazy {
