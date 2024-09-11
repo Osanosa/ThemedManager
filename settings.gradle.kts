@@ -23,3 +23,4 @@ rootProject.name = "Themed Manager"
 include(":app")
 include(":autorefreshrate")
 include(":PerAppDownscale")
+include(":PXLSRTR")
