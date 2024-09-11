@@ -1,12 +1,13 @@
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.text.*
+import java.util.*
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
     alias(libs.plugins.google.firebase.crashlytics)
-    id("com.google.firebase.firebase-perf")
+    alias(libs.plugins.google.firebase.firebase.perf)
+
     alias(libs.plugins.compose.compiler)
 
 }
@@ -23,12 +24,7 @@ android {
             variant.outputs.all { output ->
                 val appName = "ThemedManager"
                 val versionName = defaultConfig.versionName
-                output.outputFile.renameTo(
-                    File(
-                        output.outputFile.parent,
-                        "${appName}-v${versionName}-${variant.buildType.name}.apk"
-                    )
-                )
+                output.outputFile.renameTo(File(output.outputFile.parent, "${appName}-v${versionName}-${variant.buildType.name}.apk"))
             }
         }
     }
@@ -55,10 +51,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
             //isDebuggable = true
             // isJniDebuggable = true

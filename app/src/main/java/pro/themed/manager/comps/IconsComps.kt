@@ -1,54 +1,28 @@
-@file:OptIn(
-)
+@file:OptIn()
 
 package pro.themed.manager.comps
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.jaredrummler.ktsh.Shell
-import pro.themed.manager.MainActivity
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import com.jaredrummler.ktsh.*
+import pro.themed.manager.*
 import pro.themed.manager.R
-import pro.themed.manager.components.AdmobBanner
-import pro.themed.manager.components.CookieCard
-import pro.themed.manager.utils.overlayEnable
-import pro.themed.manager.ui.theme.background
-import pro.themed.manager.ui.theme.bordercol
+import pro.themed.manager.components.*
+import pro.themed.manager.ui.theme.*
+import pro.themed.manager.utils.*
 
 @Composable
 fun IconsTab() {
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = background
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = background) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -62,10 +36,9 @@ fun IconsTab() {
 
                 NavbarCard()
             }
-            CookieCard {
 
-                IconPackCard()
-            }
+
+            IconPackCard()
 
         }
     }
@@ -88,17 +61,12 @@ fun NavbarCard() {
             Text(
                 modifier = Modifier
                     .padding(8.dp)
-                    .padding(start = 8.dp),
-                text = "Navbars",
-                fontSize = 24.sp
+                    .padding(start = 8.dp), text = "Navbars", fontSize = 24.sp
             )
             IconButton(onClick = {
                 Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.navbar' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
             }) {
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.reset),
-                    contentDescription = null
-                )
+                Image(imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null)
             }
         }
 
@@ -190,14 +158,10 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
                 }
                 .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             Image(
-                imageVector = ImageVector.vectorResource(id = back),
-                contentDescription = null,
-                Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = back), contentDescription = null, Modifier.size(testdp.dp)
             )
             Image(
-                imageVector = ImageVector.vectorResource(id = home),
-                contentDescription = null,
-                Modifier.size(testdp.dp)
+                imageVector = ImageVector.vectorResource(id = home), contentDescription = null, Modifier.size(testdp.dp)
             )
             Image(
                 imageVector = ImageVector.vectorResource(id = recent),
@@ -208,18 +172,15 @@ private fun Navbar(testdp: Int, back: Int, home: Int, recent: Int, name: String)
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IconPackCard() {
     val context = LocalContext.current
 
-
     val testdp = (LocalConfiguration.current.screenWidthDp - 16) / 12
 
     var expanded by remember { mutableStateOf(true) }
-    Column(
-        modifier = Modifier.clickable { expanded = !expanded },
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    Column(modifier = Modifier.clickable { expanded = !expanded }, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -228,17 +189,12 @@ fun IconPackCard() {
             Text(
                 modifier = Modifier
                     .padding(8.dp)
-                    .padding(start = 8.dp),
-                text = "IconPacks",
-                fontSize = 24.sp
+                    .padding(start = 8.dp), text = "IconPacks", fontSize = 24.sp
             )
             IconButton(onClick = {
                 Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.iconpack' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"$" + "ol\"; done")
             }) {
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.reset),
-                    contentDescription = null
-                )
+                Image(imageVector = ImageVector.vectorResource(id = R.drawable.reset), contentDescription = null)
             }
         }
 
@@ -251,35 +207,41 @@ fun IconPackCard() {
                 label: String,
                 overlayCommands: List<String>,
                 iconResIds: List<Int>,
-                modifier: Modifier = Modifier
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(testdp.dp + 8.dp)
-                        .padding(2.dp)
-                        .clickable { overlayCommands.forEach { overlayEnable(it) } }
+
                 ) {
-                    Text(text = label, fontSize = 18.sp)
-                    iconResIds.forEach { resId ->
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = resId),
-                            contentDescription = null,
-                            Modifier.size(testdp.dp)
-                        )
+                CookieCard(onClick = { overlayCommands.forEach { overlayEnable(it) } }) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                    ) {
+                        Text(text = label, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+                        HorizontalDivider(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 32.dp, vertical = 2.dp))
+                        FlowRow(
+                            maxItemsInEachRow = 3,
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                        ) {
+
+                            iconResIds.forEach { resId ->
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = resId),
+                                    contentDescription = null,
+                                    Modifier.size(testdp.dp)
+                                )
+                            }
+                        }
+
                     }
                 }
 
             }
 
-
             val iconPacks = listOf(
                 Triple(
-                    "Archeous",
-                    listOf("iconpack.acherus.android", "iconpack.acherus.systemui"),
-                    listOf(
+                    "Archeous", listOf("iconpack.acherus.android", "iconpack.acherus.systemui"), listOf(
                         R.drawable.iconpack_archerus_wifi_signal_3,
                         R.drawable.iconpack_archerus_bluetooth_transient_animation,
                         R.drawable.iconpack_archerus_dnd,
@@ -287,9 +249,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_archerus_auto_rotate,
                         R.drawable.iconpack_archerus_airplane
                     )
-                ),
-                Triple(
-                    "Circular   ", listOf(
+                ), Triple(
+                    "Circular", listOf(
                         "iconpack.circular.android",
                         "iconpack.circular.launcher",
                         "iconpack.circular.settings",
@@ -303,9 +264,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_circular_auto_rotate,
                         R.drawable.iconpack_circular_airplane
                     )
-                ),
-                Triple(
-                    "Filled       ", listOf(
+                ), Triple(
+                    "Filled", listOf(
                         "iconpack.filled.android",
                         "iconpack.filled.launcher",
                         "iconpack.filled.settings",
@@ -319,9 +279,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_filled_auto_rotate,
                         R.drawable.iconpack_filled_airplane
                     )
-                ),
-                Triple(
-                    "Kai           ", listOf(
+                ), Triple(
+                    "Kai", listOf(
                         "iconpack.kai.android",
                         "iconpack.kai.launcher",
                         "iconpack.kai.settings",
@@ -335,9 +294,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_kai_auto_rotate,
                         R.drawable.iconpack_kai_airplane
                     )
-                ),
-                Triple(
-                    "Outline    ", listOf(
+                ), Triple(
+                    "Outline", listOf(
                         "iconpack.outline.android",
                         "iconpack.outline.launcher",
                         "iconpack.outline.settings",
@@ -351,9 +309,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_outline_auto_rotate,
                         R.drawable.iconpack_outline_airplane
                     )
-                ),
-                Triple(
-                    "OOS         ", listOf(
+                ), Triple(
+                    "OOS", listOf(
                         "iconpack.oos.android",
                         "iconpack.oos.launcher",
                         "iconpack.oos.settings",
@@ -367,9 +324,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_oos_auto_rotate,
                         R.drawable.iconpack_oos_airplane
                     )
-                ),
-                Triple(
-                    "PUI           ", listOf(
+                ), Triple(
+                    "PUI", listOf(
                         "iconpack.pui.android",
                         "iconpack.pui.launcher",
                         "iconpack.pui.settings",
@@ -383,8 +339,7 @@ fun IconPackCard() {
                         R.drawable.iconpack_pui_auto_rotate,
                         R.drawable.iconpack_pui_airplane
                     )
-                ),
-                Triple(
+                ), Triple(
                     "Rounded ", listOf(
                         "iconpack.rounded.android",
                         "iconpack.rounded.launcher",
@@ -399,9 +354,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_rounded_auto_rotate,
                         R.drawable.iconpack_rounded_airplane
                     )
-                ),
-                Triple(
-                    "Sam         ", listOf(
+                ), Triple(
+                    "Sam", listOf(
                         "iconpack.sam.android",
                         "iconpack.sam.launcher",
                         "iconpack.sam.settings",
@@ -415,9 +369,8 @@ fun IconPackCard() {
                         R.drawable.iconpack_sam_auto_rotate,
                         R.drawable.iconpack_sam_airplane
                     )
-                ),
-                Triple(
-                    "Victor      ", listOf(
+                ), Triple(
+                    "Victor", listOf(
                         "iconpack.victor.android",
                         "iconpack.victor.launcher",
                         "iconpack.victor.settings",
@@ -433,14 +386,22 @@ fun IconPackCard() {
                     )
                 )
             )
+            Row {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
-            Column {
-
-                iconPacks.forEach { (label, commands, icons) ->
-                    IconPackRow(label, commands, icons)
+                    iconPacks.forEachIndexed { index, (label, commands, icons) ->
+                        if (index % 2 == 0) IconPackRow(label, commands, icons)
+                    }
                 }
-            }
+                Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
+                    iconPacks.forEachIndexed { index, (label, commands, icons) ->
+                        if (index % 2 == 1) IconPackRow(label, commands, icons)
+                    }
+                }
+
+            }
 
         }
     }

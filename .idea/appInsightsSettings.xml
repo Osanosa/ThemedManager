@@ -23,8 +23,8 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="pro.themed.manager" />
-                  <option name="mobileSdkAppId" value="1:379152595872:android:3dde65de5a145845b0c2c5" />
+                  <option name="appId" value="pro.themed.manager.autorefreshrate" />
+                  <option name="mobileSdkAppId" value="1:379152595872:android:926a2acb3f242631b0c2c5" />
                   <option name="projectId" value="themed-manager" />
                   <option name="projectNumber" value="379152595872" />
                 </ConnectionSetting>

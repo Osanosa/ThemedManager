@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="autorefreshrate">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-08-28T14:33:30.969521100Z">
+        <DropdownSelection timestamp="2024-09-07T22:25:48.646101100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.185.117:5555;connection=388b9ee7" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=BV9200NEU0002161" />
             </handle>
           </Target>
         </DropdownSelection>
