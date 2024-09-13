@@ -1,12 +1,8 @@
 package pro.themed.autorefreshrate
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.widget.Toast
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import android.content.*
+import android.widget.*
+import com.jaredrummler.ktsh.*
 
 class AutoRefreshRateBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -17,8 +13,9 @@ class AutoRefreshRateBroadcastReceiver : BroadcastReceiver() {
                 false
             )
         ) {
-            val serviceIntent = Intent(context, AutoRefreshRateForegroundService::class.java)
-            context.startForegroundService(serviceIntent)
+            val shell = Shell.SH
+            shell.run ("su")
+            shell.run("am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
             Toast.makeText(context, "Starting autorefreshrate service", Toast.LENGTH_SHORT).show()
         }
     }

@@ -1,26 +1,27 @@
 [versions]
-firebaseBom = "33.2.0"
+firebaseBom = "33.3.0"
 firebaseFirestore = "25.1.0"
-gradle = "8.8.0-alpha01"
+gradle = "8.8.0-alpha02"
 kotlin = "2.0.20"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 ktsh = "1.0.0"
-composeBom = "2024.09.00"
+composeBom = "2024.09.01"
 googleServices = "4.4.2"
 firebaseAnalytics = "22.1.0"
 firebaseDatabase = "21.0.0"
-firebaseCrashlytics = "19.0.3"
+firebaseCrashlytics = "19.1.0"
 firebaseCrashlyticsGradle = "3.0.2"
 firebasePerf = "21.0.1"
 perfPlugin = "1.4.2"
 firebaseMessaging = "24.0.1"
 firebaseInappmessagingDisplay = "21.0.0"
 playServicesAds = "23.3.0"
-compose = "1.7.0"
+compose = "1.7.1"
 googleFirebaseCrashlytics = "3.0.2"
 googleFirebaseFirebasePerf = "1.4.2"
+googleGmsGoogleServices = "4.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.13.1" }
@@ -60,4 +61,5 @@ jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 google-firebase-firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "googleFirebaseFirebasePerf" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 

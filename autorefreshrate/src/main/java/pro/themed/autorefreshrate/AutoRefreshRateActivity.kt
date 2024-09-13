@@ -20,7 +20,8 @@ import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
-import com.google.common.math.DoubleMath.*
+import com.google.firebase.analytics.*
+import com.google.firebase.analytics.ktx.*
 import com.google.firebase.crashlytics.ktx.*
 import com.google.firebase.database.*
 import com.google.firebase.ktx.*
@@ -32,9 +33,10 @@ import java.security.*
 import kotlin.math.*
 
 class AutoRefreshRateActivity : ComponentActivity() {
-
+    private lateinit var analytics: FirebaseAnalytics
     @OptIn(ExperimentalStdlibApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+       analytics = Firebase.analytics
         fun shareStackTrace(stackTrace: String) {
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -69,7 +71,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                     val displayManager = this.getSystemService(DisplayManager::class.java).displays[0]
                     val unsupportedModes by remember { mutableStateOf(displayManager.supportedModes.size < 2) }
 
-                    var currentRefreshRate by remember { mutableStateOf(displayManager.refreshRate) }
+                    var currentRefreshRate by remember { mutableFloatStateOf(displayManager.refreshRate) }
                     LaunchedEffect(Unit) {
                         val database = FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
                         val gpShell = Shell.SH
@@ -238,7 +240,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                 }
                             }
                             var timeout by remember {
-                                mutableStateOf(sharedPreferences.getInt("countdown", 3))
+                                mutableIntStateOf(sharedPreferences.getInt("countdown", 3))
                             }
                             Text("Set timeout: $timeout")
                             Slider(
@@ -257,8 +259,12 @@ class AutoRefreshRateActivity : ComponentActivity() {
 
                                 Text(text = "Auto rate on boot: $autoRateOnBoot", style = MaterialTheme.typography.titleMedium)
                                 Switch(checked = autoRateOnBoot, onCheckedChange = {
-                                    autoRateOnBoot = it
-                                    sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                                    if (!noRoot) {
+                                        autoRateOnBoot = it
+                                        sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                                    } else {
+                                        Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
+                                    }
                                 })
                             }
 

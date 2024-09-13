@@ -29,7 +29,6 @@
         <activity
             android:name="pro.themed.autorefreshrate.AutoRefreshRateActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.ThemedManager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

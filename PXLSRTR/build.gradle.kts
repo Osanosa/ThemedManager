@@ -7,6 +7,7 @@ plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.google.firebase.firebase.perf)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.firebase.crashlytics)
 
 }
 
@@ -15,11 +16,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "pro.themed.PXLSRTR"
+        applicationId = "pro.themed.pxlsrtr"
         minSdk = 21
         targetSdk = 34
-        versionCode = 240222
-        versionName = "24.02.22"
+        versionCode =  SimpleDateFormat("yyMMdd").format(Date()).toInt()
+        versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -72,6 +73,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.perf)
     implementation(libs.firebase.inappmessaging.display)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
