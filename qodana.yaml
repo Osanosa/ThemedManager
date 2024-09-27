@@ -1,0 +1,8 @@
+version: "1.0"
+ide: QDJVMC
+linter: jetbrains/qodana-jvm-android:2024.1
+profile:
+  name: qodana.recommended
+include:
+  - name: CheckDependencyLicenses
+
