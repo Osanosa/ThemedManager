@@ -1,8 +1,8 @@
 package pro.themed.manager
 
 import android.app.ActivityManager
-import android.content.Context
-import android.os.Bundle
+import android.content.*
+import android.os.*
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.content.*
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -41,19 +42,9 @@ import kotlinx.coroutines.launch
 import pro.themed.manager.components.OnBoardingPage
 import pro.themed.manager.comps.NavigationRailSample
 import pro.themed.manager.ui.theme.ThemedManagerTheme
-import pro.themed.manager.utils.FirebaseIsContributor
+import pro.themed.manager.utils.*
 import pro.themed.manager.utils.GlobalVariables.suVersion
 import pro.themed.manager.utils.GlobalVariables.whoami
-import pro.themed.manager.utils.MyForegroundService
-import pro.themed.manager.utils.Navigation
-import pro.themed.manager.utils.OverlayListData
-import pro.themed.manager.utils.SharedPreferencesManager
-import pro.themed.manager.utils.fetchOverlayList
-import pro.themed.manager.utils.loadInterstitial
-import pro.themed.manager.utils.loadRewarded
-import pro.themed.manager.utils.removeInterstitial
-import pro.themed.manager.utils.shareStackTrace
-
 
 class MainActivity : ComponentActivity() {
 
@@ -64,7 +55,13 @@ class MainActivity : ComponentActivity() {
         var isDark by mutableStateOf("")
 
     }
-
+    fun shareStackTrace(stackTrace: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, stackTrace)
+        }.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ContextCompat.startActivity(this@MainActivity, Intent.createChooser(intent, "Share stack trace"), null)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
 
         SharedPreferencesManager.initialize(applicationContext)
@@ -75,6 +72,7 @@ class MainActivity : ComponentActivity() {
         // Set the custom UncaughtExceptionHandler
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             val stackTrace = Log.getStackTraceString(throwable)
+            stackTrace.logError()
             shareStackTrace(stackTrace)
         }
 
@@ -111,8 +109,7 @@ class MainActivity : ComponentActivity() {
 
                 if (sharedPreferences.getBoolean("onBoardingCompleted", false)) {
                     splashScreen.setKeepOnScreenCondition { true }
-                    CoroutineScope(Dispatchers.Main).launch {
-
+                    CoroutineScope(Dispatchers.IO).launch {
                         if ("root" !in whoami) {
                             Toast.makeText(
                                 context, getString(R.string.no_root_access), Toast.LENGTH_LONG

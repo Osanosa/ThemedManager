@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/PerAppDownscale" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/autorefreshrate" />
+            <option value="$PROJECT_DIR$/filesizes" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

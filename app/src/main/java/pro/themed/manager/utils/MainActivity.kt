@@ -1,8 +1,7 @@
 package pro.themed.manager.utils
 
-import android.content.Context
-import android.content.SharedPreferences
-import com.jaredrummler.ktsh.Shell
+import android.content.*
+import com.jaredrummler.ktsh.*
 
 data class OverlayListData(
     val overlayList: List<String>,
@@ -20,7 +19,7 @@ fun fetchOverlayList(): OverlayListData {
         val disabledOverlays = overlayList.filter { it.contains("[ ]") }
         OverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
     } catch (e: Exception) {
-        return OverlayListData(emptyList(), emptyList(), emptyList(), emptyList()).also {}
+        return OverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
     }
 
 }

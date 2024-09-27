@@ -1,30 +1,21 @@
 package pro.themed.autorefreshrate
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.app.*
+import android.content.*
+import android.os.*
+import androidx.core.app.*
+import com.google.firebase.crashlytics.ktx.*
+import com.google.firebase.ktx.*
+import com.jaredrummler.ktsh.*
+import kotlinx.coroutines.*
 import pro.themed.manager.autorefreshrate.R
-import java.util.concurrent.TimeUnit
-import kotlin.properties.Delegates
+import java.util.concurrent.*
 
 class AutoRefreshRateForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
     private lateinit var sharedPreferences: SharedPreferences
     var countdown = 3 // Initial countdown value
-    var countdownReset by Delegates.notNull<Int>()
+    var countdownReset = 3
     private var isMaxRate = false // Flag to track the rate state
     private val shell1 = Shell("su")
     private val shell2 = Shell("su")

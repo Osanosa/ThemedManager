@@ -35,7 +35,8 @@ import com.jaredrummler.ktsh.Shell.*
 import kotlinx.coroutines.*
 import pro.themed.manager.*
 import pro.themed.manager.MainActivity.Companion.isDark
-import pro.themed.manager.R
+import pro.themed.manager.R.*
+import pro.themed.manager.components.*
 import pro.themed.manager.ui.theme.*
 import pro.themed.manager.utils.*
 import kotlin.math.*
@@ -43,11 +44,9 @@ import kotlin.math.*
 @Preview
 @OptIn(
     ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class,
     ExperimentalLayoutApi::class,
 )
-@Composable
-fun FabricatedMonet() {
+@Composable fun FabricatedMonet() {
     val context = LocalContext.current
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
 
@@ -63,26 +62,39 @@ fun FabricatedMonet() {
     colorsShell.addOnStderrLineListener(object : OnLineListener {
         override fun onLine(line: String) {
             CoroutineScope(Dispatchers.Main).launch {
-                shareStackTrace(line)
                 line.log("FM ERROR")
             }
         }
     })
 
+    colorsShell.addOnCommandResultListener(object : OnCommandResultListener {
+        override fun onResult(result: Command.Result) {
+            CoroutineScope(Dispatchers.Main).launch {
+                result.log("FM RESULT")
+            }
+        }
+    })
+
+
     colorsShell.run("cd $colorsPath")
 
-    var colorsXmlContent by remember { mutableStateOf(colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout) }
+    var colorsXmlContent by remember {
+        mutableStateOf(colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout)
+    }
 
     fun resetColorsXmlContent() {
-        colorsXmlContent = colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+        colorsXmlContent =
+            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
     }
     LaunchedEffect(isDark) {
-        colorsXmlContent = colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
+        colorsXmlContent =
+            colorsShell.run("cat /data/adb/modules/ThemedProject/onDemandCompiler/fakeMonet/res/values$isDark/colors.xml").stdout
     }
 
     LaunchedEffect(selectedColorReference) {
-        val colorValue = colorsXmlContent.find { it.contains("<color name=\"$selectedColorReference\">") }
-            ?.substringAfter("@color/")?.substringBefore("</color>") ?: ""
+        val colorValue =
+            colorsXmlContent.find { it.contains("<color name=\"$selectedColorReference\">") }?.substringAfter("@color/")
+                ?.substringBefore("</color>") ?: ""
         if (selectedColorReference.isNotBlank()) selectedMonetColor = colorValue
     }
 
@@ -100,7 +112,8 @@ fun FabricatedMonet() {
         return if (colorLine?.contains("@color/") == true) { // If the color line references another color, recursively resolve the reference
             val referencedColorName = colorLine.substringAfter("@color/").substringBefore("</color>")
             getColorValue(referencedColorName)
-        } else { // If the color line contains an actual color value, parse and return it
+        }
+        else { // If the color line contains an actual color value, parse and return it
             colorLine?.substringAfter("#")?.substringBefore("</color>")
                 ?.let { android.graphics.Color.parseColor("#$it") }
                 ?: android.graphics.Color.WHITE // Default color is white
@@ -109,7 +122,7 @@ fun FabricatedMonet() {
 
     fun updateColor(colorName: String, colorValue: Int?) {
         colorsShell.run("cd $colorsPath")
-        colorsShell.run("""sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#${
+        colorsShell.run("""sed -i -r '/$colorName">/ s/>#[0-9A-Fa-f]{6,8}</>#${
             "%08x".format(colorValue ?: 0)
         }</g' res/values$isDark/colors.xml""")
 
@@ -131,8 +144,22 @@ fun FabricatedMonet() {
     val C_800 = hsl(hue, saturation / 100, 0.20f + lightness / 100)
     val C_900 = hsl(hue, saturation / 100, 0.10f + lightness / 100)
 
-    @Composable
-    fun ThemedColor(colorName: String) = when {
+    fun updateBatchColors(name: String) {
+        updateColor(name + "_10", C_10.toArgb())
+        updateColor(name + "_50", C_50.toArgb())
+        updateColor(name + "_100", C_100.toArgb())
+        updateColor(name + "_200", C_200.toArgb())
+        updateColor(name + "_300", C_300.toArgb())
+        updateColor(name + "_400", C_400.toArgb())
+        updateColor(name + "_500", C_500.toArgb())
+        updateColor(name + "_600", C_600.toArgb())
+        updateColor(name + "_700", C_700.toArgb())
+        updateColor(name + "_800", C_800.toArgb())
+        updateColor(name + "_900", C_900.toArgb())
+        resetColorsXmlContent()
+    }
+
+    @Composable fun ThemedColor(colorName: String) = when {
         colorName.endsWith("10")  -> C_10
         colorName.endsWith("50")  -> C_50
         colorName.endsWith("100") -> C_100
@@ -148,566 +175,436 @@ fun FabricatedMonet() {
     }
 
 
-    Card(onClick = { expanded = !expanded }, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol), modifier = Modifier.animateContentSize()) {
-        Card(onClick = { /*TODO*/ }, shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol), modifier = Modifier
-            .animateContentSize()
-            .padding(8.dp)) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = CenterVertically,
+    CookieCard(onClick = { expanded = !expanded }) {
 
+        Column(Modifier.animateContentSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = CenterVertically,
+
+                ) {
+                Text(modifier = Modifier
+                    .padding(8.dp)
+                    .padding(start = 8.dp), text = "Monet", fontSize = 24.sp)
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded; isGridExpanded = false
+                }) {
+                    Icon(modifier = Modifier,
+                        painter = painterResource(id = drawable.tactic_24px),
+                        contentDescription = "Expand")
+                }
+                IconButton(onClick = {
+                    isGridExpanded = !isGridExpanded; isColorReferenceDropdownExpanded = false
+                }) {
+                    Icon(modifier = Modifier,
+                        painter = painterResource(id = drawable.background_grid_small_24px),
+                        contentDescription = "Expand")
+                }
+                IconButton(onClick = {
+                    expanded = !expanded
+                }, colors = IconButtonDefaults.iconButtonColors(containerColor = if (!expanded) {
+                    Color.Gray
+                }
+                else {
+                    Transparent
+                })) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                }
+            }
+            val configuration = LocalConfiguration.current
+            val divisor = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                5
+            }
+            else {
+                12
+            }
+            val tilesize = (((configuration.screenWidthDp - 16 - 64 - 16) / divisor)).dp
+            HorizontalDivider()
+
+            Box {
+                androidx.compose.animation.AnimatedVisibility(visible = !expanded,
+                    modifier = Modifier.padding(8.dp),
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()) { //Tutorial text
+                    Text(
+                        text = stringResource(string.monet_tutorial),
+                    )
+                }
+
+                androidx.compose.animation.AnimatedVisibility(visible = expanded,
+                    modifier = Modifier.wrapContentHeight(),
+                    enter = fadeIn() + expandVertically(initialHeight = { it / 2 }),
+                    exit = fadeOut() + shrinkVertically(targetHeight = { it / 2 })) {
+                    Column(horizontalAlignment = CenterHorizontally,
+                        modifier = Modifier.imePadding() // .background(cardcol)
                     ) {
-                    Text(modifier = Modifier
-                        .padding(8.dp)
-                        .padding(start = 8.dp), text = "Monet", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = {
-                        isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded; isGridExpanded = false
-                    }) {
-                        Icon(modifier = Modifier, painter = painterResource(id = R.drawable.tactic_24px), contentDescription = "Expand")
-                    }
-                    IconButton(onClick = {
-                        isGridExpanded = !isGridExpanded; isColorReferenceDropdownExpanded = false
-                    }) {
-                        Icon(modifier = Modifier, painter = painterResource(id = R.drawable.background_grid_small_24px), contentDescription = "Expand")
-                    }
-                    IconButton(onClick = {
-                        expanded = !expanded
-                    }, colors = IconButtonDefaults.iconButtonColors(containerColor = if (!expanded) {
-                        Color.Gray
-                    } else {
-                        Color.Transparent
-                    })) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                    }
-                }
-                val configuration = LocalConfiguration.current
-                val divisor = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    5
-                } else {
-                    12
-                }
-                val tilesize = (((configuration.screenWidthDp - 16 - 64 - 16) / divisor)).dp
-                HorizontalDivider()
-
-                Box {
-                    androidx.compose.animation.AnimatedVisibility(visible = !expanded, modifier = Modifier.padding(8.dp), enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) { //Tutorial text
-                        Text(
-                            text = stringResource(R.string.monet_tutorial),
-                        )
-                    }
-
-                    androidx.compose.animation.AnimatedVisibility(visible = expanded, modifier = Modifier.wrapContentHeight(), enter = fadeIn() + expandVertically(initialHeight = { it / 2 }), exit = fadeOut() + shrinkVertically(targetHeight = { it / 2 })) {
-                        Column(horizontalAlignment = CenterHorizontally, modifier = Modifier.imePadding() // .background(cardcol)
+                        @Stable @Composable fun M3Tile(
+                            color: Int?,
+                            colorName: String,
+                            themedColor: Color,
+                            topStart: Float = 0f,
+                            topEnd: Float = 0f,
+                            bottomStart: Float = 0f,
+                            bottomEnd: Float = 0f,
                         ) {
-                            @Stable
-                            @Composable
-                            fun M3Tile(
-                                color: Int?,
-                                colorName: String,
-                                themedColor: Color,
-                                topStart: Float = 0f,
-                                topEnd: Float = 0f,
-                                bottomStart: Float = 0f,
-                                bottomEnd: Float = 0f,
-                            ) {
-                                color?.let { Color(it) }?.let {
-                                    Surface(shape = RoundedCornerShape(topStart = topStart, topEnd = topEnd, bottomStart = bottomStart, bottomEnd = bottomEnd), modifier = Modifier
-                                        .width(tilesize)
-                                        .aspectRatio(2f)
+                            color?.let { Color(it) }?.let {
+                                Surface(shape = RoundedCornerShape(topStart = topStart,
+                                    topEnd = topEnd,
+                                    bottomStart = bottomStart,
+                                    bottomEnd = bottomEnd), modifier = Modifier
+                                    .width(tilesize)
+                                    .aspectRatio(2f)
 
-                                        .combinedClickable(onClick = {
+                                    .combinedClickable(onClick = {
 
-                                            val hex = "%08x".format(themedColor.toArgb())
-                                            colorsShell.run("cd $colorsPath")
-                                            colorsShell.run("""sed -i '/$colorName">/ s/>#\([0-9A-Fa-f]\{8\}\)</>#$hex</g' res/values$isDark/colors.xml""")
-                                            resetColorsXmlContent()
+                                        val hex = "%08x".format(themedColor.toArgb())
+                                        colorsShell.run("cd $colorsPath")
+                                        colorsShell.run("""sed -i -r '/$colorName">/ s/>#[0-9A-Fa-f]{6,8}</>#$hex</g' res/values$isDark/colors.xml""")
+                                        resetColorsXmlContent()
 
-                                        }, onLongClick = {
-                                            Toast
-                                                .makeText(MainActivity.appContext, "", Toast.LENGTH_SHORT)
-                                                .show()
-                                        }), color = it) {
-                                        val textColor = getContrastColor(color)
+                                    }, onLongClick = {
+                                        Toast.makeText(MainActivity.appContext, "", Toast.LENGTH_SHORT).show()
+                                    }), color = it) {
+                                    val textColor = getContrastColor(color)
 
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Text(text = colorName.substringAfter("_")
-                                                .substringAfter("_"), color = textColor, fontSize = 14.sp)
-                                        }
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(text = colorName.substringAfter("_").substringAfter("_"),
+                                            color = textColor,
+                                            fontSize = 14.sp)
                                     }
                                 }
                             }
+                        }
 
-                            val values = listOf(10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
+                        val values = listOf(10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
 
-                            @Composable
-                            fun tiles(name: String) {
-                                listOf(name) + values.map { "$name$it" }.forEach { colorName ->
-                                    M3Tile(color = getColorValue(colorName), colorName = colorName, themedColor = ThemedColor(colorName))
-                                }
-
+                        @Composable fun tiles(name: String) {
+                            listOf(name) + values.map { "$name$it" }.forEach { colorName ->
+                                M3Tile(color = getColorValue(colorName),
+                                    colorName = colorName,
+                                    themedColor = ThemedColor(colorName))
                             }
 
-                            val configuration = LocalConfiguration.current
-                            AnimatedVisibility(visible = isGridExpanded) {
-                                if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                    Row(Modifier
-                                        .wrapContentWidth(unbounded = true)
-                                        .clip(RoundedCornerShape(12.dp))) {
-                                        Column(horizontalAlignment = CenterHorizontally) {
-                                            Text(text = "N1", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
-                                            tiles("system_neutral1_")
+                        }
 
-                                        }
-
-                                        Column(horizontalAlignment = CenterHorizontally) {
-                                            Text(text = "N2", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
-                                            tiles("system_neutral2_")
-                                        }
-
-                                        Column(horizontalAlignment = CenterHorizontally) {
-                                            Text(text = "A1", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
-
-                                            tiles("system_accent1_")
-                                        }
-
-                                        Column(horizontalAlignment = CenterHorizontally) {
-                                            Text(text = "A2", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
-
-                                            tiles("system_accent2_")
-                                        }
-
-                                        Column(horizontalAlignment = CenterHorizontally) {
-                                            Text(text = "A3", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
-
-                                            tiles("system_accent3_")
-                                        }
+                        val configuration = LocalConfiguration.current
+                        AnimatedVisibility(visible = isGridExpanded) {
+                            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                Row(Modifier
+                                    .wrapContentWidth(unbounded = true)
+                                    .clip(RoundedCornerShape(12.dp))) {
+                                    Column(horizontalAlignment = CenterHorizontally) {
+                                        Text(text = "N1",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(4.dp))
+                                        tiles("system_neutral1_")
 
                                     }
 
-                                } else {
-                                    Column(Modifier
-                                        .wrapContentWidth(unbounded = true)
-                                        .clip(RoundedCornerShape(12.dp))) {
-                                        Row {
-                                            tiles("system_neutral1_")
-                                        }
-
-                                        Row {
-                                            tiles("system_neutral2_")
-                                        }
-
-                                        Row {
-                                            tiles("system_accent1_")
-                                        }
-
-                                        Row {
-                                            tiles("system_accent2_")
-                                        }
-
-                                        Row {
-                                            tiles("system_accent3_")
-                                        }
+                                    Column(horizontalAlignment = CenterHorizontally) {
+                                        Text(text = "N2",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(4.dp))
+                                        tiles("system_neutral2_")
                                     }
+
+                                    Column(horizontalAlignment = CenterHorizontally) {
+                                        Text(text = "A1",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(4.dp))
+
+                                        tiles("system_accent1_")
+                                    }
+
+                                    Column(horizontalAlignment = CenterHorizontally) {
+                                        Text(text = "A2",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(4.dp))
+
+                                        tiles("system_accent2_")
+                                    }
+
+                                    Column(horizontalAlignment = CenterHorizontally) {
+                                        Text(text = "A3",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(4.dp))
+
+                                        tiles("system_accent3_")
+                                    }
+
                                 }
+
                             }
-                            AnimatedVisibility(visible = !isColorReferenceDropdownExpanded) {
-                                Column {
+                            else {
+                                Column(Modifier
+                                    .wrapContentWidth(unbounded = true)
+                                    .clip(RoundedCornerShape(12.dp))) {
                                     Row {
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(getColorValue("system_neutral1_500")),
-                                        ), contentPadding = PaddingValues(0.dp), onClick = {
-                                            updateColor("system_neutral1_10", C_10.toArgb())
-                                            updateColor("system_neutral1_50", C_50.toArgb())
-                                            updateColor("system_neutral1_100", C_100.toArgb())
-                                            updateColor("system_neutral1_200", C_200.toArgb())
-                                            updateColor("system_neutral1_300", C_300.toArgb())
-                                            updateColor("system_neutral1_400", C_400.toArgb())
-                                            updateColor("system_neutral1_500", C_500.toArgb())
-                                            updateColor("system_neutral1_600", C_600.toArgb())
-                                            updateColor("system_neutral1_700", C_700.toArgb())
-                                            updateColor("system_neutral1_800", C_800.toArgb())
-                                            updateColor("system_neutral1_900", C_900.toArgb())
-                                            resetColorsXmlContent()
-                                        }) {
-                                            Text(text = "N1")
-                                        }
-
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(getColorValue("system_neutral2_500")),
-                                        ), contentPadding = PaddingValues(0.dp), onClick = {
-                                            updateColor("system_neutral2_10", C_10.toArgb())
-                                            updateColor("system_neutral2_50", C_50.toArgb())
-                                            updateColor("system_neutral2_100", C_100.toArgb())
-                                            updateColor("system_neutral2_200", C_200.toArgb())
-                                            updateColor("system_neutral2_300", C_300.toArgb())
-                                            updateColor("system_neutral2_400", C_400.toArgb())
-                                            updateColor("system_neutral2_500", C_500.toArgb())
-                                            updateColor("system_neutral2_600", C_600.toArgb())
-                                            updateColor("system_neutral2_700", C_700.toArgb())
-                                            updateColor("system_neutral2_800", C_800.toArgb())
-                                            updateColor("system_neutral2_900", C_900.toArgb())
-                                            resetColorsXmlContent()
-
-                                        }) {
-                                            Text(text = "N2")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(getColorValue("system_accent1_500")),
-                                        ), contentPadding = PaddingValues(0.dp), onClick = {
-                                            updateColor("system_accent1_10", C_10.toArgb())
-                                            updateColor("system_accent1_50", C_50.toArgb())
-                                            updateColor("system_accent1_100", C_100.toArgb())
-                                            updateColor("system_accent1_200", C_200.toArgb())
-                                            updateColor("system_accent1_300", C_300.toArgb())
-                                            updateColor("system_accent1_400", C_400.toArgb())
-                                            updateColor("system_accent1_500", C_500.toArgb())
-                                            updateColor("system_accent1_600", C_600.toArgb())
-                                            updateColor("system_accent1_700", C_700.toArgb())
-                                            updateColor("system_accent1_800", C_800.toArgb())
-                                            updateColor("system_accent1_900", C_900.toArgb())
-                                            resetColorsXmlContent()
-
-                                        }) {
-                                            Text(text = "A1")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(getColorValue("system_accent2_500")),
-                                        ), contentPadding = PaddingValues(0.dp), onClick = {
-                                            updateColor("system_accent2_10", C_10.toArgb())
-                                            updateColor("system_accent2_50", C_50.toArgb())
-                                            updateColor("system_accent2_100", C_100.toArgb())
-                                            updateColor("system_accent2_200", C_200.toArgb())
-                                            updateColor("system_accent2_300", C_300.toArgb())
-                                            updateColor("system_accent2_400", C_400.toArgb())
-                                            updateColor("system_accent2_500", C_500.toArgb())
-                                            updateColor("system_accent2_600", C_600.toArgb())
-                                            updateColor("system_accent2_700", C_700.toArgb())
-                                            updateColor("system_accent2_800", C_800.toArgb())
-                                            updateColor("system_accent2_900", C_900.toArgb())
-                                            resetColorsXmlContent()
-
-                                        }) {
-                                            Text(text = "A2")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(getColorValue("system_accent3_500")),
-                                        ), contentPadding = PaddingValues(0.dp), onClick = {
-                                            updateColor("system_accent3_10", C_10.toArgb())
-                                            updateColor("system_accent3_50", C_50.toArgb())
-                                            updateColor("system_accent3_100", C_100.toArgb())
-                                            updateColor("system_accent3_200", C_200.toArgb())
-                                            updateColor("system_accent3_300", C_300.toArgb())
-                                            updateColor("system_accent3_400", C_400.toArgb())
-                                            updateColor("system_accent3_500", C_500.toArgb())
-                                            updateColor("system_accent3_600", C_600.toArgb())
-                                            updateColor("system_accent3_700", C_700.toArgb())
-                                            updateColor("system_accent3_800", C_800.toArgb())
-                                            updateColor("system_accent3_900", C_900.toArgb())
-                                            resetColorsXmlContent()
-
-                                        }) {
-                                            Text(text = "A3")
-                                        }
+                                        tiles("system_neutral1_")
                                     }
-                                    Column(modifier = Modifier.padding(8.dp)) {
-                                        val colors = mutableListOf<Color>()
-                                        for (h in 0..360 step 60) {
-                                            colors.add(hsl(h.toFloat(), 1f, 0.5f))
-                                        }
-                                        Text(text = "hue is ${hue.toInt()}°")
-                                        Slider(
-                                            colors = SliderDefaults.colors(
-                                                activeTrackColor = Transparent
-                                            )
-                                            ,modifier = Modifier
-                                            .background(Brush.horizontalGradient(colors = colors), shape = CircleShape)
-                                            .height(16.dp)
-                                            .padding(0.dp), value = hue, onValueChange = {
-                                            hue = it.roundToInt().toFloat()
-                                        }, valueRange = 0f..360f, onValueChangeFinished = {}, steps = 71, thumb = {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
-                                                contentDescription = null,
-                                            )
 
-                                        })
-                                        Text(text = "saturation is ${saturation.toInt()}%")
-                                        Slider(modifier = Modifier
-                                            .background(Brush.horizontalGradient(colors = listOf(hsl(hue, 0f, 0.5f), hsl(hue, 0.1f, 0.5f), hsl(hue, 0.2f, 0.5f), hsl(hue, 0.3f, 0.5f), hsl(hue, 0.4f, 0.5f), hsl(hue, 0.5f, 0.5f), hsl(hue, 0.6f, 0.5f), hsl(hue, 0.7f, 0.5f), hsl(hue, 0.8f, 0.5f), hsl(hue, 0.9f, 0.5f), hsl(hue, 1f, 0.5f))), shape = CircleShape)
-                                            .height(16.dp)
-                                            .padding(0.dp), value = saturation, onValueChange = {
-                                            saturation = it.roundToInt().toFloat()
-                                        }, valueRange = 0f..100f, onValueChangeFinished = {}, steps = 19, thumb = {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
-                                                contentDescription = null,
-                                            )
-                                        })
-                                        Text(text = "Lightness is +/-${lightness.toInt()}")
-                                        Slider(modifier = Modifier
-                                            .background(Brush.horizontalGradient(colors = listOf(hsl(hue, saturation / 100f, 0.4f), hsl(hue, saturation / 100f, 0.5f), hsl(hue, saturation / 100f, 0.6f))), shape = CircleShape)
+                                    Row {
+                                        tiles("system_neutral2_")
+                                    }
 
-                                            .height(16.dp)
-                                            .padding(0.dp), value = lightness, onValueChange = {
-                                            lightness = it.roundToInt().toFloat()
-                                        }, valueRange = -10f..10f, onValueChangeFinished = {}, steps = 19, thumb = {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(R.drawable.fiber_manual_record_48px),
-                                                contentDescription = null,
-                                            )
-                                        })
+                                    Row {
+                                        tiles("system_accent1_")
+                                    }
 
+                                    Row {
+                                        tiles("system_accent2_")
+                                    }
+
+                                    Row {
+                                        tiles("system_accent3_")
                                     }
                                 }
+                            }
+                        }
+                        AnimatedVisibility(visible = !isColorReferenceDropdownExpanded) {
+                            Column {
+                                Row {
+                                    mapOf("system_neutral1" to "N1",
+                                        "system_neutral2" to "N2",
+                                        "system_accent1" to "A1",
+                                        "system_accent2" to "A2",
+                                        "system_accent3" to "A3").forEach {
+                                        Button(modifier = Modifier
+                                            .weight(1f)
+                                            .padding(2.dp),
+                                            shape = CircleShape,
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(getColorValue(it.key + "_500")),
+                                            ),
+                                            contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                                updateBatchColors(it.key)
+                                            }) {
+                                            Text(text = it.value)
+                                        }
+                                    }
 
+                                }
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    val colors = mutableListOf<Color>()
+                                    for (h in 0..360 step 60) {
+                                        colors.add(hsl(h.toFloat(), 1f, 0.5f))
+                                    }
+                                    Text(text = "hue is ${hue.toInt()}°")
+                                    val sliderColors = SliderDefaults.colors(activeTrackColor = Transparent,
+                                        inactiveTrackColor = Transparent,
+                                        thumbColor = White,
+                                        activeTickColor = White,
+                                        inactiveTickColor = White)
+
+                                    Slider(colors = sliderColors,
+                                        modifier = Modifier
+                                            .height(16.dp)
+                                            .background(Brush.horizontalGradient(colors = colors), shape = CircleShape)
+                                            .padding(0.dp),
+                                        value = hue,
+                                        onValueChange = {
+                                            hue = it.roundToInt().toFloat()
+                                        },
+                                        valueRange = 0f..360f,
+                                        onValueChangeFinished = {},
+                                        steps = 71)
+                                    Text(text = "saturation is ${saturation.toInt()}%")
+                                    Slider(
+                                        colors = sliderColors,
+                                        modifier = Modifier
+                                            .background(Brush.horizontalGradient(colors = (0..10).map {
+                                                hsl(hue, it / 10f, 0.5f)
+                                            }), shape = CircleShape)
+                                            .height(16.dp)
+                                            .padding(0.dp),
+                                        value = saturation,
+                                        onValueChange = {
+                                            saturation = it.roundToInt().toFloat()
+                                        },
+                                        valueRange = 0f..100f,
+                                        onValueChangeFinished = {},
+                                        steps = 19,
+                                    )
+                                    Text(text = "Lightness is +/-${lightness.toInt()}")
+                                    Slider(
+                                        colors = sliderColors,
+                                        modifier = Modifier
+                                            .background(Brush.horizontalGradient(colors = listOf(hsl(hue,
+                                                saturation / 100f,
+                                                0.4f),
+                                                hsl(hue, saturation / 100f, 0.5f),
+                                                hsl(hue, saturation / 100f, 0.6f))), shape = CircleShape)
+
+                                            .height(16.dp)
+                                            .padding(0.dp),
+                                        value = lightness,
+                                        onValueChange = {
+                                            lightness = it.roundToInt().toFloat()
+                                        },
+                                        valueRange = -10f..10f,
+                                        onValueChangeFinished = {},
+                                        steps = 19,
+                                    )
+
+                                }
                             }
 
-                            AnimatedVisibility(visible = isColorReferenceDropdownExpanded) {
-                                @Composable
-                                fun ReferenceItem(
-                                    colorName: String, colorReference: String, colorValue: Int,
-                                ) {
-                                    Row(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = if (colorName == selectedColorReference) 8.dp else 0.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(if (colorName == selectedColorReference) {
-                                            contentcol.copy(alpha = 0.32f)
-                                        } else {
-                                            contentcol.copy(alpha = 0.12f)
-                                        })
-                                        .clickable(onClick = {
-                                            selectedColorReference = colorName
-                                            selectedMonetColor = colorReference
+                        }
 
-                                        }), verticalAlignment = CenterVertically) {
-                                        Text(text = colorName, style = MaterialTheme.typography.bodyMedium, modifier = Modifier
+                        AnimatedVisibility(visible = isColorReferenceDropdownExpanded) {
+                            @Composable fun ReferenceItem(
+                                colorName: String, colorReference: String, colorValue: Int,
+                            ) {
+                                Row(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp,
+                                        vertical = if (colorName == selectedColorReference) 8.dp else 0.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (colorName == selectedColorReference) {
+                                        contentcol.copy(alpha = 0.32f)
+                                    }
+                                    else {
+                                        contentcol.copy(alpha = 0.12f)
+                                    })
+                                    .clickable(onClick = {
+                                        selectedColorReference = colorName
+                                        selectedMonetColor = colorReference
+
+                                    }), verticalAlignment = CenterVertically) {
+                                    Text(text = colorName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier
                                             .weight(1f)
                                             .padding(8.dp))
-                                        Text(text = colorReference.replace("system_", "S").replace("neutral", "N")
-                                            .replace("accent", "A"), style = MaterialTheme.typography.bodyMedium.copy(shadow = Shadow(color = if (colorValue
+                                    Text(text = colorReference.replace("system_", "S").replace("neutral", "N")
+                                        .replace("accent", "A"),
+                                        style = MaterialTheme.typography.bodyMedium.copy(shadow = Shadow(color = if (colorValue
                                                 .toColor().luminance() > 0.5f) {
                                             White
-                                        } else {
+                                        }
+                                        else {
                                             Black
-                                        }, blurRadius = 16f)), color = if (colorValue.toColor().luminance() > 0.5f) {
+                                        }, blurRadius = 16f)),
+                                        color = if (colorValue.toColor().luminance() > 0.5f) {
                                             Black
-                                        } else {
+                                        }
+                                        else {
                                             White
-                                        }, modifier = Modifier
+                                        },
+                                        modifier = Modifier
                                             .wrapContentWidth(End)
                                             .clip(RoundedCornerShape(8.dp))
                                             .background(color = Color(colorValue))
                                             .padding(8.dp)
 
-                                        )
-                                    }
+                                    )
                                 }
-
-                                val colorReferences = colorsXmlContent.map { it.trim() }
-                                    .filter { it.contains("@color/") }.map {
-
-                                        val colorName = it.substringAfter("<color name=\"")
-                                            .substringBefore("\">@color/")
-
-                                        val colorReference = it.substringAfter("@color/").substringBefore("</color>")
-                                            .trim() // trim to remove leading and trailing spaces
-
-                                        val colorValue = getColorValue(colorReference)
-
-                                        Triple(colorName, colorReference, colorValue)
-                                    }
-                                Column {
-                                    LazyColumn(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        colorReferences.forEach { (colorName, colorReference, colorValue) ->
-                                            item {
-                                                ReferenceItem(colorName, colorReference, colorValue)
-                                            }
-                                        }
-                                    }
-
-                                    Row {
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue("system_neutral1_" + selectedMonetColor
-                                            .substringAfter("_")
-                                            .substringAfter("_")))), contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("neutral2", "neutral1")
-                                                .replace("accent1", "neutral1").replace("accent2", "neutral1")
-                                                .replace("accent3", "neutral1")
-                                            resetColorsXmlContent()
-
-                                        }) {
-                                            Text(text = "N1")
-                                        }
-
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue("system_neutral2_" + selectedMonetColor
-                                            .substringAfter("_")
-                                            .substringAfter("_")))), contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("neutral1", "neutral2")
-                                                .replace("accent1", "neutral2").replace("accent2", "neutral2")
-                                                .replace("accent3", "neutral2")
-                                            resetColorsXmlContent()
-                                        }) {
-                                            Text(text = "N2")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue("system_accent1_" + selectedMonetColor
-                                            .substringAfter("_")
-                                            .substringAfter("_")))), contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("neutral1", "accent1")
-                                                .replace("neutral2", "accent1").replace("accent2", "accent1")
-                                                .replace("accent3", "accent1")
-                                            resetColorsXmlContent()
-                                        }) {
-                                            Text(text = "A1")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue("system_accent2_" + selectedMonetColor
-                                            .substringAfter("_")
-                                            .substringAfter("_")))), contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("neutral1", "accent2")
-                                                .replace("neutral2", "accent2").replace("accent1", "accent2")
-                                                .replace("accent3", "accent2")
-                                            resetColorsXmlContent()
-                                        }) {
-                                            Text(text = "A2")
-                                        }
-                                        Button(modifier = Modifier
-                                            .weight(1f)
-                                            .padding(2.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue("system_accent3_" + selectedMonetColor
-                                            .substringAfter("_")
-                                            .substringAfter("_")))), contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("neutral1", "accent3")
-                                                .replace("neutral2", "accent3").replace("accent1", "accent3")
-                                                .replace("accent2", "accent3")
-                                            resetColorsXmlContent()
-                                        }) {
-                                            Text(text = "A3")
-                                        }
-                                    }
-                                    FlowRow(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_10")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_10")))) {
-                                            Text(text = "10")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_50")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_50")
-
-                                        ))) {
-                                            Text(text = "50")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_100")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_100")))) {
-                                            Text(text = "100")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_200")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_200"))
-
-                                        )) {
-                                            Text(text = "200")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_300")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_300"))
-
-                                        )) {
-                                            Text(text = "300")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_400")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_400"))
-
-                                        )) {
-                                            Text(text = "400")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_500")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_500"))
-
-                                        )) {
-                                            Text(text = "500")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_600")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_600"))
-
-                                        )) {
-                                            Text(text = "600")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_700")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_700"))
-
-                                        )) {
-                                            Text(text = "700")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_800")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_800"))
-
-                                        )) {
-                                            Text(text = "800")
-                                        }
-                                        Button(contentPadding = PaddingValues(0.dp), onClick = {
-                                            selectedMonetColor = selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_900")
-                                            resetColorsXmlContent()
-                                        }, colors = ButtonDefaults.buttonColors(containerColor = Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_900"))
-
-                                        )) {
-                                            Text(text = "900")
-                                        }
-
-                                    }
-
-                                }
-
                             }
 
-                            Row {
-                                Button(onClick = {
-                                    Shell.SH.run("su -c cmd overlay disable themed.fakemonet.generic")
-                                    Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
-                                    Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
-                                    Shell.SH.run("su -c cmd overlay enable com.android.systemui:dynamic")
-                                    Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
-                                }) {
-                                    Text(text = "Reset")
+                            val colorReferences =
+                                colorsXmlContent.map { it.trim() }.filter { it.contains("@color/") }.map {
+
+                                    val colorName = it.substringAfter("<color name=\"").substringBefore("\">@color/")
+
+                                    val colorReference = it.substringAfter("@color/").substringBefore("</color>")
+                                        .trim() // trim to remove leading and trailing spaces
+
+                                    val colorValue = getColorValue(colorReference)
+
+                                    Triple(colorName, colorReference, colorValue)
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(modifier = Modifier.fillMaxWidth(), onClick = {
+                            Column {
+                                LazyColumn(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    colorReferences.forEach { (colorName, colorReference, colorValue) ->
+                                        item {
+                                            ReferenceItem(colorName, colorReference, colorValue)
+                                        }
+                                    }
+                                }
+
+                                Row {
+                                    listOf("neutral1", "neutral2", "accent1", "accent2", "accent3").forEach { accent ->
+                                        val containerColor =
+                                            Color(getColorValue("system_$accent" + "_" + selectedMonetColor
+                                                .substringAfter("_").substringAfter("_")))
+                                        Button(modifier = Modifier
+                                            .weight(1f)
+                                            .padding(2.dp),
+                                            shape = CircleShape,
+                                            colors = ButtonDefaults.buttonColors(containerColor = containerColor,
+                                                contentColor = if (containerColor.luminance() > 0.4f) {
+                                                    Black
+                                                }
+                                                else {
+                                                    White
+                                                }),
+                                            contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                                selectedMonetColor =
+                                                    selectedMonetColor.replaceBeforeLast("_", "system_$accent")
+                                                resetColorsXmlContent()
+                                            }) {
+                                            Text(text = accent.first().uppercase() + accent.last(),
+                                                color = if (containerColor.luminance() > 0.4f) {
+                                                    Black
+                                                }
+                                                else {
+                                                    White
+                                                })
+                                        }
+                                    }
+                                }
+                                val nums =
+                                    listOf("10", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900")
+                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()) {
+                                    nums.forEach { num ->
+                                        val containerColor =
+                                            Color(getColorValue(selectedMonetColor.substringBeforeLast("_") + "_$num"))
+                                        Button(contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                                selectedMonetColor =
+                                                    selectedMonetColor.replace("_\\d{1,4}".toRegex(), "_$num")
+                                                resetColorsXmlContent()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = containerColor,
+                                                contentColor = if (containerColor.luminance() > 0.4f) {
+                                                    Black
+                                                }
+                                                else {
+                                                    White
+                                                })) {
+                                            Text(text = num, color = if (containerColor.luminance() > 0.4f) {
+                                                Black
+                                            }
+                                            else {
+                                                White
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
+                        Row {
+                            Button(onClick = {
+                                Shell.SH.run("su -c cmd overlay disable themed.fakemonet.generic")
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
+                                Shell.SH.run("su -c cmd overlay enable com.android.systemui:dynamic")
+                                Shell.SH.run("su -c cmd overlay disable themed.misc.flagmonet")
+                            }) {
+                                Text(text = "Reset")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(modifier = Modifier.fillMaxWidth(),
+                                onClick = {
                                     buildOverlay(colorsPath)
                                     Shell.SH.run("su -c cmd overlay disable com.android.systemui:accent")
                                     Shell.SH.run("su -c cmd overlay disable com.android.systemui:neutral")
@@ -717,22 +614,27 @@ fun FabricatedMonet() {
                                     colorsShell.run("""cmd overlay enable themed.fakemonet.generic""")
                                     showInterstitial(context) {}
 
-                                }, colors = ButtonDefaults.buttonColors(containerColor = C_500, contentColor = if ((lightness) > 50f) {
-                                    Black
-                                } else {
-                                    White
-                                }), shape = CircleShape) {
-                                    Row(verticalAlignment = CenterVertically) {
-                                        Text(text = "Build and update")
-                                        Icon(modifier = Modifier.height(24.dp), imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right_alt_48px), contentDescription = "")
-
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = C_500,
+                                    contentColor = if ((lightness) > 50f) {
+                                        Black
                                     }
+                                    else {
+                                        White
+                                    }),
+                                shape = CircleShape) {
+                                Row(verticalAlignment = CenterVertically) {
+                                    Text(text = "Build and update")
+                                    Icon(modifier = Modifier.height(24.dp),
+                                        imageVector = ImageVector.vectorResource(id = drawable.arrow_right_alt_48px),
+                                        contentDescription = "")
+
                                 }
                             }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
                     }
                 }
             }

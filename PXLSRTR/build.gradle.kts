@@ -1,5 +1,5 @@
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.text.*
+import java.util.*
 
 plugins {
     alias(libs.plugins.android.application)
@@ -14,14 +14,21 @@ plugins {
 android {
     namespace = "pro.themed.PXLSRTR"
     compileSdk = 34
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\Osanosa\\Key.jks")
+            storePassword = "HolyLumi"
+            keyAlias = "key0"
+            keyPassword = "HolyLumi"
+        }
+    }
     defaultConfig {
         applicationId = "pro.themed.pxlsrtr"
         minSdk = 21
         targetSdk = 34
         versionCode =  SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
-
+        signingConfig = signingConfigs.getByName("release")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -38,6 +45,10 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
         }
+        debug {
+            signingConfig = signingConfigs.getByName("release")
+        }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -13,6 +13,19 @@
         android:theme="@style/Theme.PXLSRTR"
         tools:targetApi="31"
         >
+        <service
+            android:name="pro.themed.pxlsrtr.DreamServiceCompat"
+            android:exported="true"
+            android:label="PXLSRTR"
+            android:logo="@mipmap/ic_launcher"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.service.dreams.DreamService" />
+            </intent-filter>
+            <meta-data android:name="android.service.dream"
+                android:resource="@drawable/ic_launcher_foreground"/>
+        </service>
         <activity
             android:name="pro.themed.pxlsrtr.PXLSRTRactivity"
             android:exported="true"
