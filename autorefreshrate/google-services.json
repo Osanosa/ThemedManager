@@ -8,77 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:379152595872:android:9f0971623de0773ab0c2c5",
-        "android_client_info": {
-          "package_name": "pro.themed.PXLSRTR"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
-        },
-        {
-          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
-        },
-        {
-          "current_key": "AIzaSyC0lpQsjjqT2B1Ulkpgw0VA-ul9uYpC86Y"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:379152595872:android:3dde65de5a145845b0c2c5",
-        "android_client_info": {
-          "package_name": "pro.themed.manager"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
-        },
-        {
-          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
-        },
-        {
-          "current_key": "AIzaSyC0lpQsjjqT2B1Ulkpgw0VA-ul9uYpC86Y"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      },
-      "admob_app_id": "ca-app-pub-5920419856758740~3279041161"
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:379152595872:android:926a2acb3f242631b0c2c5",
         "android_client_info": {
           "package_name": "pro.themed.manager.autorefreshrate"
@@ -92,13 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
-        },
-        {
           "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
-        },
-        {
-          "current_key": "AIzaSyC0lpQsjjqT2B1Ulkpgw0VA-ul9uYpC86Y"
         }
       ],
       "services": {
@@ -110,7 +33,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-5920419856758740~7975895306"
     }
   ],
   "configuration_version": "1"

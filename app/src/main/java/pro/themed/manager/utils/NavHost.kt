@@ -1,54 +1,26 @@
 package pro.themed.manager.utils
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import pro.themed.manager.MainActivity
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.navigation.*
+import androidx.navigation.compose.*
+import pro.themed.manager.*
 import pro.themed.manager.MainActivity.Companion.isDark
-import pro.themed.manager.R
-import pro.themed.manager.comps.AboutPage
-import pro.themed.manager.comps.AccentsAAPT
-import pro.themed.manager.comps.FabricatedMonet
-import pro.themed.manager.comps.FontsTab
-import pro.themed.manager.comps.IconsTab
-import pro.themed.manager.comps.MiscTab
-import pro.themed.manager.comps.QsPanel
-import pro.themed.manager.comps.SettingsPage
-import pro.themed.manager.comps.ToolboxPage
-import pro.themed.manager.ui.theme.contentcol
+import pro.themed.manager.R.*
+import pro.themed.manager.comps.*
+import pro.themed.manager.ui.theme.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -118,7 +90,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                 //    .padding(16.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ohnocringememe),
+                    painter = painterResource(id = drawable.ohnocringememe),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -127,6 +99,8 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                     text = "Themed overlays are missing\n\n\n\nTry installing module from about screen",
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black,
                         shadow = Shadow(
                             color = Color.Black, offset = Offset(4f, 4f), blurRadius = 8f
                         )
@@ -138,9 +112,10 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
         when (route) {
             NavigationItems.ColorsTab.route -> {
                 {
+                    val scroll = rememberScrollState()
                     Column(
                         modifier = Modifier
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(scroll)
                             .padding(horizontal = 8.dp)
                     ) {
                         Spacer(Modifier.height(32.dp))
@@ -162,7 +137,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 .padding(16.dp),
                                 horizontalArrangement = Arrangement.Center) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.light_mode_24px),
+                                    painter = painterResource(id = drawable.light_mode_24px),
                                     contentDescription = "Light",
                                     tint = contentcol
                                 )
@@ -170,7 +145,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                             }
 
                             Icon(
-                                painter = painterResource(id = R.drawable.developer_mode_24px),
+                                painter = painterResource(id = drawable.developer_mode_24px),
                                 contentDescription = null,
                                 modifier = Modifier.padding(16.dp),
                                 tint = contentcol
@@ -185,7 +160,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                                 .padding(16.dp),
                                 horizontalArrangement = Arrangement.Center) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.dark_mode_24px),
+                                    painter = painterResource(id = drawable.dark_mode_24px),
                                     contentDescription = "Dark",
                                     tint = contentcol
                                 )
@@ -196,7 +171,7 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                         Spacer(modifier = Modifier.height(8.dp))
                         AccentsAAPT()
                         Spacer(modifier = Modifier.height(8.dp))
-                        FabricatedMonet()
+                        FabricatedMonet(scroll)
                     }
                 }
             }

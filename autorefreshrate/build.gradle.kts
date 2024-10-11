@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId = "pro.themed.manager.autorefreshrate"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 34
         versionCode =  SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
         signingConfig = signingConfigs.getByName("release")

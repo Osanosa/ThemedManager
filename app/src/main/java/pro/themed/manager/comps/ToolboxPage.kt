@@ -1,83 +1,36 @@
 package pro.themed.manager.comps
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import android.content.*
+import android.content.pm.*
+import android.os.*
+import android.widget.*
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.foundation.text.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.core.graphics.drawable.toBitmap
-import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.tooling.preview.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.*
+import androidx.core.graphics.drawable.*
+import com.jaredrummler.ktsh.*
+import kotlinx.coroutines.*
 import pro.themed.manager.R
-import pro.themed.manager.utils.SharedPreferencesManager
-import pro.themed.manager.components.CookieCard
-import pro.themed.manager.components.HeaderRow
-import pro.themed.manager.utils.log
-import pro.themed.manager.ui.theme.background
-import pro.themed.manager.utils.GlobalVariables
-
-import pro.themed.manager.utils.showInterstitial
-import java.text.DecimalFormat
-import java.util.concurrent.TimeUnit
+import pro.themed.manager.components.*
+import pro.themed.manager.ui.theme.*
+import pro.themed.manager.utils.*
+import java.text.*
+import java.util.concurrent.*
 
 @Preview
 @Composable
@@ -125,7 +78,6 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
             }
         }
     })
-
     LazyColumn(Modifier.fillMaxWidth()) {
         if (resolvedInfos.isEmpty()) item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -495,47 +447,52 @@ fun ToolboxPage() {
                     var customresShown by remember { mutableStateOf(false) }
                     var customres by remember { mutableStateOf("") }
                     if (customresShown) {
-                        BasicAlertDialog(onDismissRequest = { /* Handle the dismissal here */ },
+                        BasicAlertDialog(onDismissRequest = { customresShown = false },
                             content = {
-                                Column {
-                                    Text(stringResource(R.string.enter_your_custom_resolution))
-                                    Text(stringResource(R.string.downscale_warning))
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        TextField(modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 8.dp),
-                                            value = customres,
-                                            singleLine = true,
-                                            onValueChange = { customres = it },
-                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                            label = { Text("Enter custom resolution") })
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.padding(8.dp)
-                                        ) {
-                                            Button(modifier = Modifier
+                                CookieCard(){
+
+                                    Column {
+                                        Text(stringResource(R.string.enter_your_custom_resolution))
+                                        Text(stringResource(R.string.downscale_warning))
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            TextField(modifier = Modifier
                                                 .fillMaxWidth()
-                                                .weight(1f),
-                                                onClick = {
-                                                    downscalebynumber(width = customres)
-                                                    Shell("su").run("sleep 10 ; wm size reset ; wm density reset")
-                                                }) { Text(text = stringResource(R.string.test)) }
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Button(
-                                                modifier = Modifier
+                                                .padding(horizontal = 8.dp),
+                                                value = customres,
+                                                singleLine = true,
+                                                onValueChange = { customres = it.replace(Regex("[^0-9]"), "") },
+                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                                label = { Text("Enter custom resolution") },
+                                                placeholder = { Text("720", Modifier.basicMarquee()) }
+                                            )
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(8.dp)
+                                            ) {
+                                                Button(modifier = Modifier
                                                     .fillMaxWidth()
                                                     .weight(1f),
-                                                onClick = {
-                                                    downscalebynumber(width = customres)
-                                                },
-                                            ) { Text(text = stringResource(R.string.apply)) }
-                                        }
-                                        Text(text = stringResource(R.string.close),
-                                            modifier = Modifier.clickable {
-                                                customresShown = false
-                                            })
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                                    onClick = {
+                                                        downscalebynumber(width = customres)
+                                                        Shell("su").run("sleep 10 ; wm size reset ; wm density reset")
+                                                    }) { Text(text = stringResource(R.string.test)) }
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Button(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .weight(1f),
+                                                    onClick = {
+                                                        downscalebynumber(width = customres)
+                                                    },
+                                                ) { Text(text = stringResource(R.string.apply)) }
+                                            }
+                                            Text(text = stringResource(R.string.close),
+                                                modifier = Modifier.clickable {
+                                                    customresShown = false
+                                                })
+                                            Spacer(modifier = Modifier.height(8.dp))
 
+                                        }
                                     }
                                 }
                             })

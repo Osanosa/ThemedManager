@@ -1,6 +1,5 @@
 package pro.themed.manager.comps
 
-import android.content.*
 import android.content.res.*
 import android.widget.*
 import androidx.compose.animation.*
@@ -27,7 +26,6 @@ import androidx.compose.ui.graphics.vector.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
-import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.core.graphics.*
 import com.jaredrummler.ktsh.*
@@ -41,21 +39,23 @@ import pro.themed.manager.ui.theme.*
 import pro.themed.manager.utils.*
 import kotlin.math.*
 
-@Preview
 @OptIn(
     ExperimentalFoundationApi::class,
     ExperimentalLayoutApi::class,
 )
-@Composable fun FabricatedMonet() {
+@Composable fun FabricatedMonet(scroll: ScrollState) {
     val context = LocalContext.current
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-
     var selectedColorReference by remember { mutableStateOf("") }
     var selectedMonetColor by remember { mutableStateOf("system_accent1_500") }
     var isGridExpanded by remember { mutableStateOf(false) }
     var expanded by rememberSaveable { mutableStateOf(true) }
 
     var isColorReferenceDropdownExpanded by remember { mutableStateOf(false) }
+    LaunchedEffect(isColorReferenceDropdownExpanded) {
+        if (isColorReferenceDropdownExpanded) {
+            scroll.animateScrollTo(Int.MAX_VALUE)
+        }
+    }
 
     val colorsPath = """${GlobalVariables.modulePath}/onDemandCompiler/fakeMonet"""
     val colorsShell = Shell("su")
@@ -188,7 +188,9 @@ import kotlin.math.*
                     .padding(start = 8.dp), text = "Monet", fontSize = 24.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
-                    isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded; isGridExpanded = false
+                    isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded
+                    isGridExpanded = false
+
                 }) {
                     Icon(modifier = Modifier,
                         painter = painterResource(id = drawable.tactic_24px),
@@ -294,43 +296,19 @@ import kotlin.math.*
                                 Row(Modifier
                                     .wrapContentWidth(unbounded = true)
                                     .clip(RoundedCornerShape(12.dp))) {
-                                    Column(horizontalAlignment = CenterHorizontally) {
-                                        Text(text = "N1",
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp))
-                                        tiles("system_neutral1_")
-
-                                    }
-
-                                    Column(horizontalAlignment = CenterHorizontally) {
-                                        Text(text = "N2",
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp))
-                                        tiles("system_neutral2_")
-                                    }
-
-                                    Column(horizontalAlignment = CenterHorizontally) {
-                                        Text(text = "A1",
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp))
-
-                                        tiles("system_accent1_")
-                                    }
-
-                                    Column(horizontalAlignment = CenterHorizontally) {
-                                        Text(text = "A2",
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp))
-
-                                        tiles("system_accent2_")
-                                    }
-
-                                    Column(horizontalAlignment = CenterHorizontally) {
-                                        Text(text = "A3",
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp))
-
-                                        tiles("system_accent3_")
+                                    listOf(
+                                        "system_neutral1_" to "N1",
+                                        "system_neutral2_" to "N2",
+                                        "system_accent1_" to "A1",
+                                        "system_accent2_" to "A2",
+                                        "system_accent3_" to "A3",
+                                    ).forEach { (colorName, colorReference) ->
+                                        Column(horizontalAlignment = CenterHorizontally) {
+                                            Text(text = colorReference,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(4.dp))
+                                            tiles(colorName)
+                                        }
                                     }
 
                                 }
@@ -340,25 +318,17 @@ import kotlin.math.*
                                 Column(Modifier
                                     .wrapContentWidth(unbounded = true)
                                     .clip(RoundedCornerShape(12.dp))) {
-                                    Row {
-                                        tiles("system_neutral1_")
+                                    listOf("system_neutral1",
+                                        "system_neutral2",
+                                        "system_accent1",
+                                        "system_accent2",
+                                        "system_accent3").forEach { colorName ->
+                                        Row {
+                                            tiles(colorName + "_")
+                                        }
+
                                     }
 
-                                    Row {
-                                        tiles("system_neutral2_")
-                                    }
-
-                                    Row {
-                                        tiles("system_accent1_")
-                                    }
-
-                                    Row {
-                                        tiles("system_accent2_")
-                                    }
-
-                                    Row {
-                                        tiles("system_accent3_")
-                                    }
                                 }
                             }
                         }
@@ -518,7 +488,7 @@ import kotlin.math.*
                             Column {
                                 LazyColumn(modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(300.dp),
+                                    .height(250.dp),
                                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     colorReferences.forEach { (colorName, colorReference, colorValue) ->
                                         item {
@@ -526,7 +496,7 @@ import kotlin.math.*
                                         }
                                     }
                                 }
-
+                                if (selectedColorReference.isBlank()) Text("Pick a color first ↑↑↑")
                                 Row {
                                     listOf("neutral1", "neutral2", "accent1", "accent2", "accent3").forEach { accent ->
                                         val containerColor =
@@ -545,9 +515,13 @@ import kotlin.math.*
                                                 }),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
-                                                selectedMonetColor =
-                                                    selectedMonetColor.replaceBeforeLast("_", "system_$accent")
-                                                resetColorsXmlContent()
+                                                if (selectedColorReference.isBlank()){
+                                                    Toast.makeText(context, "Pick a color first", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    selectedMonetColor =
+                                                        selectedMonetColor.replaceBeforeLast("_", "system_$accent")
+                                                    resetColorsXmlContent()
+                                                }
                                             }) {
                                             Text(text = accent.first().uppercase() + accent.last(),
                                                 color = if (containerColor.luminance() > 0.4f) {

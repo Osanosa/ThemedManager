@@ -2,7 +2,9 @@
 
 package pro.themed.autorefreshrate
 
+import android.app.*
 import android.content.*
+import android.content.Context.*
 import android.hardware.display.*
 import android.os.*
 import android.util.*
@@ -17,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.res.*
@@ -32,9 +35,14 @@ import com.jaredrummler.ktsh.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.*
 import pro.themed.autorefreshrate.ui.theme.*
-import pro.themed.manager.autorefreshrate.R
+import pro.themed.manager.autorefreshrate.R.*
 import java.security.*
 import kotlin.math.*
+
+@Suppress("DEPRECATION") // Deprecated for third party Services.
+fun <T> Context.isServiceForegrounded(service: Class<T>) =
+    (getSystemService(ACTIVITY_SERVICE) as? ActivityManager)?.getRunningServices(Integer.MAX_VALUE)
+        ?.find { it.service.className == service.name }?.foreground == true
 
 class AutoRefreshRateActivity : ComponentActivity() {
 
@@ -72,11 +80,9 @@ class AutoRefreshRateActivity : ComponentActivity() {
             val sharedPreferences = this.applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
             val context = LocalContext.current
             ThemedManagerTheme {
-                Toast.makeText(
-                    context,
+                Toast.makeText(context,
                     "YOUR FEEDBACK IS IMPORTANT AND VERY MUCH WELCOMED (on telegram or email)",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    Toast.LENGTH_SHORT).show()
 
                 FirebaseIsContributor(sharedPreferences, context)
                 Surface(Modifier.fillMaxSize()) {
@@ -130,315 +136,347 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         val ref = database.getReference("devices").child(document.sha256())
                         if (!ref.get().await().exists()) {
 
-                            ref.setValue(
-                                hashMapOf(
-                                    "ref" to document.sha256(),
-                                    "cpu" to cpu,
-                                    "currentBuildId" to currentBuidId,
-                                    "currentVersion" to currentVersion,
-                                    "manufacturer" to manufacturer,
-                                    "model" to model,
-                                    "modes" to modes,
-                                    "rom" to rom,
-                                    "vendorBuildId" to vendorBuildId,
-                                    "vendorVersion" to vendorVersion
-                                )
-                            )
+                            ref.setValue(hashMapOf("ref" to document.sha256(),
+                                "cpu" to cpu,
+                                "currentBuildId" to currentBuidId,
+                                "currentVersion" to currentVersion,
+                                "manufacturer" to manufacturer,
+                                "model" to model,
+                                "modes" to modes,
+                                "rom" to rom,
+                                "vendorBuildId" to vendorBuildId,
+                                "vendorVersion" to vendorVersion))
                         }
 
                     }
                     LaunchedEffect(displayManager) {
                         Log.d("DISPLAY", displayManager.toString())
                     }
+                    var noRoot by remember { mutableStateOf(false) }
 
 
-                    Column(
-                        Modifier
-                            .windowInsetsPadding(WindowInsets.safeDrawing)
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        val clipboardManager: ClipboardManager = LocalClipboardManager.current
-
-                        Row(Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp), horizontalArrangement = Arrangement.Center) {
-                            Text(text = "TMARR", style = MaterialTheme.typography.headlineLarge,
-
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        clipboardManager.setText(
-                                            AnnotatedString(Shell.SH
-                                                .run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
-                                                .stdout()
-                                        ))
-                                    }
-                                    .padding(4.dp)
-
-                            )
-                        }
-                        AdmobBanner(applicationContext)
-                        Image(
-                            painterResource(R.drawable.gridfps_00000), null, Modifier
-                                .fillMaxWidth()
-                                .basicMarquee(
-                                    iterations = Int.MAX_VALUE,
-                                    spacing = MarqueeSpacing(0.dp),
-                                    initialDelayMillis = 0,
-                                    repeatDelayMillis = 0,
-                                    velocity = 500.dp
-                                )
-                        )
-                        Text(
-                            displayManager.name + ": " + currentRefreshRate.roundToInt()
-                                .toString() + "Hz, " + displayManager.mode.physicalHeight.toString() + "x" + displayManager.mode.physicalWidth.toString(),
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        var noRoot by remember { mutableStateOf(false) }
+                    Column(Modifier
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())) {
                         AnimatedVisibility(noRoot) {
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.error,
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                Text(
-                                    "Root access required",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    modifier = Modifier.padding(16.dp)
-                                )
+                            Column {
+                                Surface(modifier = Modifier
+                                    .fillMaxWidth()
+                                    ,
+                                    color = MaterialTheme.colorScheme.error,
+                                    shape = MaterialTheme.shapes.medium) {
+                                    Text("Root access required",
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        modifier = Modifier.padding(16.dp))
+                                }
+
+                                Text("Supported modes: ", style = MaterialTheme.typography.bodyLarge)
+                                if (!unsupportedModes) {
+                                    displayManager.supportedModes.forEach {
+                                        Text(text = it.refreshRate.roundToInt().toString())
+                                    }
+                                }
                             }
 
                         }
+
+
+
+
                         AnimatedVisibility(noRoot && unsupportedModes) {
                             Spacer(Modifier.height(8.dp))
                         }
                         AnimatedVisibility(unsupportedModes) {
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
+                            Surface(modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.error,
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                Text(
-                                    "Uh oh, looks like your device doesn't support multiple refresh rates",
+                                shape = MaterialTheme.shapes.medium) {
+                                Text("Uh oh, looks like your device doesn't support multiple refresh rates",
                                     style = MaterialTheme.typography.headlineMedium,
-                                    modifier = Modifier.padding(16.dp)
+                                    modifier = Modifier.padding(16.dp))
+                            }
+
+                        }
+
+
+
+
+                        AnimatedVisibility(!noRoot && !unsupportedModes) {
+                            Column {
+                                val clipboardManager: ClipboardManager = LocalClipboardManager.current
+
+                                Row(Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp), horizontalArrangement = Arrangement.Center) {
+                                    Text(text = "TMARR", style = MaterialTheme.typography.headlineLarge,
+
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                clipboardManager.setText(AnnotatedString(Shell.SH
+                                                    .run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
+                                                    .stdout()))
+                                            }
+                                            .padding(4.dp)
+
+                                    )
+                                }
+                                AdmobBanner(applicationContext)
+                                Image(painterResource(drawable.gridfps_00000),
+                                    null,
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .basicMarquee(iterations = Int.MAX_VALUE,
+                                            spacing = MarqueeSpacing(0.dp),
+                                            initialDelayMillis = 0,
+                                            repeatDelayMillis = 0,
+                                            velocity = 500.dp))
+                                Text(displayManager.name + ": " + currentRefreshRate.roundToInt()
+                                    .toString() + "Hz, " + displayManager.mode.physicalHeight.toString() + "x" + displayManager.mode.physicalWidth.toString(),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 8.dp))
+
+                                var isRunning by remember {
+                                    mutableStateOf(isServiceForegrounded(AutoRefreshRateForegroundService::class.java))
+                                }
+
+                                Text(
+                                    if (isRunning) "Foreground service is running" else "Foreground service is not running",
+                                    color = if (isRunning) Color.Green else Color.Red,
                                 )
-                            }
 
-                        }
-
-                        val shell = Shell.SH.addOnStderrLineListener(object : Shell.OnLineListener {
-                            override fun onLine(line: String) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    when {
-                                        line.contains(
-                                            "su: inaccessible or not found", ignoreCase = true
-                                        ) || line.contains("permission denied", ignoreCase = true) -> {
-                                            noRoot = true
-                                        }
-
-                                        line.contains("service stopped", ignoreCase = true)        -> {
-                                            Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                        }
-
-                                        line.contains("not stopped", ignoreCase = true)            -> {
-                                            Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                        }
-
-                                        else                                                       -> shareStackTrace(
-                                            line
-                                        )
-                                    }
-                                }
-                            }
-                        })
-                        LaunchedEffect(Unit) {
-                            shell.run("su")
-                        }
-                        var showRate by remember {
-                            mutableStateOf(
-                                shell.run("service call SurfaceFlinger 1034 i32 2").stdout().contains("1")
-                            )
-                        }
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Show rate: ")
-                            Switch(checked = showRate, onCheckedChange = {
-                                showRate = it
-                                CoroutineScope(Dispatchers.IO).launch {
-
-                                    if (it) {
-                                        shell.run("service call SurfaceFlinger 1034 i32 1")
-                                    } else {
-                                        shell.run("service call SurfaceFlinger 1034 i32 0")
-                                    }
-                                }
-
-                            })
-                        }
-                        val supportedModesArray = displayManager.supportedModes.withIndex()
-                        Text("Test supported modes:")
-                        FlowRow(
-                            horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()
-                        ) {
-
-                            for ((index, mode) in supportedModesArray) {
-                                Button(colors = ButtonColors(
-                                    containerColor = if (displayManager.mode.modeId == index + 1) {
-                                        MaterialTheme.colorScheme.tertiary
-                                    } else {
-                                        MaterialTheme.colorScheme.primary
-                                    },
-                                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ), onClick = {
-                                    //coroutine
-
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        shell.run("$testCommand $index")
-                                        Thread.sleep(100)
-                                        currentRefreshRate = displayManager.refreshRate
+                                AnimatedVisibility(unsupportedModes) {
+                                    Surface(modifier = Modifier.fillMaxWidth(),
+                                        color = MaterialTheme.colorScheme.error,
+                                        shape = MaterialTheme.shapes.medium) {
+                                        Text("Uh oh, looks like your device doesn't support multiple refresh rates",
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            modifier = Modifier.padding(16.dp))
                                     }
 
-                                }) {
-                                    Text(index.toString() + ": " + mode.refreshRate.roundToInt())
                                 }
-                            }
 
-                        }
-                        Text(
-                            "Foreground service settings:",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 16.dp)
-                        )
-                        Text("Set max mode:")
-                        var maxRate by remember {
-                            mutableStateOf(sharedPreferences.getString("maxRate", "0"))
-                        }
-                        FlowRow(
-                            horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()
-                        ) {
+                                val shell = Shell.SH.addOnStderrLineListener(object : Shell.OnLineListener {
+                                    override fun onLine(line: String) {
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            when {
+                                                line.contains("su: inaccessible or not found",
+                                                    ignoreCase = true) || line.contains("permission denied",
+                                                    ignoreCase = true)                              -> {
+                                                    noRoot = true
+                                                }
 
-                            for ((index, mode) in supportedModesArray) {
-                                Button(colors = ButtonColors(
-                                    containerColor = if (maxRate?.toInt() == index) {
-                                        MaterialTheme.colorScheme.tertiary
-                                    } else {
-                                        MaterialTheme.colorScheme.primary
+                                                line.contains("service stopped", ignoreCase = true) -> {
+                                                    Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+                                                }
+
+                                                line.contains("not stopped", ignoreCase = true)     -> {
+                                                    Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+                                                }
+
+                                                else                                                -> shareStackTrace(
+                                                    line)
+                                            }
+                                        }
+                                    }
+                                })
+                                LaunchedEffect(Unit) {
+                                    shell.run("su")
+                                }
+                                var showRate by remember {
+                                    mutableStateOf(shell.run("service call SurfaceFlinger 1034 i32 2").stdout()
+                                        .contains("1"))
+                                }
+
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()) {
+                                    Text("Show rate: ")
+                                    Switch(checked = showRate, onCheckedChange = {
+                                        showRate = it
+                                        CoroutineScope(Dispatchers.IO).launch {
+
+                                            if (it) {
+                                                shell.run("service call SurfaceFlinger 1034 i32 1")
+                                            }
+                                            else {
+                                                shell.run("service call SurfaceFlinger 1034 i32 0")
+                                            }
+                                        }
+
+                                    })
+                                }
+                                val supportedModesArray = displayManager.supportedModes.withIndex()
+                                Text("Test supported modes:")
+                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()) {
+
+                                    for ((index, mode) in supportedModesArray) {
+                                        Button(colors = ButtonColors(containerColor = if (displayManager.mode.modeId == index + 1) {
+                                            MaterialTheme.colorScheme.tertiary
+                                        }
+                                        else {
+                                            MaterialTheme.colorScheme.primary
+                                        },
+                                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                                            onClick = {
+                                                //coroutine
+
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    shell.run("$testCommand $index")
+                                                    Thread.sleep(100)
+                                                    currentRefreshRate = displayManager.refreshRate
+                                                }
+
+                                            }) {
+                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
+                                        }
+                                    }
+
+                                }
+                                Text("Foreground service settings:",
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 16.dp))
+                                Text("Set max mode:")
+                                var maxRate by remember {
+                                    mutableStateOf(sharedPreferences.getString("maxRate", "0"))
+                                }
+                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()) {
+
+                                    for ((index, mode) in supportedModesArray) {
+                                        Button(colors = ButtonColors(containerColor = if (maxRate?.toInt() == index) {
+                                            MaterialTheme.colorScheme.tertiary
+                                        }
+                                        else {
+                                            MaterialTheme.colorScheme.primary
+                                        },
+                                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                                            onClick = {
+                                                sharedPreferences.edit().putString("maxRate", index.toString()).apply()
+                                                maxRate = index.toString()
+                                            }) {
+                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
+                                        }
+                                    }
+                                }
+                                Text("Set min mode:")
+                                var minRate by remember {
+                                    mutableStateOf(sharedPreferences.getString("minRate", "0"))
+                                }
+                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()) {
+
+                                    for ((index, mode) in supportedModesArray) {
+                                        Button(colors = ButtonColors(containerColor = if (minRate?.toInt() == index) {
+                                            MaterialTheme.colorScheme.tertiary
+                                        }
+                                        else {
+                                            MaterialTheme.colorScheme.primary
+                                        },
+                                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                                            onClick = {
+                                                sharedPreferences.edit().putString("minRate", index.toString()).apply()
+                                                minRate = index.toString()
+                                            }) {
+                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
+                                        }
+                                    }
+                                }
+                                var timeout by remember {
+                                    mutableIntStateOf(sharedPreferences.getInt("countdown", 3))
+                                }
+                                Text("Set timeout: $timeout")
+                                Slider(
+
+                                    value = timeout.toFloat(),
+                                    onValueChange = { timeout = it.roundToInt() },
+                                    onValueChangeFinished = {
+                                        sharedPreferences.edit().putInt("countdown", timeout).apply()
                                     },
-                                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ), onClick = {
-                                    sharedPreferences.edit().putString("maxRate", index.toString()).apply()
-                                    maxRate = index.toString()
-                                }) {
-                                    Text(index.toString() + ": " + mode.refreshRate.roundToInt())
+                                    valueRange = 1f..10f,
+                                    steps = 8
+
+                                )
+                                var autoRateOnBoot by remember {
+                                    mutableStateOf(sharedPreferences.getBoolean("autoRateOnBoot", false))
                                 }
-                            }
-                        }
-                        Text("Set min mode:")
-                        var minRate by remember {
-                            mutableStateOf(sharedPreferences.getString("minRate", "0"))
-                        }
-                        FlowRow(
-                            horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()
-                        ) {
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)) {
 
-                            for ((index, mode) in supportedModesArray) {
-                                Button(colors = ButtonColors(
-                                    containerColor = if (minRate?.toInt() == index) {
-                                        MaterialTheme.colorScheme.tertiary
-                                    } else {
-                                        MaterialTheme.colorScheme.primary
-                                    },
-                                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ), onClick = {
-                                    sharedPreferences.edit().putString("minRate", index.toString()).apply()
-                                    minRate = index.toString()
-                                }) {
-                                    Text(index.toString() + ": " + mode.refreshRate.roundToInt())
+                                    Text(text = "Auto rate on boot: $autoRateOnBoot",
+                                        style = MaterialTheme.typography.titleMedium)
+                                    Switch(checked = autoRateOnBoot, onCheckedChange = {
+                                        if (!noRoot) {
+                                            autoRateOnBoot = it
+                                            sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                                        }
+                                        else {
+                                            Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
+                                        }
+                                    })
                                 }
-                            }
-                        }
-                        var timeout by remember {
-                            mutableIntStateOf(sharedPreferences.getInt("countdown", 3))
-                        }
-                        Text("Set timeout: $timeout")
-                        Slider(
 
-                            value = timeout.toFloat(),
-                            onValueChange = { timeout = it.roundToInt() },
-                            onValueChangeFinished = {
-                                sharedPreferences.edit().putInt("countdown", timeout).apply()
-                            },
-                            valueRange = 1f..10f,
-                            steps = 8
+                                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()) {
+                                    Button(onClick = {
+                                        if (!noRoot) shell.run("am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
+                                        showInterstitial(context)
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            isRunning =
+                                                isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
+                                            var retryCount = 0
+                                            while (retryCount < 10 && !isRunning) {
+                                                Thread.sleep(100)
+                                                isRunning =
+                                                    isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
+                                                retryCount++
+                                            }
+                                        }
 
-                        )
-                        var autoRateOnBoot by remember {
-                            mutableStateOf(sharedPreferences.getBoolean("autoRateOnBoot", false))
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        ) {
-
-                            Text(
-                                text = "Auto rate on boot: $autoRateOnBoot",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Switch(checked = autoRateOnBoot, onCheckedChange = {
-                                if (!noRoot) {
-                                    autoRateOnBoot = it
-                                    sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
-                                } else {
-                                    Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
+                                    }) {
+                                        Text("Stop service")
+                                    }
+                                    Button(onClick = {
+                                        if (!noRoot) shell.run("am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
+                                        showInterstitial(context)
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            isRunning =
+                                                isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
+                                            var retryCount = 0
+                                            while (retryCount < 10 && !isRunning) {
+                                                Thread.sleep(100)
+                                                isRunning =
+                                                    isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
+                                                retryCount++
+                                            }
+                                        }
+                                    }) {
+                                        Text("Start service")
+                                    }
                                 }
-                            })
-                        }
 
-                        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                            Button(onClick = {
-                                if (!noRoot) shell.run("am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
-                                showInterstitial(applicationContext)
-
-                            }) {
-                                Text("Stop service")
-                            }
-                            Button(onClick = {
-                                if (!noRoot) shell.run("am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
-                                showInterstitial(applicationContext)
-                            }) {
-                                Text("Start service")
                             }
                         }
-                        LinkButtons(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 72.dp, vertical = 8.dp)
-                                .background(MaterialTheme.colorScheme.inversePrimary.copy(0.2f), CircleShape)
-                        )
+                        LinkButtons(Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 72.dp, vertical = 8.dp)
+                            .background(MaterialTheme.colorScheme.inversePrimary.copy(0.2f), CircleShape))
 
                     }
                 }
-
             }
         }
     }
 }
-
 

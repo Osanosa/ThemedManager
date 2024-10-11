@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "379152595872",
+    "firebase_url": "https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "themed-manager",
+    "storage_bucket": "themed-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:d48297ea3faa6988b0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.perappdownscale"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "379152595872-7m3q18ikjgv8m6i4mb3bgn9htvfhue4f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

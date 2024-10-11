@@ -25,3 +25,4 @@ include(":autorefreshrate")
 include(":PerAppDownscale")
 include(":PXLSRTR")
 include(":filesizes")
+

@@ -1,59 +1,31 @@
 package pro.themed.manager.comps
 
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
-import android.widget.TextView
-import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.app.*
+import android.content.*
+import android.net.*
+import android.os.*
+import android.widget.*
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.jaredrummler.ktsh.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import pro.themed.manager.MainActivity
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import com.jaredrummler.ktsh.*
+import kotlinx.coroutines.*
+import pro.themed.manager.*
 import pro.themed.manager.R
-import pro.themed.manager.ui.theme.background
-import pro.themed.manager.utils.AndroidDownloader
-import pro.themed.manager.utils.GlobalVariables
-import pro.themed.manager.utils.showRewarded
+import pro.themed.manager.ui.theme.*
+import pro.themed.manager.utils.*
 
 @Composable
 fun LinkButtons(modifier: Modifier = Modifier) {
@@ -123,7 +95,7 @@ fun AboutPage() {
             ).versionName
             Text(text = stringResource(R.string.about_description))
             Text(
-                text = stringResource(R.string.app_version, versionName),
+                text = stringResource(R.string.app_version, versionName.toString()),
                 textAlign = TextAlign.Center
             )
             val path =

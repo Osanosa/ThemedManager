@@ -31,12 +31,12 @@ android {
 
 
     namespace = "pro.themed.manager"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "pro.themed.manager"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName = SimpleDateFormat("yy.MM.dd").format(Date()).toString()
 
@@ -111,14 +111,14 @@ dependencies {
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
-    testImplementation("androidx.compose.runtime:runtime-tracing:1.0.0-beta01")
+  //  testImplementation(libs.androidx.runtime.tracing)
 
     // For AppWidgets support
-    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation(libs.androidx.glance.appwidget)
 
     // For interop APIs with Material 3
-    implementation("androidx.glance:glance-material3:1.1.0")
+    implementation(libs.androidx.glance.material3)
 
     // For interop APIs with Material 2
-    implementation("androidx.glance:glance-material:1.1.0")
+    implementation(libs.androidx.glance.material)
 }
