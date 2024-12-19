@@ -315,8 +315,6 @@ fun ToolboxPage() {
                     context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-                Spacer(Modifier.height(32.dp))
-
                 Column(
                     Modifier.padding(horizontal = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -547,7 +545,7 @@ fun ToolboxPage() {
                         }
                     }
                     HeaderRow(header = "AutoRefreshRate ForegroundService",
-                        subHeader = "Dynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
+                        subHeader = "\nPlease note that this feature was refactored into a separate app.\n\nDynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
                         button1text = "Stop",
                         button2text = "Start",
                         button2onClick = {

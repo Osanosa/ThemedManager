@@ -1,28 +1,19 @@
 package pro.themed.manager.comps
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.os.Looper
-import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.jaredrummler.ktsh.Shell
+import android.content.*
+import android.os.*
+import android.widget.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.unit.*
+import com.jaredrummler.ktsh.*
 import pro.themed.manager.R
-import pro.themed.manager.components.HeaderRow
+import pro.themed.manager.components.*
 
 @Composable
 fun SettingsPage() {
@@ -41,7 +32,6 @@ fun SettingsPage() {
                 .padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Spacer(Modifier.height(32.dp))
 
             HeaderRow(
                 header = "Automatically restart SystemUI",

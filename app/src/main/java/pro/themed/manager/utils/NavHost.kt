@@ -118,7 +118,6 @@ fun getComposableForRoute(route: String): @Composable () -> Unit {
                             .verticalScroll(scroll)
                             .padding(horizontal = 8.dp)
                     ) {
-                        Spacer(Modifier.height(32.dp))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

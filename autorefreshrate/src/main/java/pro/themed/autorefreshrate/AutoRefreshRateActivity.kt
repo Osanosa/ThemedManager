@@ -8,6 +8,7 @@ import android.content.Context.*
 import android.hardware.display.*
 import android.os.*
 import android.util.*
+import android.view.Display
 import android.widget.*
 import androidx.activity.*
 import androidx.activity.compose.*
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
@@ -77,7 +79,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val sharedPreferences = this.applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+            val sharedPreferences = this.applicationContext.getSharedPreferences("my_preferences", MODE_PRIVATE)
             val context = LocalContext.current
             ThemedManagerTheme {
                 Toast.makeText(context,
@@ -162,9 +164,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         .verticalScroll(rememberScrollState())) {
                         AnimatedVisibility(noRoot) {
                             Column {
-                                Surface(modifier = Modifier
-                                    .fillMaxWidth()
-                                    ,
+                                Surface(modifier = Modifier.fillMaxWidth(),
                                     color = MaterialTheme.colorScheme.error,
                                     shape = MaterialTheme.shapes.medium) {
                                     Text("Root access required",
@@ -263,7 +263,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                             when {
                                                 line.contains("su: inaccessible or not found",
                                                     ignoreCase = true) || line.contains("permission denied",
-                                                    ignoreCase = true)                              -> {
+                                                    ignoreCase = true) -> {
                                                     noRoot = true
                                                 }
 
@@ -271,12 +271,11 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                                     Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
                                                 }
 
-                                                line.contains("not stopped", ignoreCase = true)     -> {
+                                                line.contains("not stopped", ignoreCase = true) -> {
                                                     Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
                                                 }
 
-                                                else                                                -> shareStackTrace(
-                                                    line)
+                                                else -> shareStackTrace(line)
                                             }
                                         }
                                     }
@@ -307,87 +306,92 @@ class AutoRefreshRateActivity : ComponentActivity() {
 
                                     })
                                 }
-                                val supportedModesArray = displayManager.supportedModes.withIndex()
-                                Text("Test supported modes:")
-                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
-                                    modifier = Modifier.fillMaxWidth()) {
-
-                                    for ((index, mode) in supportedModesArray) {
-                                        Button(colors = ButtonColors(containerColor = if (displayManager.mode.modeId == index + 1) {
-                                            MaterialTheme.colorScheme.tertiary
-                                        }
-                                        else {
-                                            MaterialTheme.colorScheme.primary
-                                        },
+                                @Composable
+                                fun ModeSelectionButton(
+                                    index: Int,
+                                    mode: Display.Mode,
+                                    isSelected: Boolean,
+                                    onClick: () -> Unit
+                                ) {
+                                    Button(
+                                        colors = ButtonColors(
+                                            containerColor = if (isSelected) {
+                                                MaterialTheme.colorScheme.tertiary
+                                            } else {
+                                                MaterialTheme.colorScheme.primary
+                                            },
                                             contentColor = MaterialTheme.colorScheme.onPrimary,
                                             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                                            onClick = {
-                                                //coroutine
+                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                        ),
+                                        contentPadding = PaddingValues(horizontal = 16.dp),
+                                        onClick = onClick
+                                    ) {
+                                        Text("${index}: ${mode.refreshRate.roundToInt()}")
+                                    }
+                                }
 
+                                val supportedModesArray = displayManager.supportedModes.withIndex()
+                                Text("Test supported modes:")
+                                FlowRow(
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.primaryContainer,
+                                        RoundedCornerShape(8.dp))
+                                ) {
+                                    repeat(2){
+                                    for ((index, mode) in supportedModesArray) {
+                                        ModeSelectionButton(
+                                            index = index,
+                                            mode = mode,
+                                            isSelected = displayManager.mode.modeId == index + 1,
+                                            onClick = {
                                                 CoroutineScope(Dispatchers.IO).launch {
                                                     shell.run("$testCommand $index")
                                                     Thread.sleep(100)
                                                     currentRefreshRate = displayManager.refreshRate
                                                 }
-
-                                            }) {
-                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
-                                        }
-                                    }
-
+                                            }
+                                        )
+                                    }}
                                 }
-                                Text("Foreground service settings:",
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(vertical = 16.dp))
+
+                                Text("Foreground service settings:", fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 16.dp))
                                 Text("Set max mode:")
-                                var maxRate by remember {
-                                    mutableStateOf(sharedPreferences.getString("maxRate", "0"))
-                                }
-                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
-                                    modifier = Modifier.fillMaxWidth()) {
-
+                                var maxRate by remember { mutableStateOf(sharedPreferences.getString("maxRate", "0")) }
+                                FlowRow(
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     for ((index, mode) in supportedModesArray) {
-                                        Button(colors = ButtonColors(containerColor = if (maxRate?.toInt() == index) {
-                                            MaterialTheme.colorScheme.tertiary
-                                        }
-                                        else {
-                                            MaterialTheme.colorScheme.primary
-                                        },
-                                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                                        ModeSelectionButton(
+                                            index = index,
+                                            mode = mode,
+                                            isSelected = maxRate?.toInt() == index,
                                             onClick = {
                                                 sharedPreferences.edit().putString("maxRate", index.toString()).apply()
                                                 maxRate = index.toString()
-                                            }) {
-                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
-                                        }
+                                            }
+                                        )
                                     }
                                 }
-                                Text("Set min mode:")
-                                var minRate by remember {
-                                    mutableStateOf(sharedPreferences.getString("minRate", "0"))
-                                }
-                                FlowRow(horizontalArrangement = Arrangement.SpaceAround,
-                                    modifier = Modifier.fillMaxWidth()) {
 
+                                Text("Set min mode:")
+                                var minRate by remember { mutableStateOf(sharedPreferences.getString("minRate", "0")) }
+                                FlowRow(
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     for ((index, mode) in supportedModesArray) {
-                                        Button(colors = ButtonColors(containerColor = if (minRate?.toInt() == index) {
-                                            MaterialTheme.colorScheme.tertiary
-                                        }
-                                        else {
-                                            MaterialTheme.colorScheme.primary
-                                        },
-                                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                                        ModeSelectionButton(
+                                            index = index,
+                                            mode = mode,
+                                            isSelected = minRate?.toInt() == index,
                                             onClick = {
                                                 sharedPreferences.edit().putString("minRate", index.toString()).apply()
                                                 minRate = index.toString()
-                                            }) {
-                                            Text(index.toString() + ": " + mode.refreshRate.roundToInt())
-                                        }
+                                            }
+                                        )
                                     }
                                 }
                                 var timeout by remember {
@@ -420,6 +424,31 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                         if (!noRoot) {
                                             autoRateOnBoot = it
                                             sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                                        }
+                                        else {
+                                            Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
+                                        }
+                                    })
+                                }
+
+                                var autoRestart by remember {
+                                    mutableStateOf(sharedPreferences.getBoolean("autoRestartService", false))
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)) {
+
+                                    Text(text = "Auto restart if killed on each 15min: $autoRestart",
+                                        style = MaterialTheme.typography.titleMedium)
+                                    Switch(modifier = Modifier.weight(1f), checked = autoRestart, onCheckedChange = {
+                                        if (!noRoot) {
+                                            autoRestart = it
+                                            sharedPreferences.edit().putBoolean("autoRestartService", it).apply()
+                                            if (it) schedulePeriodicTask(context)
+                                            else removeScheduledTask(context,
+                                                "my_periodic_task")
                                         }
                                         else {
                                             Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()

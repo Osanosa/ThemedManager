@@ -5,11 +5,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.firebase.crashlytics)
+
 }
 
 android {
     namespace = "pro.themed.filesizes"
-    compileSdk = 34
+    compileSdk = 35
 
     signingConfigs {
         create("release") {
@@ -82,4 +85,7 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.inappmessaging.display)
     implementation (libs.firebase.firestore)
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.36.0")
+
 }

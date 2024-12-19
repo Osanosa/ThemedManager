@@ -1,8 +1,10 @@
 package pro.themed.pxlsrtr
 
 import android.hardware.display.*
+import android.os.*
 import android.os.Build.*
 import android.service.dreams.*
+import android.view.*
 import androidx.annotation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -39,7 +41,6 @@ class DreamServiceCompat : DreamService(), SavedStateRegistryOwner, ViewModelSto
     @CallSuper
     override fun onCreate() {
         super.onCreate()
-
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
     }
@@ -55,10 +56,17 @@ class DreamServiceCompat : DreamService(), SavedStateRegistryOwner, ViewModelSto
         view.setViewTreeViewModelStoreOwner(this)
         view.setViewTreeSavedStateRegistryOwner(this)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.decorView.windowInsetsController?.hide(android.view.WindowInsets.Type.systemBars())
+        } else {
+            @Suppress("DEPRECATION") // Older API support
+            this@DreamServiceCompat.window.decorView.systemUiVisibility =
+                (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN)
+        }
         // Set content composable
-        view.setContent({
+        view.setContent  {
             Random()
-        })
+        }
 
         // Set content view
         setContentView(view)

@@ -184,8 +184,7 @@ import kotlin.math.*
 
                 ) {
                 Text(modifier = Modifier
-                    .padding(8.dp)
-                    .padding(start = 8.dp), text = "Monet", fontSize = 24.sp)
+                    .padding(start = 16.dp), text = "Monet", style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
                     isColorReferenceDropdownExpanded = !isColorReferenceDropdownExpanded
@@ -356,7 +355,7 @@ import kotlin.math.*
                                     }
 
                                 }
-                                Column(modifier = Modifier.padding(8.dp)) {
+                                Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                                     val colors = mutableListOf<Color>()
                                     for (h in 0..360 step 60) {
                                         colors.add(hsl(h.toFloat(), 1f, 0.5f))
@@ -566,8 +565,8 @@ import kotlin.math.*
 
                         }
 
-                        Row {
-                            Button(onClick = {
+                        Row(Modifier.padding(8.dp)) {
+                            OutlinedButton (border = BorderStroke(2.dp, contentcol.copy(0.5f)), onClick = {
                                 Shell.SH.run("su -c cmd overlay disable themed.fakemonet.generic")
                                 Shell.SH.run("su -c cmd overlay enable com.android.systemui:accent")
                                 Shell.SH.run("su -c cmd overlay enable com.android.systemui:neutral")
@@ -596,7 +595,8 @@ import kotlin.math.*
                                     else {
                                         White
                                     }),
-                                shape = CircleShape) {
+                                shape = CircleShape,
+                                contentPadding = PaddingValues(0.dp)) {
                                 Row(verticalAlignment = CenterVertically) {
                                     Text(text = "Build and update")
                                     Icon(modifier = Modifier.height(24.dp),
@@ -607,7 +607,6 @@ import kotlin.math.*
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
 
                     }
                 }

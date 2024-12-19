@@ -55,8 +55,8 @@ import kotlin.math.*
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(modifier = Modifier
-                        .padding(8.dp)
-                        .padding(start = 8.dp), text = "Accent", fontSize = 24.sp)
+
+                        .padding(start = 16.dp), text = "Accent", style = MaterialTheme.typography.headlineSmall)
 
                     IconButton(onClick = {
                         expanded = !expanded
@@ -163,8 +163,8 @@ import kotlin.math.*
                                 steps = 19,
                             )
 
-                            Row {
-                                Button(onClick = {
+                            Row(Modifier.padding(vertical = 4.dp)) {
+                                OutlinedButton (border = BorderStroke(2.dp, contentcol.copy(0.5f)), onClick = {
                                     shell.run("cmd overlay disable themed.accent.generic ; pm uninstall themed.accent.generic")
                                     hue = 45f
                                     saturation = 100f
@@ -189,9 +189,10 @@ import kotlin.math.*
                                         else {
                                             White
                                         }),
-                                    shape = CircleShape) {
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(0.dp)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "Build, $hex", color = if (lightness > 50f) {
+                                        Text(text = "Build, ${hex.removePrefix("ff")}", color = if (lightness > 50f) {
                                             Color.Black
                                         }
                                         else {

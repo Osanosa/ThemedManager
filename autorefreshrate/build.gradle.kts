@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "pro.themed.manager.autorefreshrate"
-    compileSdk = 34
+    compileSdk = 35
     signingConfigs {
         create("release") {
             storeFile = file("C:\\Users\\Osanosa\\Key.jks")
@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId = "pro.themed.manager.autorefreshrate"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode =  SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
         signingConfig = signingConfigs.getByName("release")
@@ -86,4 +86,5 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
     implementation (libs.firebase.firestore)
 
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 }

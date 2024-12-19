@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "pro.themed.PXLSRTR"
-    compileSdk = 34
+    compileSdk = 35
     signingConfigs {
         create("release") {
             storeFile = file("C:\\Users\\Osanosa\\Key.jks")
