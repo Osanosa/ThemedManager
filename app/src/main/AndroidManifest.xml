@@ -37,6 +37,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThemedManager.Starting"
         tools:targetApi="33">
+
         <service
             android:name=".utils.MyForegroundService"
             android:foregroundServiceType="specialUse" />

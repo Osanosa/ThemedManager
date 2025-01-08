@@ -86,6 +86,6 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
     implementation (libs.firebase.firestore)
 
-    implementation ("com.google.accompanist:accompanist-permissions:0.36.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.37.0")
 
 }

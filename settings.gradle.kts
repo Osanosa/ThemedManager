@@ -26,3 +26,4 @@ include(":PerAppDownscale")
 include(":PXLSRTR")
 include(":filesizes")
 
+include(":audhdlauncher")
