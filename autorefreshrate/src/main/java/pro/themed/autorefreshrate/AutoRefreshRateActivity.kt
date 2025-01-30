@@ -434,27 +434,6 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                 var autoRestart by remember {
                                     mutableStateOf(sharedPreferences.getBoolean("autoRestartService", false))
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)) {
-
-                                    Text(text = "Auto restart if killed on each 15min: $autoRestart",
-                                        style = MaterialTheme.typography.titleMedium)
-                                    Switch(modifier = Modifier.weight(1f), checked = autoRestart, onCheckedChange = {
-                                        if (!noRoot) {
-                                            autoRestart = it
-                                            sharedPreferences.edit().putBoolean("autoRestartService", it).apply()
-                                            if (it) schedulePeriodicTask(context)
-                                            else removeScheduledTask(context,
-                                                "my_periodic_task")
-                                        }
-                                        else {
-                                            Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
-                                        }
-                                    })
-                                }
 
                                 Row(horizontalArrangement = Arrangement.SpaceBetween,
                                     modifier = Modifier.fillMaxWidth()) {

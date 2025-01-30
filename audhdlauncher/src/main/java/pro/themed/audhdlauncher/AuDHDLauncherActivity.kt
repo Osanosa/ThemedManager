@@ -1,17 +1,22 @@
 package pro.themed.audhdlauncher
 
+import android.app.ActivityOptions
 import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +26,21 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,10 +48,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.drawable.toBitmap
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import pro.themed.audhdlauncher.ui.theme.ThemedManagerTheme
 import pro.themed.audhdlauncher.ui.theme.contentcol
 import pro.themed.audhdlauncher.ui.theme.cookieForeground
@@ -72,42 +86,140 @@ fun getLaunchableApps(context: Context): List<ResolveInfo> {
 
 class AuDHDLauncherActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         enableEdgeToEdge()
         setContent {
+            val context = LocalContext.current
+            var isVisible by remember { mutableStateOf(true) }
+
+            val readPermissionState = rememberMultiplePermissionsState(
+                listOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            )
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                readPermissionState.launchMultiplePermissionRequest()
+                if (!readPermissionState.allPermissionsGranted) {
+                    Toast.makeText(context, "No permission, change in settings", Toast.LENGTH_SHORT).show()
+                    isVisible = true
+                } else {
+                    Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                if (!Environment.isExternalStorageManager()) {
+                    Toast.makeText(context, "No permission, change in settings", Toast.LENGTH_SHORT).show()
+                    isVisible = true
+                }
+            }
+            if (!Environment.isExternalStorageManager()) {
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        Uri.parse("package:pro.themed.audhdlauncher")
+                    )
+                )
+            }
             ThemedManagerTheme {
                 Wallpaper()
                 Box(
                     modifier = Modifier
                         .safeDrawingPadding()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 8.dp)
                 ) {
+                    Column {
 
-                    CookieCard {
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            getLaunchableApps(this@AuDHDLauncherActivity).forEach { resolveInfo ->
-                                val context = LocalContext.current
-                                Image(
-                                    painter = rememberDrawablePainter(resolveInfo.loadIcon(this@AuDHDLauncherActivity.packageManager)),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(56.dp)
-                                        .clickable {
-                                            val intent =
-                                                context.packageManager.getLeanbackLaunchIntentForPackage(resolveInfo.activityInfo.packageName)
-                                            intent?.addCategory(Intent.CATEGORY_LAUNCHER)
-                                            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                            context.startActivity(intent)
-                                        }
-
-                                )
+                        CookieCard {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.SpaceAround,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .verticalScroll(
+                                        rememberScrollState()
+                                    )
+                            ) {
+                                getLaunchableApps(this@AuDHDLauncherActivity).filter {
+                                    it.activityInfo.packageName.contains(
+                                        "google"
+                                    ) || it.loadLabel(packageManager).contains("google", true)
+                                }.forEach { resolveInfo ->
+                                    AndroidView(
+                                        factory = { context ->
+                                            val imageView = ImageView(context)
+                                            imageView.setImageDrawable(resolveInfo.loadIcon(context.packageManager))
+                                            imageView.setOnClickListener {
+                                                val intent =
+                                                    context.packageManager.getLaunchIntentForPackage(resolveInfo.activityInfo.packageName)
+                                                val centerX = imageView.width / 2
+                                                val centerY = imageView.height / 2
+                                                val options = ActivityOptions.makeScaleUpAnimation(
+                                                    imageView,
+                                                    centerX,
+                                                    centerY,
+                                                    0,
+                                                    0
+                                                )
+                                                context.startActivity(intent, options.toBundle())
+                                            }
+                                            imageView
+                                        }, modifier = Modifier.size(48.dp)
+                                    )
+                                }
                             }
                         }
-                        getLaunchableApps(this@AuDHDLauncherActivity).forEach { resolveInfo ->
-                            Text(text = resolveInfo.loadLabel(this@AuDHDLauncherActivity.packageManager).toString())
-                        }
+
+                        CookieCard {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.SpaceAround,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .verticalScroll(
+                                        rememberScrollState()
+                                    )
+                            ) {
+                                getLaunchableApps(this@AuDHDLauncherActivity).filter {
+                                    !it.activityInfo.packageName.contains(
+                                        "google"
+                                    ) || !it.activityInfo.loadLabel(packageManager).contains("google", true)
+                                }.forEach { resolveInfo ->
+                                    AndroidView(
+                                        factory = { context ->
+                                            val imageView = ImageView(context)
+                                            imageView.setImageDrawable(resolveInfo.loadIcon(context.packageManager))
+
+                                            // Set transitionName for shared element transition
+                                            imageView.transitionName = "iconTransition"
+
+                                            imageView.setOnClickListener {
+                                                val intent =
+                                                    context.packageManager.getLaunchIntentForPackage(resolveInfo.activityInfo.packageName)
+
+                                                // Wait for layout to be ready to get correct width and height
+                                                imageView.viewTreeObserver.addOnGlobalLayoutListener {
+                                                    val centerX = imageView.width / 2
+                                                    val centerY = imageView.height / 2
+                                                    val options = ActivityOptions.makeScaleUpAnimation(
+                                                        imageView,
+                                                        centerX,
+                                                        centerY,
+                                                        0,
+                                                        0
+                                                    )
+                                                    context.startActivity(intent, options.toBundle())
+                                                }
+                                            }
+                                            imageView
+                                        },
+                                        modifier = Modifier.size(48.dp)
+                                    )
+                                }
+                            }                        }
                     }
                 }
             }

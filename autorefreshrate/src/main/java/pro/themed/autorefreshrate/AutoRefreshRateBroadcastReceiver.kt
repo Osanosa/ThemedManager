@@ -1,8 +1,11 @@
 package pro.themed.autorefreshrate
 
-import android.content.*
-import android.widget.*
-import com.jaredrummler.ktsh.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.widget.Toast
+import com.jaredrummler.ktsh.Shell
 
 class AutoRefreshRateBroadcastReceiver : BroadcastReceiver() {
 
@@ -15,8 +18,6 @@ class AutoRefreshRateBroadcastReceiver : BroadcastReceiver() {
             shell.run("am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
             Toast.makeText(context, "Starting autorefreshrate service", Toast.LENGTH_SHORT).show()
         }
-        if (sharedPreferences.getBoolean("autoRestartService", false)) {
-            schedulePeriodicTask(context)
-        }
+
     }
 }
