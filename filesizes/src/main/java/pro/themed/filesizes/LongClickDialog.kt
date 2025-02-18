@@ -14,7 +14,8 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 
-@Composable fun LongClickDialog(onDismissRequest: () -> Unit, fullPath: String, onDeletion: () -> ItemState?) {
+@Composable
+fun LongClickDialog(onDismissRequest: () -> Unit, fullPath: String, onDeletion: () -> ItemState?) {
     var showDeletionDialog by remember { mutableStateOf(false) }
 
     if (showDeletionDialog) {
@@ -25,15 +26,12 @@ import androidx.compose.ui.window.*
         CookieCard {
             Column(Modifier.padding(8.dp)) {
 
-                //copy move info delete etc
+                // copy move info delete etc
                 Text(fullPath)
                 Row(
-                    Modifier
-                        .fillMaxWidth()
+                    Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable {
-                            showDeletionDialog = true
-                        }
+                        .clickable { showDeletionDialog = true }
                         .padding(8.dp),
                 ) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
@@ -45,7 +43,8 @@ import androidx.compose.ui.window.*
     }
 }
 
-@Composable fun DelitionDialog(onDismissRequest: () -> Unit, fullPath: String, onDeletion: () -> ItemState?) {
+@Composable
+fun DelitionDialog(onDismissRequest: () -> Unit, fullPath: String, onDeletion: () -> ItemState?) {
 
     var additionalConfirmationPrompt by remember { mutableStateOf(false) }
     if (additionalConfirmationPrompt) {
@@ -53,74 +52,83 @@ import androidx.compose.ui.window.*
     }
     Dialog(onDismissRequest = onDismissRequest) {
         CookieCard {
-
-            Text(buildAnnotatedString {
-                withStyle(SpanStyle(fontSize = 16.sp)) {
-
-                append("Confirm deletion of\n")
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(fullPath)
-                }
-                append("\n?")}
-            }, Modifier.padding(8.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                Button(onClick = {
-
-                    onDismissRequest()
-                }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Cancel")
-
-                }
-                Button(onClick = {
-                    if (fullPath.endsWith("/")) {
-                        additionalConfirmationPrompt = true
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(fontSize = 16.sp)) {
+                        append("Confirm deletion of\n")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(fullPath) }
+                        append("\n?")
                     }
-                    else {
-                        delete(fullPath)
-                        onDeletion()
-                    }
-                    onDismissRequest()
-                }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Delete")
-                }
-            }
+                },
+                Modifier.padding(8.dp)
+            )
 
-        }
-    }
-}
-
-@Composable fun FolderConfirmationDialog(onDismissRequest: () -> Unit, fullPath: String, onDeletion: () -> ItemState?) {
-    Dialog(onDismissRequest) {
-        CookieCard {
-
-            Text(buildAnnotatedString {
-                withStyle(SpanStyle(fontSize = 16.sp)) {
-
-                    append("Are you sure you want to delete\n")
-
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(fullPath)
-                }
-
-                append("\n?")}
-            }, Modifier.padding(8.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
                 Button(onClick = { onDismissRequest() }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text("Cancel")
                 }
-                Button(onClick = {
-                    delete(fullPath)
-                    onDeletion()
-                    onDismissRequest()
-                }) {
+                Button(
+                    onClick = {
+                        if (fullPath.endsWith("/")) {
+                            additionalConfirmationPrompt = true
+                        } else {
+                            delete(fullPath)
+                            onDeletion()
+                        }
+                        onDismissRequest()
+                    }
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Delete")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FolderConfirmationDialog(
+    onDismissRequest: () -> Unit,
+    fullPath: String,
+    onDeletion: () -> ItemState?
+) {
+    Dialog(onDismissRequest) {
+        CookieCard {
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(fontSize = 16.sp)) {
+                        append("Are you sure you want to delete\n")
+
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(fullPath) }
+
+                        append("\n?")
+                    }
+                },
+                Modifier.padding(8.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Button(onClick = { onDismissRequest() }) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Cancel")
+                }
+                Button(
+                    onClick = {
+                        delete(fullPath)
+                        onDeletion()
+                        onDismissRequest()
+                    }
+                ) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text("Delete")

@@ -46,34 +46,39 @@ import androidx.compose.ui.window.DialogProperties
 import com.jaredrummler.ktsh.Shell
 import pro.themed.manager.MainActivity
 import pro.themed.manager.R
-import pro.themed.manager.utils.SharedPreferencesManager
 import pro.themed.manager.components.CookieCard
-import pro.themed.manager.utils.fetchOverlayList
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.ui.theme.bordercol
 import pro.themed.manager.ui.theme.contentcol
 import pro.themed.manager.utils.GlobalVariables.themedId
+import pro.themed.manager.utils.SharedPreferencesManager
+import pro.themed.manager.utils.*
 
 @Composable
 fun SectionDialogHeader(header: String, onClick: () -> Unit) {
     Card(
-        onClick = onClick, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(
-            containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol
-        ), modifier = Modifier.animateContentSize()
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = contentcol.copy(alpha = 0.05f),
+                contentColor = contentcol,
+            ),
+        modifier = Modifier.animateContentSize(),
     ) {
         Card(
-            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                containerColor = contentcol.copy(alpha = 0.05f), contentColor = contentcol
-            ), modifier = Modifier
-                .animateContentSize()
-                .padding(8.dp)
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = contentcol.copy(alpha = 0.05f),
+                    contentColor = contentcol,
+                ),
+            modifier = Modifier.animateContentSize().padding(8.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(text = header, fontWeight = FontWeight.Bold)
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
@@ -86,58 +91,54 @@ fun SectionDialogHeader(header: String, onClick: () -> Unit) {
 @Composable
 fun DebugPage() {
     val context = LocalContext.current
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = background
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = background) {
         val overlayList = MainActivity.overlayList
-        Column(
-            modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)
-
-        ) {
+        Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             var showOverlayDialog by rememberSaveable { mutableStateOf(false) }
             var dialogtext by rememberSaveable { mutableStateOf("empty") }
-            var dialogname by rememberSaveable {
-                mutableStateOf(
-                    "empty"
-                )
-            }
+            var dialogname by rememberSaveable { mutableStateOf("empty") }
             val clipboardManager: ClipboardManager = LocalClipboardManager.current
             val scroll = rememberScrollState()
             if (showOverlayDialog) {
                 Dialog(
-                    onDismissRequest = {
-                        showOverlayDialog = false
-                    }, properties = DialogProperties(usePlatformDefaultWidth = false)
+                    onDismissRequest = { showOverlayDialog = false },
+                    properties = DialogProperties(usePlatformDefaultWidth = false),
                 ) {
                     Card {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .verticalScroll(scroll)
-                            ) {
-                                Text(dialogtext)
-                            }
+                            Column(Modifier.weight(1f).verticalScroll(scroll)) { Text(dialogtext) }
 
-                            Button(modifier = Modifier.fillMaxWidth(), onClick = {
-                                clipboardManager.setText(AnnotatedString((dialogtext)))
-                            }) {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString((dialogtext)))
+                                },
+                            ) {
                                 Text(text = "Copy")
                             }
 
                             Row {
-                                Button(modifier = Modifier.weight(1f), onClick = {
-                                    Shell("su").run("cmd overlay enable $dialogname")
-                                    MainActivity.overlayList = fetchOverlayList()
-                                }) {
+                                Button(
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {
+                                        Shell("su").run("cmd overlay enable $dialogname")
+                                        MainActivity.overlayList = fetchOverlayList()
+                                          MainActivity.allOverlayList = fetchAllOverlayList()
+                                    },
+                                ) {
                                     Text(text = "Enable")
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
 
-                                Button(modifier = Modifier.weight(1f), onClick = {
-                                    Shell("su").run("cmd overlay disable $dialogname")
-                                    MainActivity.overlayList = fetchOverlayList()
-                                }) {
+                                Button(
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {
+                                        Shell("su").run("cmd overlay disable $dialogname")
+                                        MainActivity.overlayList = fetchOverlayList()
+                                               MainActivity.allOverlayList = fetchAllOverlayList()
+                                   
+                                    },
+                                ) {
                                     Text(text = "Disable")
                                 }
                             }
@@ -145,36 +146,42 @@ fun DebugPage() {
                     }
                 }
             }
-            var showAdFreeDialog by rememberSaveable {
-                mutableStateOf(false)
-            }
+
+            var showAdFreeDialog by rememberSaveable { mutableStateOf(false) }
             SectionDialogHeader(header = "AdFree", onClick = { showAdFreeDialog = true })
             if (showAdFreeDialog) {
                 Dialog(onDismissRequest = { showAdFreeDialog = false }) {
                     Card(
                         onClick = { showAdFreeDialog = false },
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = bordercol, contentColor = contentcol
-                        ),
-                        modifier = Modifier.animateContentSize()
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = bordercol,
+                                contentColor = contentcol,
+                            ),
+                        modifier = Modifier.animateContentSize(),
                     ) {
                         Card(
-                            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                                containerColor = contentcol.copy(alpha = 0.05f),
-                                contentColor = contentcol
-                            ), modifier = Modifier
-                                .animateContentSize()
-                                .padding(8.dp)
+                            shape = RoundedCornerShape(10.dp),
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = contentcol.copy(alpha = 0.05f),
+                                    contentColor = contentcol,
+                                ),
+                            modifier = Modifier.animateContentSize().padding(8.dp),
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(text = "Your ThemedId is ${themedId}, your prevelegies are due ${
+                                Text(
+                                    text =
+                                        "Your ThemedId is ${themedId}, your prevelegies are due ${
                                     SharedPreferencesManager.getSharedPreferences()
                                         .getString("isContributorDate", "null")
-                                }", modifier = Modifier.clickable {
-                                    clipboardManager.setText(AnnotatedString((themedId)))
-                                })
-
+                                }",
+                                    modifier =
+                                        Modifier.clickable {
+                                            clipboardManager.setText(AnnotatedString((themedId)))
+                                        },
+                                )
                             }
                         }
                     }
@@ -186,35 +193,33 @@ fun DebugPage() {
 
             if (showLogs) {
                 Dialog(onDismissRequest = { showLogs = false }) {
-
                     CookieCard {
-
                         Row(modifier = Modifier.padding(8.dp)) {
-
                             OutlinedButton(
                                 onClick = {
                                     Shell("su").run("rm /sdcard/themeddebug/logs")
                                     Shell("su").run("mkdir /sdcard/themeddebug")
                                     Shell("su").run("mkdir /sdcard/themeddebug/logs")
 
-                                    Shell("su").run("cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt")
-                                    Shell("su").run("ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt")
+                                    Shell("su")
+                                        .run(
+                                            "cmd overlay list | tee -a /sdcard/themeddebug/logs/cmdoverlaylist.txt"
+                                        )
+                                    Shell("su")
+                                        .run(
+                                            "ls /data/adb/modules  | tee -a /sdcard/themeddebug/logs/modules.txt"
+                                        )
 
                                     Toast.makeText(
-                                        context,
-                                        context.getString(R.string.done),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
+                                            context,
+                                            context.getString(R.string.done),
+                                            Toast.LENGTH_SHORT,
+                                        )
+                                        .show()
                                 },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+                                modifier = Modifier.fillMaxWidth().weight(1f),
                                 shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = background,
-                                )
-
+                                colors = ButtonDefaults.buttonColors(containerColor = background),
                             ) {
                                 Text(text = stringResource(R.string.collect_logs))
                             }
@@ -225,50 +230,51 @@ fun DebugPage() {
                                     Shell("su").run("mkdir /sdcard/themeddebug/")
                                     Shell("su").run("mkdir /sdcard/themeddebug/files")
 
-                                    Shell("su").run("cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files")
-                                    Shell("su").run("cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files")
+                                    Shell("su")
+                                        .run(
+                                            "cp \$( cmd package path android | sed -E 's/^........//' ) /sdcard/themeddebug/files"
+                                        )
+                                    Shell("su")
+                                        .run(
+                                            "cp \$( cmd package path com.android.systemui | sed -E 's/^........//' ) /sdcard/themeddebug/files"
+                                        )
 
                                     Toast.makeText(
-                                        context,
-                                        context.getString(R.string.done),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
+                                            context,
+                                            context.getString(R.string.done),
+                                            Toast.LENGTH_SHORT,
+                                        )
+                                        .show()
                                 },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+                                modifier = Modifier.fillMaxWidth().weight(1f),
                                 shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = background,
-                                )
-
+                                colors = ButtonDefaults.buttonColors(containerColor = background),
                             ) {
                                 Text(text = stringResource(R.string.collect_files))
                             }
                         }
                         Text(
-                            text = "If you're having issues of something not working you need to collect files and send zipped /sdcard/themeddebug",
-                            modifier = Modifier.padding(8.dp)
+                            text =
+                                "If you're having issues of something not working you need to collect files and send zipped /sdcard/themeddebug",
+                            modifier = Modifier.padding(8.dp),
                         )
-
                     }
                 }
             }
 
             var showThemedOverlaysDialog by rememberSaveable { mutableStateOf(false) }
 
-            SectionDialogHeader(header = "Themed Overlays",
-                onClick = { showThemedOverlaysDialog = true })
+            SectionDialogHeader(
+                header = "Themed Overlays",
+                onClick = { showThemedOverlaysDialog = true },
+            )
 
             if (showThemedOverlaysDialog) {
                 Dialog(onDismissRequest = { showThemedOverlaysDialog = false }) {
                     CookieCard {
                         Column(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                ,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             if (overlayList.overlayList.isEmpty()) {
 
@@ -280,26 +286,29 @@ fun DebugPage() {
                                 overlayList.unsupportedOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier
-                                            .combinedClickable(onClick = {
-                                                dialogname = overlay
-                                                    .removePrefix("[x] ")
-                                                    .removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                                dialogtext = Shell("su")
-                                                    .run(
-                                                        "cmd overlay dump ${
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
                                                             overlay
                                                                 .removePrefix("[x] ")
                                                                 .removePrefix("[ ] ")
                                                                 .removePrefix("--- ")
                                                         }"
-                                                    )
-                                                    .stdout()
-                                                showOverlayDialog = true
-
-                                            })
-                                            .basicMarquee()
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
                                     )
                                 }
                             }
@@ -309,26 +318,29 @@ fun DebugPage() {
                                 overlayList.enabledOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier
-                                            .combinedClickable(onClick = {
-                                                dialogname = overlay
-                                                    .removePrefix("[x] ")
-                                                    .removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                                dialogtext = Shell("su")
-                                                    .run(
-                                                        "cmd overlay dump ${
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
                                                             overlay
                                                                 .removePrefix("[x] ")
                                                                 .removePrefix("[ ] ")
                                                                 .removePrefix("--- ")
                                                         }"
-                                                    )
-                                                    .stdout()
-                                                showOverlayDialog = true
-
-                                            })
-                                            .basicMarquee()
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
                                     )
                                 }
                             }
@@ -338,26 +350,29 @@ fun DebugPage() {
                                 overlayList.disabledOverlays.forEach { overlay ->
                                     Text(
                                         text = overlay,
-                                        modifier = Modifier
-                                            .combinedClickable(onClick = {
-                                                dialogname = overlay
-                                                    .removePrefix("[x] ")
-                                                    .removePrefix("[ ] ")
-                                                    .removePrefix("--- ")
-                                                dialogtext = Shell("su")
-                                                    .run(
-                                                        "cmd overlay dump ${
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
                                                             overlay
                                                                 .removePrefix("[x] ")
                                                                 .removePrefix("[ ] ")
                                                                 .removePrefix("--- ")
                                                         }"
-                                                    )
-                                                    .stdout()
-                                                showOverlayDialog = true
-
-                                            })
-                                            .basicMarquee()
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
                                     )
                                 }
                             }
@@ -365,7 +380,125 @@ fun DebugPage() {
                     }
                 }
             }
+            
+                        var showAllOverlaysDialog by rememberSaveable { mutableStateOf(false) }
+val allOverlayList = MainActivity.allOverlayList
+            SectionDialogHeader(
+                header = "System Overlays",
+                onClick = { showAllOverlaysDialog = true },
+            )
 
+            if (showAllOverlaysDialog) {
+                Dialog(onDismissRequest = { showAllOverlaysDialog = false }) {
+                    CookieCard {
+                        Column(
+                            modifier = Modifier.verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            if (allOverlayList.overlayList.isEmpty()) {
+
+                                Text(text = "Overlay list is empty")
+                            }
+
+                            if (allOverlayList.unsupportedOverlays.isNotEmpty()) {
+                                Text(text = "Unsupported")
+                                allOverlayList.unsupportedOverlays.forEach { overlay ->
+                                    Text(
+                                        text = overlay,
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
+                                    )
+                                }
+                            }
+
+                            if (allOverlayList.enabledOverlays.isNotEmpty()) {
+                                Text(text = "Enabled")
+                                allOverlayList.enabledOverlays.forEach { overlay ->
+                                    Text(
+                                        text = overlay,
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
+                                    )
+                                }
+                            }
+
+                            if (allOverlayList.disabledOverlays.isNotEmpty()) {
+                                Text(text = "Disabled")
+                                allOverlayList.disabledOverlays.forEach { overlay ->
+                                    Text(
+                                        text = overlay,
+                                        modifier =
+                                            Modifier.combinedClickable(
+                                                    onClick = {
+                                                        dialogname =
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        dialogtext =
+                                                            Shell("su")
+                                                                .run(
+                                                                    "cmd overlay dump ${
+                                                            overlay
+                                                                .removePrefix("[x] ")
+                                                                .removePrefix("[ ] ")
+                                                                .removePrefix("--- ")
+                                                        }"
+                                                                )
+                                                                .stdout()
+                                                        showOverlayDialog = true
+                                                    }
+                                                )
+                                                .basicMarquee(),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

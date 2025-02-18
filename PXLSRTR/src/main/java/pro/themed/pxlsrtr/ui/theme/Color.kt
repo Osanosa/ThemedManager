@@ -4,7 +4,6 @@ import androidx.compose.foundation.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
-
 private val backgroundLight = Color(0xfff9f9f9)
 private val backgroundDark = Color(0xFF0F1012)
 

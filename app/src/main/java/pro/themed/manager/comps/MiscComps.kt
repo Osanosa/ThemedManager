@@ -43,20 +43,15 @@ import pro.themed.manager.components.Slideritem
 import pro.themed.manager.ui.theme.background
 import pro.themed.manager.utils.GlobalVariables
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalMaterial3Api
-//@Preview
+// @Preview
 @Composable
 fun MiscTab() {
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = background
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = background) {
         Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Spacer(Modifier.height(32.dp))
 
@@ -67,31 +62,46 @@ fun MiscTab() {
 
             var rounded_corner_radius by remember {
                 mutableStateOf(
-                    Shell("su").run("""awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'""")
+                    Shell("su")
+                        .run(
+                            """awk -F'[<>]' '/<dimen name="rounded_corner_radius">/ {print $3}' $cornersPath/res/values/dimens.xml | sed 's/dip//g'"""
+                        )
                         .stdout()
                 )
             }
             var config_qs_columns_landscape by remember {
                 mutableStateOf(
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml""")
+                    Shell("su")
+                        .run(
+                            """awk -F'[<>]' '/<integer name="config_qs_columns_landscape">/ {print $3}' ${qsGridGenericPath}ColumnsLandscapeGeneric/res/values/integers.xml"""
+                        )
                         .stdout()
                 )
             }
             var config_qs_columns_portrait by remember {
                 mutableStateOf(
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml""")
+                    Shell("su")
+                        .run(
+                            """awk -F'[<>]' '/<integer name="config_qs_columns_portrait">/ {print $3}' ${qsGridGenericPath}ColumnsPortraitGeneric/res/values/integers.xml"""
+                        )
                         .stdout()
                 )
             }
             var config_qs_rows_landscape by remember {
                 mutableStateOf(
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                    Shell("su")
+                        .run(
+                            """awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml"""
+                        )
                         .stdout()
                 )
             }
             var config_qs_rows_portrait by remember {
                 mutableStateOf(
-                    Shell("su").run("""awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml""")
+                    Shell("su")
+                        .run(
+                            """awk -F'[<>]' '/<integer name="config_qs_rows_landscape">/ {print $3}' ${qsGridGenericPath}RowsLandscapeGeneric/res/values/integers.xml"""
+                        )
                         .stdout()
                 )
             }
@@ -99,15 +109,14 @@ fun MiscTab() {
             LaunchedEffect(Unit) {}
 
             CookieCard {
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp),
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.rounded_corner_48px),
                         null,
-                        Modifier.size(24.dp)
+                        Modifier.size(24.dp),
                     )
                     Spacer(Modifier.width(8.dp))
                     MiscTextField(
@@ -117,9 +126,8 @@ fun MiscTab() {
                         file = """dimens""",
                         overlay = """themed.corners.generic""",
                         modifier = Modifier.weight(1f),
-                        label = "Rounded Corner Radius"
+                        label = "Rounded Corner Radius",
                     )
-
                 }
             }
             CookieCard {
@@ -128,31 +136,27 @@ fun MiscTab() {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.view_week_48px),
                         null,
-                        Modifier
-                            .padding(4.dp)
-                            .size(24.dp)
+                        Modifier.padding(4.dp).size(24.dp),
                     )
                     Text("Qs Grid Columns", fontWeight = FontWeight.Bold)
                     Spacer(Modifier.weight(1f))
-                    Icon(imageVector = ImageVector.vectorResource(R.drawable.reset),
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.reset),
                         null,
-                        Modifier
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .size(24.dp)
-                            .clickable {
-                                Shell("su").run("cmd overlay disable themed.qsgrid.columnsportrait.generic")
-                                Shell("su").run("cmd overlay disable themed.qsgrid.columnslandscape.generic")
-                            })
-
+                        Modifier.padding(4.dp).clip(CircleShape).size(24.dp).clickable {
+                            Shell("su")
+                                .run("cmd overlay disable themed.qsgrid.columnsportrait.generic")
+                            Shell("su")
+                                .run("cmd overlay disable themed.qsgrid.columnslandscape.generic")
+                        },
+                    )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
                 ) {
 
-
-                    //columns portrait
+                    // columns portrait
                     MiscTextField(
                         input = config_qs_columns_portrait,
                         path = qsGridGenericPath + "ColumnsPortraitGeneric/",
@@ -160,11 +164,11 @@ fun MiscTab() {
                         file = "integers",
                         overlay = "themed.qsgrid.columnsportrait.generic",
                         modifier = Modifier.weight(1f),
-                        label = "Portrait"
+                        label = "Portrait",
                     )
                     Spacer(Modifier.width(8.dp))
 
-                    //columns landscape
+                    // columns landscape
                     MiscTextField(
                         input = config_qs_columns_landscape,
                         path = qsGridGenericPath + "ColumnsLandscapeGeneric/",
@@ -172,9 +176,8 @@ fun MiscTab() {
                         file = "integers",
                         overlay = "themed.qsgrid.columnslandscape.generic",
                         modifier = Modifier.weight(1f),
-                        label = "Landscape"
+                        label = "Landscape",
                     )
-
                 }
                 Spacer(Modifier.height(8.dp))
             }
@@ -184,33 +187,28 @@ fun MiscTab() {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.table_rows_48px),
                         null,
-                        Modifier
-                            .padding(4.dp)
-
-                            .size(24.dp)
+                        Modifier.padding(4.dp).size(24.dp),
                     )
                     Text("Qs Grid Rows", fontWeight = FontWeight.Bold)
                     Spacer(Modifier.weight(1f))
-                    Icon(imageVector = ImageVector.vectorResource(R.drawable.reset),
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.reset),
                         null,
-                        Modifier
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .size(24.dp)
-                            .clickable {
-                                Shell("su").run("cmd overlay disable themed.qsgrid.rowslandscape.generic")
-                                Shell("su").run("cmd overlay disable themed.qsgrid.rowsportrait.generic")
-                            })
-
+                        Modifier.padding(4.dp).clip(CircleShape).size(24.dp).clickable {
+                            Shell("su")
+                                .run("cmd overlay disable themed.qsgrid.rowslandscape.generic")
+                            Shell("su")
+                                .run("cmd overlay disable themed.qsgrid.rowsportrait.generic")
+                        },
+                    )
                 }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
                 ) {
 
-
-                    //rows portrait
+                    // rows portrait
                     MiscTextField(
                         input = config_qs_rows_portrait,
                         path = qsGridGenericPath + "RowsPortraitGeneric/",
@@ -218,11 +216,11 @@ fun MiscTab() {
                         file = "integers",
                         overlay = "themed.qsgrid.rowsportrait.generic",
                         modifier = Modifier.weight(1f),
-                        label = "Portrait"
+                        label = "Portrait",
                     )
                     Spacer(Modifier.width(8.dp))
 
-                    //rows landscape
+                    // rows landscape
                     MiscTextField(
                         input = config_qs_rows_landscape,
                         path = qsGridGenericPath + "RowsLandscapeGeneric/",
@@ -230,14 +228,13 @@ fun MiscTab() {
                         file = "integers",
                         overlay = "themed.qsgrid.rowslandscape.generic",
                         modifier = Modifier.weight(1f),
-                        label = "Landscape"
+                        label = "Landscape",
                     )
                 }
                 Spacer(Modifier.height(8.dp))
             }
 
             CookieCard {
-
                 Slideritem(
                     drawable = R.drawable.table_rows_48px,
                     header = stringResource(R.string.qsquicktilesize),
@@ -245,7 +242,7 @@ fun MiscTab() {
                     sliderStepValue = 20,
                     minSliderValue = 60f,
                     maxSliderValue = 80f,
-                    overlayName = "qsquicktilesize"
+                    overlayName = "qsquicktilesize",
                 )
                 Slideritem(
                     drawable = R.drawable.table_rows_48px,
@@ -254,7 +251,7 @@ fun MiscTab() {
                     sliderStepValue = 20,
                     minSliderValue = 60f,
                     maxSliderValue = 80f,
-                    overlayName = "qstileheight"
+                    overlayName = "qstileheight",
                 )
             }
 
@@ -284,9 +281,6 @@ fun MiscTab() {
                 },
                 isChecked = overlayList.enabledOverlays.any { it.contains("borderless") },
             )
-
         }
     }
-
 }
-

@@ -37,68 +37,56 @@ fun OnBoardingPage() {
     val sharedPreferences = SharedPreferencesManager.getSharedPreferences()
     val context = MainActivity.appContext
     Column(
-        Modifier.fillMaxSize(),
+        Modifier.fillMaxSize()
         //                        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         val pageCount = 5
-        val pagerState = rememberPagerState {
-            pageCount
-        }
-        HorizontalPager(
-            state = pagerState, Modifier.weight(1f),
-        ) { index ->
-
+        val pagerState = rememberPagerState { pageCount }
+        HorizontalPager(state = pagerState, Modifier.weight(1f)) { index ->
             when (index) {
                 0 -> {
                     OnBoarding(
                         image = R.drawable.main_logo_circle_mask00000,
-                        text = stringResource(R.string.onboarding0)
+                        text = stringResource(R.string.onboarding0),
                     )
-
                 }
-
                 1 -> {
                     OnBoarding(
-                        image = R.drawable.magisk_logo, text = stringResource(R.string.onboarding1)
+                        image = R.drawable.magisk_logo,
+                        text = stringResource(R.string.onboarding1),
                     )
-
                 }
-
                 2 -> {
                     OnBoarding(
-                        image = R.drawable.dead_android, text = stringResource(R.string.onboarding2)
+                        image = R.drawable.dead_android,
+                        text = stringResource(R.string.onboarding2),
                     )
-
                 }
-
                 3 -> {
                     OnBoarding(
                         image = R.drawable.telegram_logo,
-                        text = stringResource(R.string.onboarding3)
+                        text = stringResource(R.string.onboarding3),
                     )
-
                 }
-
                 4 -> {
                     OnBoarding(
                         image = R.drawable.localazy_logo,
-                        text = stringResource(R.string.onboarding4)
+                        text = stringResource(R.string.onboarding4),
                     )
-
                 }
             }
         }
         val coroutineScope = rememberCoroutineScope()
 
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 32.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            OutlinedButton(shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
+            OutlinedButton(
+                shape = CircleShape,
+                colors =
+                    ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                 onClick = {
                     coroutineScope.launch {
                         if (pagerState.currentPage == 0) {
@@ -111,36 +99,33 @@ fun OnBoardingPage() {
                             pagerState.animateScrollToPage(pagerState.currentPage - 1)
                         }
                     }
-                }) {
+                },
+            ) {
                 when (pagerState.currentPage) {
                     0 -> {
-                        Text(
-                            text = "Skip", color = contentcol
-                        )
-
+                        Text(text = "Skip", color = contentcol)
                     }
-
                     else -> {
-                        Text(
-                            text = "Back", color = contentcol
-                        )
+                        Text(text = "Back", color = contentcol)
                     }
                 }
             }
             // Spacer(modifier = Modifier.fillMaxWidth())
-            OutlinedButton(shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
+            OutlinedButton(
+                shape = CircleShape,
+                colors =
+                    ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                 onClick = {
                     coroutineScope.launch {
                         if (pagerState.currentPage == 1) {
                             if ("root" !in GlobalVariables.whoami) {
                                 Toast.makeText(
-                                    context,
-                                    ContextCompat.getString(context, R.string.no_root_access),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                        context,
+                                        ContextCompat.getString(context, R.string.no_root_access),
+                                        Toast.LENGTH_SHORT,
+                                    )
+                                    .show()
                             }
-
                         }
                         if (pagerState.currentPage == pageCount - 1) {
                             sharedPreferences.edit().putBoolean("onBoardingCompleted", true).apply()
@@ -150,30 +135,20 @@ fun OnBoardingPage() {
                         }
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-                }) {
+                },
+            ) {
                 when (pagerState.currentPage) {
                     pageCount - 1 -> {
-                        Text(
-                            text = "Get started", color = contentcol
-                        )
-
+                        Text(text = "Get started", color = contentcol)
                     }
-
                     1 -> {
-                        Text(
-                            text = "Grant access", color = contentcol
-                        )
-
+                        Text(text = "Grant access", color = contentcol)
                     }
-
                     else -> {
-                        Text(
-                            text = "Next", color = contentcol
-                        )
+                        Text(text = "Next", color = contentcol)
                     }
                 }
             }
-
         }
     }
 }

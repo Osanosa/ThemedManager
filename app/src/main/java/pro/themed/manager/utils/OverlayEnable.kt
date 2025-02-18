@@ -15,7 +15,6 @@ fun overlayEnable(overlayname: String) {
 
         if ("exclusive" in overlay) {
             Shell.SH.run("su -c cmd overlay enable-exclusive --category themed.$overlayname")
-
         } else {
             Shell("su").run("su -c cmd overlay enable themed.$overlayname")
         }
@@ -27,10 +26,7 @@ fun overlayEnable(overlayname: String) {
             Shell("su").run("su -c killall com.android.systemui")
         }
 
-        Firebase.analytics.logEvent("Overlay_Selected") {
-            param("Overlay_Name", overlayname)
-        }
+        Firebase.analytics.logEvent("Overlay_Selected") { param("Overlay_Name", overlayname) }
         MainActivity.overlayList = fetchOverlayList()
     }
-
 }

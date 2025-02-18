@@ -8,11 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.*
 
-@OptIn(ExperimentalFoundationApi::class) @Composable fun Item(
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun Item(
     name: String,
     itemState: ItemState,
     mimetype: String? = null,
@@ -29,42 +30,45 @@ import kotlinx.coroutines.*
     var showLongClickDialog by remember { mutableStateOf(false) }
 
     if (showLongClickDialog) {
-        LongClickDialog ({ showLongClickDialog = false }, fullPath, onDeletion)
+        LongClickDialog({ showLongClickDialog = false }, fullPath, onDeletion)
     }
 
     Box {
-
-        Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .combinedClickable(onClick = {
-                    onClick()
-                    clicked = true
-                }, onLongClick = {
-                    showLongClickDialog = true
-                })
-                .height(48.dp)
-                .padding(horizontal = 8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                Modifier.background(MaterialTheme.colorScheme.surface)
+                    .combinedClickable(
+                        onClick = {
+                            onClick()
+                            clicked = true
+                        },
+                        onLongClick = { showLongClickDialog = true }
+                    )
+                    .height(48.dp)
+                    .padding(horizontal = 8.dp)
+        ) {
             ItemIcon(name, itemState.du, mimetype)
             Text(
-              if(name == "/" || name.isEmpty()) fullPath.removeSuffix("/").substringAfterLast("/") + "/"
-                  else name.removeSuffix("/")
-                ,
+                if (name == "/" || name.isEmpty())
+                    fullPath.removeSuffix("/").substringAfterLast("/") + "/"
+                else name.removeSuffix("/"),
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp))
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+            )
             SizeText(itemState.size)
         }
-        AnimatedVisibility(clicked,
+        AnimatedVisibility(
+            clicked,
             enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 20000))) {
-            Row(Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))) {
+            exit = fadeOut(animationSpec = tween(durationMillis = 20000))
+        ) {
+            Row(
+                Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+            ) {
                 Spacer(Modifier.height(48.dp))
             }
         }
     }
-
 }

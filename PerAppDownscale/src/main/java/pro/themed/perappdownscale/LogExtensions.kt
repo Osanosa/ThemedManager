@@ -1,7 +1,8 @@
-package pro.themed.perappdownscale// Create a LogExtensions.kt file or add this code to an existing Kotlin file.
+package pro.themed.perappdownscale // Create a LogExtensions.kt file or add this code to an existing
+
+// Kotlin file.
 
 import android.util.Log
-
 
 fun Any.log(TAG: String = "Simple Log") {
     Log.d(TAG, this.toString())

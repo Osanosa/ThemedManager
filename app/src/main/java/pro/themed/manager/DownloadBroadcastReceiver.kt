@@ -9,7 +9,6 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
         if (intent.action == "android.intent.action.DOWNLOAD_COMPLETE") {
             GlobalVariables.isdownloaded = true
-
         }
     }
 }

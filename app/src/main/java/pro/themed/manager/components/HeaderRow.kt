@@ -58,32 +58,32 @@ fun HeaderRow(
     onCheckedChange: (Boolean) -> Unit = {},
     isChecked: Boolean = false,
     showSwitch: Boolean = false,
-    content: @Composable () -> Unit = {}
+    content: @Composable () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var checkedState by remember { mutableStateOf(isChecked) }
 
-    LaunchedEffect(isChecked) {
-        checkedState = isChecked
-    }
+    LaunchedEffect(isChecked) { checkedState = isChecked }
     val context = LocalContext.current
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
-            contentColor = pro.themed.manager.ui.theme.contentcol
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
+                contentColor = pro.themed.manager.ui.theme.contentcol,
+            ),
     ) {
         Card(
-            shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(
-                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
-                contentColor = pro.themed.manager.ui.theme.contentcol
-            ), modifier = Modifier.padding(8.dp)
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.05f),
+                    contentColor = pro.themed.manager.ui.theme.contentcol,
+                ),
+            modifier = Modifier.padding(8.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxWidth().padding(8.dp)
                 // verticalAlignment = Alignment.CenterVertically,
                 // horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -91,26 +91,27 @@ fun HeaderRow(
                     Text(
                         text = header,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         if (subHeader.isNotEmpty()) {
                             Text(
                                 text = subHeader,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
                         }
 
-
                         Switch(
-                            checked = checkedState, onCheckedChange = {
+                            checked = checkedState,
+                            onCheckedChange = {
                                 checkedState = it
                                 onCheckedChange(it)
-                            }, modifier = Modifier
+                            },
+                            modifier = Modifier,
                         )
                     }
                 } else if (showSwitch && switchDescription.isNotEmpty()) {
@@ -118,26 +119,25 @@ fun HeaderRow(
                         Text(
                             text = header,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = subHeader,
                             style = MaterialTheme.typography.bodyMedium,
                         )
+                        Text(text = subHeader, style = MaterialTheme.typography.bodyMedium)
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
                                 text = switchDescription,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
                             Switch(
-                                checked = checkedState, onCheckedChange = {
+                                checked = checkedState,
+                                onCheckedChange = {
                                     checkedState = it
                                     onCheckedChange(it)
-                                }, modifier = Modifier
+                                },
+                                modifier = Modifier,
                             )
                         }
                     }
@@ -145,59 +145,80 @@ fun HeaderRow(
                     Text(
                         text = header,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = subHeader,
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                    Text(text = subHeader, style = MaterialTheme.typography.bodyMedium)
                 }
                 content()
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (button1text.isNotEmpty()) {
                         Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button1onClick() } } },
+                            onClick = {
+                                scope.launch { withContext(Dispatchers.IO) { button1onClick() } }
+                            },
                             modifier = Modifier.weight(button1weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button1text, modifier = Modifier.basicMarquee()) }
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor =
+                                        pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                                ),
+                        ) {
+                            Text(text = button1text, modifier = Modifier.basicMarquee())
+                        }
                     }
 
                     if (button2text.isNotEmpty()) {
                         Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button2onClick() } } },
+                            onClick = {
+                                scope.launch { withContext(Dispatchers.IO) { button2onClick() } }
+                            },
                             modifier = Modifier.weight(button2weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button2text, modifier = Modifier.basicMarquee()) }
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor =
+                                        pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                                ),
+                        ) {
+                            Text(text = button2text, modifier = Modifier.basicMarquee())
+                        }
                     }
                     if (button3text.isNotEmpty()) {
                         Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button3onClick() } } },
+                            onClick = {
+                                scope.launch { withContext(Dispatchers.IO) { button3onClick() } }
+                            },
                             modifier = Modifier.weight(button3weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button3text, modifier = Modifier.basicMarquee()) }
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor =
+                                        pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                                ),
+                        ) {
+                            Text(text = button3text, modifier = Modifier.basicMarquee())
+                        }
                     }
                     if (button4text.isNotEmpty()) {
                         Button(
-                            onClick = { scope.launch { withContext(Dispatchers.IO) { button4onClick() } } },
+                            onClick = {
+                                scope.launch { withContext(Dispatchers.IO) { button4onClick() } }
+                            },
                             modifier = Modifier.weight(button4weight),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
-                            )
-                        ) { Text(text = button4text, modifier = Modifier.basicMarquee()) }
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor =
+                                        pro.themed.manager.ui.theme.contentcol.copy(alpha = 0.1f)
+                                ),
+                        ) {
+                            Text(text = button4text, modifier = Modifier.basicMarquee())
+                        }
                     }
                 }
             }

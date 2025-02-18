@@ -33,35 +33,43 @@ fun MiscTextField(
     modifier: Modifier,
 ) {
     var input by remember { mutableStateOf(input) }
-    OutlinedTextField(modifier = modifier.padding(bottom = 2.dp),
+    OutlinedTextField(
+        modifier = modifier.padding(bottom = 2.dp),
         value = input,
         singleLine = true,
         onValueChange = {
             if (file == "integers") {
-                Shell("su").run(
-                    """sed -i 's/<integer name="$resource">[^<]*/<integer name="$resource">${it}/g' $path/res/values/$file.xml"""
-                ).log(); input = it
+                Shell("su")
+                    .run(
+                        """sed -i 's/<integer name="$resource">[^<]*/<integer name="$resource">${it}/g' $path/res/values/$file.xml"""
+                    )
+                    .log()
+                input = it
             } else if (file == "dimens") {
-                Shell("su").run(
-                    """sed -i 's/<dimens name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
-                ).log(); input = it
+                Shell("su")
+                    .run(
+                        """sed -i 's/<dimens name="$resource">[^<]*/<dimen name="$resource">${it}dip/g' $path/res/values/$file.xml"""
+                    )
+                    .log()
+                input = it
             }
         },
         placeholder = { Text("Enter your value", Modifier.basicMarquee()) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-
         trailingIcon = {
-            IconButton(onClick = {
-                buildOverlay(path)
-                Shell("su").run("""cmd overlay enable $overlay""")
-
-            }) {
+            IconButton(
+                onClick = {
+                    buildOverlay(path)
+                    Shell("su").run("""cmd overlay enable $overlay""")
+                }
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.move_up_24px),
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         },
-        label = { Text(label, Modifier.basicMarquee()) })
+        label = { Text(label, Modifier.basicMarquee()) },
+    )
 }

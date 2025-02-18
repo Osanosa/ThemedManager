@@ -51,13 +51,14 @@ fun FontsTab() {
         val config_headlineFontFamily: String = "@string/config_bodyFontFamily",
         val config_headlineFontFamilyMedium: String = "@string/config_bodyFontFamily",
         val config_lightFontFamily: String = "@string/config_bodyFontFamily",
-        val config_regularFontFamily: String = "@string/config_bodyFontFamily"
+        val config_regularFontFamily: String = "@string/config_bodyFontFamily",
     )
 
-    val fontItems = listOf(
-        FontItemData(R.drawable.font_3d_disometric_black, "3d-isometric-black"),
-        FontItemData(R.drawable.font_3d_disometric_bold, "3d-isometric-bold"),
-    )
+    val fontItems =
+        listOf(
+            FontItemData(R.drawable.font_3d_disometric_black, "3d-isometric-black"),
+            FontItemData(R.drawable.font_3d_disometric_bold, "3d-isometric-bold"),
+        )
     var font by remember { mutableStateOf("System") }
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -72,18 +73,13 @@ fun FontsTab() {
         config_regularFontFamily: String = "@string/config_bodyFontFamily",
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(onClick = { }, onLongClick = { })
+            modifier = Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = {})
         ) {
             Image(
                 imageVector = ImageVector.vectorResource(id = imageResourceId),
                 contentDescription = null,
-                modifier = Modifier
-                    .basicMarquee(spacing = MarqueeSpacing(0.dp))
-                    .padding(16.dp)
+                modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(0.dp)).padding(16.dp),
             )
-
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {
@@ -93,43 +89,50 @@ fun FontsTab() {
 
             LaunchedEffect(font) {
                 //    Shell("su").run("cd ${GlobalVariables.modulePath}/onDemandCompiler/Font")
-                //  Shell("su").run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$font/g' "res/drawable/themed_qspanel.xml"""")
+                //  Shell("su").run("""sed -i 's/@drawable\/[^"]*/@drawable\/bg_$font/g'
+                // "res/drawable/themed_qspanel.xml"""")
 
             }
 
-            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
+            FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
                 shape = CircleShape,
                 selected = font.contains("System"),
                 onClick = { font = "System" },
                 label = { Text("System") },
-                leadingIcon = if (font.contains("System")) {
-                    {
-                        Icon(
-                            imageVector = Icons.Filled.Done,
-                            contentDescription = "Localized Description",
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
-                    }
-                } else {
-                    null
-                })
+                leadingIcon =
+                    if (font.contains("System")) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Localized Description",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    },
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
+            FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Yellow),
                 shape = CircleShape,
                 selected = font.contains("Clock"),
                 onClick = { font = "Clock" },
                 label = { Text("Clock") },
-                leadingIcon = if (font.contains("Clock")) {
-                    {
-                        Icon(
-                            imageVector = Icons.Filled.Done,
-                            contentDescription = "Localized Description",
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
-                    }
-                } else {
-                    null
-                })
+                leadingIcon =
+                    if (font.contains("Clock")) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Localized Description",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    },
+            )
         }
         LazyColumn {
             items(fontItems) { item ->
@@ -140,7 +143,7 @@ fun FontsTab() {
                     item.config_headlineFontFamily,
                     item.config_headlineFontFamilyMedium,
                     item.config_lightFontFamily,
-                    item.config_regularFontFamily
+                    item.config_regularFontFamily,
                 )
             }
             item {

@@ -19,33 +19,38 @@ import pro.themed.manager.MainActivity
 
 @Composable
 fun AdmobBanner() {
-    if (!MainActivity.appContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+    if (
+        !MainActivity.appContext
+            .getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
             .getBoolean("isContributor", false)
     ) {
         val isAdLoaded = remember { mutableStateOf(false) }
 
-        AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
-            AdView(context).apply {
-                setAdSize(AdSize.LARGE_BANNER)
-                adUnitId = "ca-app-pub-5920419856758740/9976311451"
-                adListener = object : AdListener() {
-                    override fun onAdLoaded() {
-                        super.onAdLoaded()
-                        isAdLoaded.value = true
-                    }
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize(AdSize.LARGE_BANNER)
+                    adUnitId = "ca-app-pub-5920419856758740/9976311451"
+                    adListener =
+                        object : AdListener() {
+                            override fun onAdLoaded() {
+                                super.onAdLoaded()
+                                isAdLoaded.value = true
+                            }
 
-                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                        super.onAdFailedToLoad(loadAdError)
-                        isAdLoaded.value = false
-                    }
+                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                super.onAdFailedToLoad(loadAdError)
+                                isAdLoaded.value = false
+                            }
+                        }
+                    loadAd(AdRequest.Builder().build())
                 }
-                loadAd(AdRequest.Builder().build())
-            }
-        })
+            },
+        )
 
         if (isAdLoaded.value) {
             Spacer(modifier = Modifier.height(8.dp))
         }
-
     }
 }

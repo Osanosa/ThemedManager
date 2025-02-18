@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import androidx.core.graphics.drawable.*
 import com.jaredrummler.ktsh.*
+import java.text.*
+import java.util.concurrent.*
 import kotlinx.coroutines.*
 import pro.themed.manager.R
 import pro.themed.manager.components.*
 import pro.themed.manager.ui.theme.*
 import pro.themed.manager.utils.*
-import java.text.*
-import java.util.concurrent.*
 
 @Preview
 @Composable
@@ -41,57 +41,55 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
     val mainIntent = Intent(Intent.ACTION_MAIN, null)
     mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
 
-    var resolvedInfos by remember {
-        mutableStateOf(emptyList<ResolveInfo>())
-
-    }
+    var resolvedInfos by remember { mutableStateOf(emptyList<ResolveInfo>()) }
 
     LaunchedEffect(key1 = Unit) {
-
-        resolvedInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.queryIntentActivities(
-                mainIntent, PackageManager.ResolveInfoFlags.of(0L)
-            )
-        } else {
-            pm.queryIntentActivities(mainIntent, 0)
-        }
+        resolvedInfos =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.queryIntentActivities(mainIntent, PackageManager.ResolveInfoFlags.of(0L))
+            } else {
+                pm.queryIntentActivities(mainIntent, 0)
+            }
     }
 
     val shell = Shell("su")
-    shell.addOnStderrLineListener(object : Shell.OnLineListener {
-        override fun onLine(line: String) {
-            CoroutineScope(Dispatchers.Main).launch {
-                // do something
-                Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+    shell.addOnStderrLineListener(
+        object : Shell.OnLineListener {
+            override fun onLine(line: String) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    // do something
+                    Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    })
-    shell.addOnStdoutLineListener(object : Shell.OnLineListener {
-        override fun onLine(line: String) {
-            CoroutineScope(Dispatchers.Main).launch {
-                // do something
-                if (line.contains("set")) showInterstitial(context) {}
-                line.log()
-                if (line.contains("not supported")) Toast.makeText(
-                    context, line, Toast.LENGTH_SHORT
-                ).show()
+    )
+    shell.addOnStdoutLineListener(
+        object : Shell.OnLineListener {
+            override fun onLine(line: String) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    // do something
+                    if (line.contains("set")) showInterstitial(context) {}
+                    line.log()
+                    if (line.contains("not supported"))
+                        Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    })
+    )
     LazyColumn(Modifier.fillMaxWidth()) {
-        if (resolvedInfos.isEmpty()) item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CircularProgressIndicator()
-                Text(text = "Loading...")
+        if (resolvedInfos.isEmpty())
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CircularProgressIndicator()
+                    Text(text = "Loading...")
+                }
             }
-        }
-        resolvedInfos.sortedBy { it.activityInfo.applicationInfo.loadLabel(pm).toString() }
+        resolvedInfos
+            .sortedBy { it.activityInfo.applicationInfo.loadLabel(pm).toString() }
             .forEach { resolveInfo ->
-
                 item {
                     val resources =
                         pm.getResourcesForApplication(resolveInfo.activityInfo.applicationInfo)
-
 
                     val label by rememberSaveable {
                         mutableStateOf(
@@ -99,7 +97,8 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
                                 // getting proper label from resources
                                 resources.getString(resolveInfo.activityInfo.labelRes)
                             } else {
-                                // getting it out of app info - equivalent to context.packageManager.getApplicationInfo
+                                // getting it out of app info - equivalent to
+                                // context.packageManager.getApplicationInfo
                                 resolveInfo.activityInfo.applicationInfo.loadLabel(pm).toString()
                             }
                         )
@@ -110,151 +109,174 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
                     }
 
                     Column {
-
-
-                        var expanded by rememberSaveable {
-                            mutableStateOf(false)
-                        }
+                        var expanded by rememberSaveable { mutableStateOf(false) }
                         var interventions by rememberSaveable {
-                            mutableStateOf(
-                                shell.run("cmd game list-configs $packageName").stdout()
-
-                            )
+                            mutableStateOf(shell.run("cmd game list-configs $packageName").stdout())
                         }
                         Row(Modifier.clickable { expanded = !expanded }) {
-
                             Image(
                                 bitmap = icon,
                                 contentDescription = null,
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(8.dp)
+                                modifier = Modifier.size(48.dp).padding(8.dp),
                             )
                             Column {
-
-                                Text(
-                                    text = label
-                                )
+                                Text(text = label)
                                 Text(text = packageName, maxLines = 1)
                             }
-                            if (interventions.contains("Name")) Icon(
-                                painter = painterResource(id = R.drawable.qscookie),
-                                contentDescription = null,
-                                tint = Color.Yellow,
-                                modifier = Modifier.size(12.dp)
-                            )
+                            if (interventions.contains("Name"))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.qscookie),
+                                    contentDescription = null,
+                                    tint = Color.Yellow,
+                                    modifier = Modifier.size(12.dp),
+                                )
                         }
                         AnimatedVisibility(visible = expanded) {
                             var gameMode =
-                                interventions.substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                interventions
+                                    .substringAfter("Game Mode:", "UNSET/UNKNOWN")
                                     .substringBefore(",", "UNSET/UNKNOWN")
-                            var scaling = interventions.substringAfter("Scaling:", "UNSET/UNKNOWN")
-                                .substringBefore(",", "UNSET/UNKNOWN")
-                            var useAngle = interventions.substringAfter("Use Angle:")
-                                .substringBefore(",", "UNSET/UNKNOWN")
-                            var fps = interventions.substringAfter("Fps:", "UNSET/UNKNOWN")
-                                .substringBefore(",", "UNSET/UNKNOWN")
-
+                            var scaling =
+                                interventions
+                                    .substringAfter("Scaling:", "UNSET/UNKNOWN")
+                                    .substringBefore(",", "UNSET/UNKNOWN")
+                            var useAngle =
+                                interventions
+                                    .substringAfter("Use Angle:")
+                                    .substringBefore(",", "UNSET/UNKNOWN")
+                            var fps =
+                                interventions
+                                    .substringAfter("Fps:", "UNSET/UNKNOWN")
+                                    .substringBefore(",", "UNSET/UNKNOWN")
 
                             Column(Modifier.padding(8.dp)) {
-
-
                                 Text(
-                                    text = "Gamemode: " + when (gameMode) {
-                                        "1" -> "standard"
-                                        "2" -> "performance"
-                                        "3" -> "battery"
-                                        "4" -> "custom"
-                                        else -> "UNSET/UNKNOWN"
-                                    }
+                                    text =
+                                        "Gamemode: " +
+                                            when (gameMode) {
+                                                "1" -> "standard"
+                                                "2" -> "performance"
+                                                "3" -> "battery"
+                                                "4" -> "custom"
+                                                else -> "UNSET/UNKNOWN"
+                                            }
                                 )
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.horizontalScroll(rememberScrollState()),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
-
-
-                                    Button(onClick = {
-                                        shell.run("cmd game mode 1 $packageName")
-                                        interventions =
-                                            shell.run("cmd game list-configs $packageName").stdout()
-                                        gameMode = interventions.substringAfter(
-                                            "Game Mode:", "UNSET/UNKNOWN"
-                                        ).substringBefore(",", "UNSET/UNKNOWN")
-                                    }) {
+                                    Button(
+                                        onClick = {
+                                            shell.run("cmd game mode 1 $packageName")
+                                            interventions =
+                                                shell
+                                                    .run("cmd game list-configs $packageName")
+                                                    .stdout()
+                                            gameMode =
+                                                interventions
+                                                    .substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                                    .substringBefore(",", "UNSET/UNKNOWN")
+                                        }
+                                    ) {
                                         Text(text = "Standard")
                                     }
-                                    Button(onClick = {
-                                        shell.run("cmd game mode 2 $packageName")
-                                        interventions =
-                                            shell.run("cmd game list-configs $packageName").stdout()
-                                        gameMode = interventions.substringAfter(
-                                            "Game Mode:", "UNSET/UNKNOWN"
-                                        ).substringBefore(",", "UNSET/UNKNOWN")
-                                    }) {
+                                    Button(
+                                        onClick = {
+                                            shell.run("cmd game mode 2 $packageName")
+                                            interventions =
+                                                shell
+                                                    .run("cmd game list-configs $packageName")
+                                                    .stdout()
+                                            gameMode =
+                                                interventions
+                                                    .substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                                    .substringBefore(",", "UNSET/UNKNOWN")
+                                        }
+                                    ) {
                                         Text(text = "Performance")
                                     }
-                                    Button(onClick = {
-                                        shell.run("cmd game mode 3 $packageName")
-                                        interventions =
-                                            shell.run("cmd game list-configs $packageName").stdout()
+                                    Button(
+                                        onClick = {
+                                            shell.run("cmd game mode 3 $packageName")
+                                            interventions =
+                                                shell
+                                                    .run("cmd game list-configs $packageName")
+                                                    .stdout()
 
-                                        gameMode = interventions.substringAfter(
-                                            "Game Mode:", "UNSET/UNKNOWN"
-                                        ).substringBefore(",", "UNSET/UNKNOWN")
-                                    }) {
+                                            gameMode =
+                                                interventions
+                                                    .substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                                    .substringBefore(",", "UNSET/UNKNOWN")
+                                        }
+                                    ) {
                                         Text(text = "Battery")
                                     }
-                                    Button(onClick = {
-                                        shell.run("cmd game mode 4 $packageName")
-                                        interventions =
-                                            shell.run("cmd game list-configs $packageName").stdout()
-                                        gameMode = interventions.substringAfter(
-                                            "Game Mode:", "UNSET/UNKNOWN"
-                                        ).substringBefore(",", "UNSET/UNKNOWN")
-                                    }) {
+                                    Button(
+                                        onClick = {
+                                            shell.run("cmd game mode 4 $packageName")
+                                            interventions =
+                                                shell
+                                                    .run("cmd game list-configs $packageName")
+                                                    .stdout()
+                                            gameMode =
+                                                interventions
+                                                    .substringAfter("Game Mode:", "UNSET/UNKNOWN")
+                                                    .substringBefore(",", "UNSET/UNKNOWN")
+                                        }
+                                    ) {
                                         Text(text = "Custom")
                                     }
-
                                 }
                                 var floatDownscale by remember {
-                                    mutableFloatStateOf(scaling.toFloatOrNull().takeIf {
-                                        (it ?: 1f) >= 0f
-                                    } ?: 1f)
+                                    mutableFloatStateOf(
+                                        scaling.toFloatOrNull().takeIf { (it ?: 1f) >= 0f } ?: 1f
+                                    )
                                 }
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
-
                                     Text(text = "Scaling: $floatDownscale")
-                                    Button(onClick = {
-                                        shell.run("cmd game set --downscale 1.0 $packageName")
+                                    Button(
+                                        onClick = {
+                                            shell.run("cmd game set --downscale 1.0 $packageName")
+                                            interventions =
+                                                shell
+                                                    .run("cmd game list-configs $packageName")
+                                                    .stdout()
+                                            floatDownscale =
+                                                interventions
+                                                    .substringAfter("Scaling:", "UNSET/UNKNOWN")
+                                                    .substringBefore(",", "UNSET/UNKNOWN")
+                                                    .toFloatOrNull() ?: 1f
+                                        }
+                                    ) {
+                                        Text(text = "Reset")
+                                    }
+                                }
+                                Slider(
+                                    value = floatDownscale,
+                                    onValueChange = {
+                                        floatDownscale = ((it * 100).toInt()).toFloat() / 100
+                                    },
+                                    onValueChangeFinished = {
+                                        shell.run(
+                                            "cmd game set --downscale $floatDownscale $packageName"
+                                        )
                                         interventions =
                                             shell.run("cmd game list-configs $packageName").stdout()
-                                        floatDownscale = interventions.substringAfter(
-                                            "Scaling:", "UNSET/UNKNOWN"
-                                        ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull()
-                                            ?: 1f
-                                    }) { Text(text = "Reset") }
-                                }
-                                Slider(value = floatDownscale, onValueChange = {
-                                    floatDownscale = ((it * 100).toInt()).toFloat() / 100
-                                }, onValueChangeFinished = {
-                                    shell.run("cmd game set --downscale $floatDownscale $packageName")
-                                    interventions =
-                                        shell.run("cmd game list-configs $packageName").stdout()
-
-
-                                }, valueRange = 0f..2f, steps = 199
+                                    },
+                                    valueRange = 0f..2f,
+                                    steps = 199,
                                 )
                                 Text(text = "Use Angle: $useAngle")
                                 var floatFps by remember {
                                     mutableFloatStateOf(fps.toFloatOrNull() ?: 1f)
                                 }
                                 Text(
-                                    text = "FPS: ${
+                                    text =
+                                        "FPS: ${
                                         if (fps == "UNSET/UNKNOWN") {
                                             "UNSET/UNKNOWN"
                                         } else {
@@ -262,30 +284,39 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
                                         }
                                     }"
                                 )
-                                Slider(value = floatFps, onValueChange = {
-                                    floatFps = ((it * 100).toInt()).toFloat() / 100
-                                }, onValueChangeFinished = {
-                                    shell.run("cmd game set --fps ${floatFps.toInt()} $packageName")
-                                    interventions =
-                                        shell.run("cmd game list-configs $packageName").stdout()
-
-
-                                }, valueRange = 0f..500f, steps = 499
+                                Slider(
+                                    value = floatFps,
+                                    onValueChange = {
+                                        floatFps = ((it * 100).toInt()).toFloat() / 100
+                                    },
+                                    onValueChangeFinished = {
+                                        shell.run(
+                                            "cmd game set --fps ${floatFps.toInt()} $packageName"
+                                        )
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                    },
+                                    valueRange = 0f..500f,
+                                    steps = 499,
                                 )
 
-
-                                Button(onClick = {
-                                    shell.run("cmd game reset $packageName")
-                                    interventions =
-                                        shell.run("cmd game list-configs $packageName").stdout()
-                                    floatDownscale = interventions.substringAfter(
-                                        "Scaling:", "UNSET/UNKNOWN"
-                                    ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull() ?: 1f
-                                    floatFps = interventions.substringAfter(
-                                        "Fps:", "UNSET/UNKNOWN"
-                                    ).substringBefore(",", "UNSET/UNKNOWN").toFloatOrNull() ?: 1f
-
-                                }) {
+                                Button(
+                                    onClick = {
+                                        shell.run("cmd game reset $packageName")
+                                        interventions =
+                                            shell.run("cmd game list-configs $packageName").stdout()
+                                        floatDownscale =
+                                            interventions
+                                                .substringAfter("Scaling:", "UNSET/UNKNOWN")
+                                                .substringBefore(",", "UNSET/UNKNOWN")
+                                                .toFloatOrNull() ?: 1f
+                                        floatFps =
+                                            interventions
+                                                .substringAfter("Fps:", "UNSET/UNKNOWN")
+                                                .substringBefore(",", "UNSET/UNKNOWN")
+                                                .toFloatOrNull() ?: 1f
+                                    }
+                                ) {
                                     Text(text = "Reset all")
                                 }
                             }
@@ -300,12 +331,8 @@ fun PerAppDownscale(modifier: Modifier = Modifier) {
 @Composable
 fun ToolboxPage() {
     val context = LocalContext.current
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = background
-    ) {
-        var progress by rememberSaveable {
-            mutableStateOf(false)
-        }
+    Surface(modifier = Modifier.fillMaxSize(), color = background) {
+        var progress by rememberSaveable { mutableStateOf(false) }
         var progresstext by remember { mutableStateOf("Waiting to start") }
 
         Box {
@@ -317,73 +344,102 @@ fun ToolboxPage() {
 
                 Column(
                     Modifier.padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    HeaderRow(stringResource(R.string.disable_overlays),
+                    HeaderRow(
+                        stringResource(R.string.disable_overlays),
                         stringResource(R.string.disable_overlays_header),
                         button1text = stringResource(R.string.all),
-                        button1onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") },
+                        button1onClick = {
+                            Shell("su")
+                                .run(
+                                    """for ol in $(cmd overlay list | grep -E '[x]' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" +
+                                        """ol"; done"""
+                                )
+                        },
                         button2text = stringResource(R.string.stock),
                         button2onClick = {
-                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
-                            Shell("su").run("""for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""")
+                            Shell("su")
+                                .run(
+                                    """for ol in $(cmd overlay list | grep -E 'com.android.theme' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" +
+                                        """ol"; done"""
+                                )
+                            Shell("su")
+                                .run(
+                                    """for ol in $(cmd overlay list | grep -E 'com.android.system' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" +
+                                        """ol"; done"""
+                                )
+                            Shell("su")
+                                .run(
+                                    """for ol in $(cmd overlay list | grep -E 'com.accent' | grep  -E '.x'  | sed -E 's/^....//'); do cmd overlay disable "$""" +
+                                        """ol"; done"""
+                                )
                         },
                         button3text = stringResource(R.string.themed),
-                        button3onClick = { Shell("su").run("""for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" + """ol"; done""") })
+                        button3onClick = {
+                            Shell("su")
+                                .run(
+                                    """for ol in $(cmd overlay list | grep -E '.x..themed.'  | sed -E 's/^....//'); do cmd overlay disable "$""" +
+                                        """ol"; done"""
+                                )
+                        },
+                    )
                     HeaderRow(
                         stringResource(R.string.restart_systemui),
                         stringResource(R.string.systemui_restart_header),
                         button1text = stringResource(R.string.restart_now),
                         button1onClick = { Shell("su").run("su -c killall com.android.systemui") },
                     )
-                    HeaderRow(stringResource(R.string.change_system_theme),
+                    HeaderRow(
+                        stringResource(R.string.change_system_theme),
                         stringResource(R.string.change_a_theme_of_your_device),
                         button1text = stringResource(R.string.light),
-                        button1onClick = {
-                            Shell("su").run("cmd uimode night no")
-                        },
+                        button1onClick = { Shell("su").run("cmd uimode night no") },
                         button2text = stringResource(R.string.dark),
-                        button2onClick = {
-                            Shell("su").run("cmd uimode night yes")
-                        },
+                        button2onClick = { Shell("su").run("cmd uimode night yes") },
                         button3text = stringResource(R.string.auto),
-                        button3onClick = {
-                            Shell("su").run("cmd uimode night auto")
-                        })
+                        button3onClick = { Shell("su").run("cmd uimode night auto") },
+                    )
                     HeaderRow(
                         stringResource(R.string.clear_app_caches),
                         stringResource(R.string.clears_cache_of_all_apps_data_is_safe),
                         button1text = stringResource(R.string.clear_all),
                         button1onClick = {
                             val freebefore =
-                                Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                    .replace(Regex("[^0-9]"), "").toLong()
+                                Shell("su")
+                                    .run("df -k /data | awk 'NR==2{print \$4}'\n")
+                                    .stdout
+                                    .toString()
+                                    .replace(Regex("[^0-9]"), "")
+                                    .toLong()
                             Shell("su").run("pm trim-caches 100000g")
                             val freeafter =
-                                Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                    .replace(Regex("[^0-9]"), "").toLong()
+                                Shell("su")
+                                    .run("df -k /data | awk 'NR==2{print \$4}'\n")
+                                    .stdout
+                                    .toString()
+                                    .replace(Regex("[^0-9]"), "")
+                                    .toLong()
                             val difference: Float = freeafter.toFloat() - freebefore.toFloat()
-                            val toast = when {
-                                difference > 1024 * 1024 -> "${
+                            val toast =
+                                when {
+                                    difference > 1024 * 1024 ->
+                                        "${
                                     DecimalFormat("#.##").format(
                                         difference / 1024 / 1024
                                     )
                                 }Gb"
-
-                                difference > 1024 -> "${
+                                    difference > 1024 ->
+                                        "${
                                     DecimalFormat("#.##").format(
                                         difference / 1024
                                     )
                                 }Mb"
-
-                                else -> "${DecimalFormat("#").format(difference)}Kb"
-                            }
+                                    else -> "${DecimalFormat("#").format(difference)}Kb"
+                                }
 
                             Handler(Looper.getMainLooper()).post {
-                                Toast.makeText(
-                                    context, "+$toast", Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "+$toast", Toast.LENGTH_SHORT).show()
                             }
                         },
                     )
@@ -398,102 +454,105 @@ fun ToolboxPage() {
                         button1onClick = {
                             progress = true
                             Shell("su").run("cmd package compile -m everything -a$forcedex2oat") {
-                                onStdOut = { line: String ->
-                                    progresstext = line
-                                }
+                                onStdOut = { line: String -> progresstext = line }
                                 timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                             }
-                            Shell("su").run("cmd package compile -m everything --secondary-dex -a$forcedex2oat") {
-                                onStdOut = { line: String ->
-                                    progresstext = line
-                                }
+                            Shell("su").run(
+                                "cmd package compile -m everything --secondary-dex -a$forcedex2oat"
+                            ) {
+                                onStdOut = { line: String -> progresstext = line }
                                 timeout = Shell.Timeout(1, TimeUnit.SECONDS)
-
                             }
-
                         },
                         button2text = "Layouts",
                         button2onClick = {
                             progress = true
-                            Shell("su").run("cmd package compile --compile-layouts -a$forcedex2oat") {
-                                onStdOut = { line: String ->
-                                    progresstext = line
-                                }
+                            Shell("su").run(
+                                "cmd package compile --compile-layouts -a$forcedex2oat"
+                            ) {
+                                onStdOut = { line: String -> progresstext = line }
                                 timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                             }
-
                         },
                         button3text = "Reset",
                         button3onClick = {
                             progress = true
                             Shell("su").run("cmd package compile --reset -a") {
-                                onStdOut = { line: String ->
-                                    progresstext = line
-                                }
+                                onStdOut = { line: String -> progresstext = line }
                                 timeout = Shell.Timeout(1, TimeUnit.SECONDS)
                             }
-
                         },
                         showSwitch = true,
                         switchDescription = "Force recompile even if not needed",
                         isChecked = sharedPreferences.getBoolean("force_dex2oat", false),
-                        onCheckedChange = {
-                            editor.putBoolean("force_dex2oat", it).apply()
-
-                        },
+                        onCheckedChange = { editor.putBoolean("force_dex2oat", it).apply() },
                     )
                     var customresShown by remember { mutableStateOf(false) }
                     var customres by remember { mutableStateOf("") }
                     if (customresShown) {
-                        BasicAlertDialog(onDismissRequest = { customresShown = false },
+                        BasicAlertDialog(
+                            onDismissRequest = { customresShown = false },
                             content = {
-                                CookieCard(){
-
+                                CookieCard() {
                                     Column {
                                         Text(stringResource(R.string.enter_your_custom_resolution))
                                         Text(stringResource(R.string.downscale_warning))
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            TextField(modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 8.dp),
+                                            TextField(
+                                                modifier =
+                                                    Modifier.fillMaxWidth()
+                                                        .padding(horizontal = 8.dp),
                                                 value = customres,
                                                 singleLine = true,
-                                                onValueChange = { customres = it.replace(Regex("[^0-9]"), "") },
-                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                                onValueChange = {
+                                                    customres = it.replace(Regex("[^0-9]"), "")
+                                                },
+                                                keyboardOptions =
+                                                    KeyboardOptions(
+                                                        keyboardType = KeyboardType.Number
+                                                    ),
                                                 label = { Text("Enter custom resolution") },
-                                                placeholder = { Text("720", Modifier.basicMarquee()) }
+                                                placeholder = {
+                                                    Text("720", Modifier.basicMarquee())
+                                                },
                                             )
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(8.dp)
+                                                modifier = Modifier.padding(8.dp),
                                             ) {
-                                                Button(modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .weight(1f),
+                                                Button(
+                                                    modifier = Modifier.fillMaxWidth().weight(1f),
                                                     onClick = {
                                                         downscalebynumber(width = customres)
-                                                        Shell("su").run("sleep 10 ; wm size reset ; wm density reset")
-                                                    }) { Text(text = stringResource(R.string.test)) }
+                                                        Shell("su")
+                                                            .run(
+                                                                "sleep 10 ; wm size reset ; wm density reset"
+                                                            )
+                                                    },
+                                                ) {
+                                                    Text(text = stringResource(R.string.test))
+                                                }
                                                 Spacer(modifier = Modifier.width(8.dp))
                                                 Button(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .weight(1f),
+                                                    modifier = Modifier.fillMaxWidth().weight(1f),
                                                     onClick = {
                                                         downscalebynumber(width = customres)
                                                     },
-                                                ) { Text(text = stringResource(R.string.apply)) }
+                                                ) {
+                                                    Text(text = stringResource(R.string.apply))
+                                                }
                                             }
-                                            Text(text = stringResource(R.string.close),
-                                                modifier = Modifier.clickable {
-                                                    customresShown = false
-                                                })
+                                            Text(
+                                                text = stringResource(R.string.close),
+                                                modifier =
+                                                    Modifier.clickable { customresShown = false },
+                                            )
                                             Spacer(modifier = Modifier.height(8.dp))
-
                                         }
                                     }
                                 }
-                            })
+                            },
+                        )
                     }
                     HeaderRow(
                         stringResource(R.string.downscale),
@@ -505,7 +564,6 @@ fun ToolboxPage() {
                                 Thread.sleep(10000)
                                 Shell("su").run("wm size reset ; wm density reset")
                             }
-
                         },
                         button2text = "1/3",
                         button2onClick = {
@@ -514,146 +572,137 @@ fun ToolboxPage() {
                                 Thread.sleep(10000)
                                 Shell("su").run("wm size reset ; wm density reset")
                             }
-
                         },
                         button3text = "Set",
-                        button3onClick = {
-                            customresShown = true
-
-                        },
+                        button3onClick = { customresShown = true },
                         button4text = "Reset",
-                        button4onClick = {
-                            Shell("su").run("wm size reset ; wm density reset")
-
-                        },
+                        button4onClick = { Shell("su").run("wm size reset ; wm density reset") },
                         showSwitch = true,
-                        switchDescription = stringResource(R.string.reset_to_defaults_after_10_seconds),
+                        switchDescription =
+                            stringResource(R.string.reset_to_defaults_after_10_seconds),
                         isChecked = sharedPreferences.getBoolean("resetwm", false),
-                        onCheckedChange = {
-                            editor.putBoolean("resetwm", it).apply()
-
-                        },
+                        onCheckedChange = { editor.putBoolean("resetwm", it).apply() },
                     )
-                    var showdialog by remember {
-                        mutableStateOf(false)
-                    }
+                    var showdialog by remember { mutableStateOf(false) }
                     SectionDialogHeader(header = "PerAppDownscale", onClick = { showdialog = true })
-                    if (showdialog) Dialog(onDismissRequest = { showdialog = false }) {
-                        CookieCard {
-
-                            PerAppDownscale()
+                    if (showdialog)
+                        Dialog(onDismissRequest = { showdialog = false }) {
+                            CookieCard { PerAppDownscale() }
                         }
-                    }
-                    HeaderRow(header = "AutoRefreshRate ForegroundService",
-                        subHeader = "\nPlease note that this feature was refactored into a separate app.\n\nDynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
+                    HeaderRow(
+                        header = "AutoRefreshRate ForegroundService",
+                        subHeader =
+                            "\nPlease note that this feature was refactored into a separate app.\n\nDynamically changing screen refresh modes. If your device supports multiple refresh rates, for example 120-90-60, you can change max and min refresh mode where max is 0 and min [in this example] is 2 since 120=0, 90=1, 60=2",
                         button1text = "Stop",
                         button2text = "Start",
                         button2onClick = {
-                            Shell("su").run("am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                            Shell("su")
+                                .run(
+                                    "am start-foreground-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService"
+                                )
                                 .log()
                         },
                         button1onClick = {
-                            Shell("su").run("am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService")
+                            Shell("su")
+                                .run(
+                                    "am stop-service pro.themed.manager/pro.themed.manager.utils.MyForegroundService"
+                                )
                                 .log()
                         },
                         showSwitch = true,
                         switchDescription = "Start on boot",
-                        isChecked = GlobalVariables.sharedPreferences.getBoolean(
-                            "autoRateOnBoot", false
-                        ),
+                        isChecked =
+                            GlobalVariables.sharedPreferences.getBoolean("autoRateOnBoot", false),
                         onCheckedChange = {
                             sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
                         },
                         content = {
                             var MaxRate by remember {
                                 mutableStateOf(
-                                    sharedPreferences.getString(
-                                        "maxRate", "0"
-                                    ).toString()
+                                    sharedPreferences.getString("maxRate", "0").toString()
                                 )
                             }
 
                             var MinRate by remember {
                                 mutableStateOf(
-                                    sharedPreferences.getString(
-                                        "minRate", "0"
-                                    ).toString()
+                                    sharedPreferences.getString("minRate", "0").toString()
                                 )
                             }
                             Row {
-                                OutlinedTextField(modifier = Modifier.fillMaxWidth(0.5f),
+                                OutlinedTextField(
+                                    modifier = Modifier.fillMaxWidth(0.5f),
                                     value = MaxRate,
                                     singleLine = true,
                                     onValueChange = {
-                                        MaxRate = it; editor.putString("maxRate", it).apply()
+                                        MaxRate = it
+                                        editor.putString("maxRate", it).apply()
                                     },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    keyboardOptions =
+                                        KeyboardOptions(keyboardType = KeyboardType.Number),
                                     label = {
                                         Text(
                                             "Enter max refresh mode",
-                                            modifier = Modifier.basicMarquee()
+                                            modifier = Modifier.basicMarquee(),
                                         )
-                                    })
+                                    },
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                OutlinedTextField(modifier = Modifier.fillMaxWidth(),
+                                OutlinedTextField(
+                                    modifier = Modifier.fillMaxWidth(),
                                     value = MinRate,
                                     singleLine = true,
                                     onValueChange = {
-                                        MinRate = it;editor.putString("minRate", it).apply()
+                                        MinRate = it
+                                        editor.putString("minRate", it).apply()
                                     },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    keyboardOptions =
+                                        KeyboardOptions(keyboardType = KeyboardType.Number),
                                     label = {
                                         Text(
                                             "Enter min refresh mode",
-                                            modifier = Modifier.basicMarquee()
+                                            modifier = Modifier.basicMarquee(),
                                         )
-                                    })
+                                    },
+                                )
                             }
-                        })
-
+                        },
+                    )
                 }
                 Spacer(Modifier.height(32.dp))
-
             }
             AnimatedVisibility(
                 visible = progress,
-                Modifier
-                    .align(
-                        Alignment.Center
-                    )
-                    .padding(16.dp), enter = scaleIn()
+                Modifier.align(Alignment.Center).padding(16.dp),
+                enter = scaleIn(),
             ) {
                 Card(
-                    Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
+                    Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(8.dp)
+                    elevation = CardDefaults.cardElevation(8.dp),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
                         ) {
                             if (progresstext.contains("/")) CircularProgressIndicator()
                             if (progresstext.contains("/")) Spacer(Modifier.width(16.dp))
                             Text(text = progresstext)
                         }
-                        if (!progresstext.contains("/")) Button(onClick = {
-                            progress = false
-                        }) { Text("Hide") }
+                        if (!progresstext.contains("/"))
+                            Button(onClick = { progress = false }) { Text("Hide") }
                     }
                 }
             }
         }
-
     }
-
 }
 
 fun downscalebydivisor(divisor: String) {
-    Shell("su").run(
-        command = """
+    Shell("su")
+        .run(
+            command =
+                """
                 # Set the number of division
                 divisor=$divisor
                 
@@ -685,13 +734,14 @@ fun downscalebydivisor(divisor: String) {
                 wm size ${'$'}width"x"${'$'}height
                 wm density ${'$'}density
                 """
-    )
-
+        )
 }
 
 private fun downscalebynumber(width: String) {
-    Shell("su").run(
-        command = """
+    Shell("su")
+        .run(
+            command =
+                """
                 # Get current screen resolution
                 resolution=${'$'}(wm size | awk '{if (${'$'}1 == "Physical") {print ${'$'}3}}')
                 
@@ -721,5 +771,5 @@ private fun downscalebynumber(width: String) {
                 wm density ${'$'}(printf "%.0f" ${'$'}new_density)
                 
                 """
-    )
+        )
 }

@@ -16,25 +16,22 @@ import pro.themed.pxlsrtr.ui.theme.*
 fun CookieCard(
     onClick: () -> Unit = {},
     content: @Composable () -> Unit = {
-
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CircularProgressIndicator()
             Text(text = "Loading...")
         }
-
     },
 ) {
-    Surface(color = cookieForeground, contentColor = contentcol, modifier = Modifier
-
-        .clip(RoundedCornerShape(16.dp))
-        .clickable { onClick() }
-        .border(width = 8.dp, shape = RoundedCornerShape(16.0.dp), color = cookieBackdrop)) {
+    Surface(
+        color = cookieForeground,
+        contentColor = contentcol,
+        modifier =
+            Modifier.clip(RoundedCornerShape(16.dp))
+                .clickable { onClick() }
+                .border(width = 8.dp, shape = RoundedCornerShape(16.0.dp), color = cookieBackdrop)
+    ) {
         Column(modifier = Modifier.clip(RoundedCornerShape(16.dp))) {
-            Column(modifier = Modifier.padding(8.dp)) {
-
-                content()
-            }
+            Column(modifier = Modifier.padding(8.dp)) { content() }
         }
     }
 }
-

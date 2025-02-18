@@ -11,13 +11,13 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jaredrummler.ktsh.Shell
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pro.themed.manager.R
-import java.util.concurrent.TimeUnit
 
 class MyForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -40,14 +40,19 @@ class MyForegroundService : Service() {
             getSystemService(NotificationManager::class.java) as NotificationManager
 
         val notificationChannelId = "ForegroundServiceChannel"
-        val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
-            .setSmallIcon(R.drawable.palette_48px).setContentTitle("AutoRefreshRate")
-            .setContentText("Service is running...")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        val notificationBuilder =
+            NotificationCompat.Builder(this, notificationChannelId)
+                .setSmallIcon(R.drawable.palette_48px)
+                .setContentTitle("AutoRefreshRate")
+                .setContentText("Service is running...")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        val notificationChannel = NotificationChannel(
-            notificationChannelId, notificationChannelId, NotificationManager.IMPORTANCE_LOW
-        )
+        val notificationChannel =
+            NotificationChannel(
+                notificationChannelId,
+                notificationChannelId,
+                NotificationManager.IMPORTANCE_LOW,
+            )
 
         notificationManager.createNotificationChannel(notificationChannel)
 
@@ -70,7 +75,7 @@ class MyForegroundService : Service() {
                                 "service call SurfaceFlinger 1035 i32 ${
                                     sharedPreferences.getString(
                                         "maxRate",
-                                        "0"
+                                        "0",
                                     ).toString()
                                 }"
                             )
@@ -84,7 +89,7 @@ class MyForegroundService : Service() {
                                 "service call SurfaceFlinger 1035 i32 ${
                                     sharedPreferences.getString(
                                         "minRate",
-                                        "0"
+                                        "0",
                                     ).toString()
                                 }"
                             )
@@ -94,9 +99,7 @@ class MyForegroundService : Service() {
                     }
                 }
             }
-            onStdErr = { line: String ->
-                Firebase.crashlytics.log("StdErr: $line")
-            }
+            onStdErr = { line: String -> Firebase.crashlytics.log("StdErr: $line") }
             timeout = Shell.Timeout(1, TimeUnit.SECONDS)
         }
 

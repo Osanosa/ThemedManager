@@ -19,29 +19,22 @@ import pro.themed.manager.components.*
 fun SettingsPage() {
     val context = LocalContext.current
     // A surface container using the 'background' color from the theme
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
         Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-
             HeaderRow(
                 header = "Automatically restart SystemUI",
-                subHeader = "Enabling this will automatically restart system interface after applying overlays",
+                subHeader =
+                    "Enabling this will automatically restart system interface after applying overlays",
                 isChecked = sharedPreferences.getBoolean("restart_system_ui", false),
-                onCheckedChange = {
-                    editor.putBoolean("restart_system_ui", it).apply()
-
-                },
-                showSwitch = true
+                onCheckedChange = { editor.putBoolean("restart_system_ui", it).apply() },
+                showSwitch = true,
             )
             val scope = rememberCoroutineScope()
 
@@ -50,20 +43,18 @@ fun SettingsPage() {
                 subHeader = stringResource(R.string.uninstall_unused_overlays_subheader),
                 button1onClick = {
                     Looper.prepare()
-                    Toast.makeText(
-                        context, R.string.process_started_now_wait, Toast.LENGTH_SHORT
-                    ).show()
-                    Shell("su").run(
-                        """cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
+                    Toast.makeText(context, R.string.process_started_now_wait, Toast.LENGTH_SHORT)
+                        .show()
+                    Shell("su")
+                        .run(
+                            """cmd overlay list | grep themed. | grep -Ev '^.x..themed.' | sed -E 's/^....//' | while read -r ol; do
                                              path=${'$'}(cmd package path "${'$'}ol" | awk -F':' '{print ${'$'}2}')
                                              rm_path="/data/adb/modules/ThemedProject/system${'$'}(echo "${'$'}path" | sed 's/^package://')"
                                              rm "${'$'}rm_path" done"""
-                    )
-                    Toast.makeText(
-                        context, R.string.done, Toast.LENGTH_SHORT
-                    ).show()
+                        )
+                    Toast.makeText(context, R.string.done, Toast.LENGTH_SHORT).show()
                 },
-                button1text = "Uninstall"
+                button1text = "Uninstall",
             )
             DebugPage()
         }

@@ -8,36 +8,46 @@ android {
     namespace = "pro.themed.audhdlauncher"
     compileSdk = 35
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootDir}/keystore/keystore.jks")
+            storePassword = "HolyLumi"
+            keyAlias = "key0"
+            keyPassword = "HolyLumi"
+        }
+    }
+
     defaultConfig {
         applicationId = "pro.themed.audhdlauncher"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
+        signingConfig = signingConfigs.getByName("release")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            signingConfig = signingConfigs.getByName("release")
         }
+        debug { signingConfig = signingConfigs.getByName("release") }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
-    }
+    kotlinOptions { jvmTarget = "17" }
+    buildFeatures { compose = true }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,10 +63,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation (libs.accompanist.permissions)
+    implementation(libs.accompanist.permissions)
     implementation(libs.coil.compose)
-    implementation (libs.accompanist.drawablepainter)
-
-
-
+    implementation(libs.accompanist.drawablepainter)
 }

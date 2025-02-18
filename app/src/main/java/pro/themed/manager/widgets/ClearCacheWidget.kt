@@ -44,53 +44,69 @@ class ClearCacheWidget : GlanceAppWidget() {
                 Column(
                     modifier = GlanceModifier,
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "Clear Cache",
-                        modifier = GlanceModifier.padding(12.dp)
-                            .background(GlanceTheme.colors.primary)
-                            .clickable(onClick = action {
-                                val freebefore =
-                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                        .replace(Regex("[^0-9]"), "").toLong()
-                                Shell("su").run("pm trim-caches 100000g")
-                                val freeafter =
-                                    Shell("su").run("df -k /data | awk 'NR==2{print \$4}'\n").stdout.toString()
-                                        .replace(Regex("[^0-9]"), "").toLong()
-                                val difference: Float = freeafter.toFloat() - freebefore.toFloat()
-                                val toast = when {
-                                    difference > 1024 * 1024 -> "${
+                        modifier =
+                            GlanceModifier.padding(12.dp)
+                                .background(GlanceTheme.colors.primary)
+                                .clickable(
+                                    onClick =
+                                        action {
+                                            val freebefore =
+                                                Shell("su")
+                                                    .run("df -k /data | awk 'NR==2{print \$4}'\n")
+                                                    .stdout
+                                                    .toString()
+                                                    .replace(Regex("[^0-9]"), "")
+                                                    .toLong()
+                                            Shell("su").run("pm trim-caches 100000g")
+                                            val freeafter =
+                                                Shell("su")
+                                                    .run("df -k /data | awk 'NR==2{print \$4}'\n")
+                                                    .stdout
+                                                    .toString()
+                                                    .replace(Regex("[^0-9]"), "")
+                                                    .toLong()
+                                            val difference: Float =
+                                                freeafter.toFloat() - freebefore.toFloat()
+                                            val toast =
+                                                when {
+                                                    difference > 1024 * 1024 ->
+                                                        "${
                                         DecimalFormat("#.##").format(
                                             difference / 1024 / 1024
                                         )
                                     }Gb"
-
-                                    difference > 1024 -> "${
+                                                    difference > 1024 ->
+                                                        "${
                                         DecimalFormat("#.##").format(
                                             difference / 1024
                                         )
                                     }Mb"
+                                                    else ->
+                                                        "${DecimalFormat("#").format(difference)}Kb"
+                                                }
 
-                                    else -> "${DecimalFormat("#").format(difference)}Kb"
-                                }
-
-                                Handler(context.mainLooper).post {
-                                    Toast.makeText(
-                                        context, "+$toast", Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                            }),
-                        style = TextStyle(
-                            color = GlanceTheme.colors.background,
-                            textAlign = TextAlign.Center
-                        )
+                                            Handler(context.mainLooper).post {
+                                                Toast.makeText(
+                                                        context,
+                                                        "+$toast",
+                                                        Toast.LENGTH_SHORT,
+                                                    )
+                                                    .show()
+                                            }
+                                        }
+                                ),
+                        style =
+                            TextStyle(
+                                color = GlanceTheme.colors.background,
+                                textAlign = TextAlign.Center,
+                            ),
                     )
-
                 }
             }
         }
     }
-
 }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,10 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pro.themed.manager.R
 import pro.themed.manager.ui.theme.contentcol
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -36,12 +33,12 @@ fun OnBoarding(image: Int, text: String) {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 painter = painterResource(id = image),
                 contentDescription = null,
-                modifier = Modifier.size(screenWidth)
+                modifier = Modifier.size(screenWidth),
             )
 
             Text(
@@ -49,32 +46,27 @@ fun OnBoarding(image: Int, text: String) {
                 modifier = Modifier.padding(horizontal = 30.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 16.sp,
-                color = contentcol
+                color = contentcol,
             )
         }
     } else {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxHeight(),
         ) {
             Image(
                 painter = painterResource(id = image),
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(horizontal = 80.dp)
-                    .aspectRatio(1f)
-                    .weight(0.8f)
-                    .fillMaxSize()
+                modifier =
+                    Modifier.padding(horizontal = 80.dp).aspectRatio(1f).weight(0.8f).fillMaxSize(),
             )
             Text(
                 text = text,
-                modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                    .weight(0.2f),
+                modifier = Modifier.padding(horizontal = 30.dp).weight(0.2f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
-                color = contentcol
+                color = contentcol,
             )
         }
     }

@@ -8,13 +8,31 @@ plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.google.firebase.firebase.perf)
-
 }
 
 android {
     namespace = "pro.themed.perappdownscale"
     compileSdk = 35
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootDir}/keystore/keystore.jks")
+            storePassword = "HolyLumi"
+            keyAlias = "key0"
+            keyPassword = "HolyLumi"
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                val appName = "TMPAD"
+                val versionName = defaultConfig.versionName
+                output.outputFile.renameTo(
+                    File(
+                        output.outputFile.parent,
+                        "${appName}-v${versionName}-${variant.buildType.name}.apk",
+                    )
+                )
+            }
+        }
+    }
     defaultConfig {
         applicationId = "pro.themed.perappdownscale"
         minSdk = 33
@@ -32,25 +50,24 @@ android {
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
+            isJniDebuggable = true
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    buildFeatures {
-        compose = true
-    }
+    kotlinOptions { jvmTarget = "17" }
+    buildFeatures { compose = true }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -69,8 +86,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.rebugger)
-    implementation (libs.accompanist.drawablepainter)
-
+    implementation(libs.accompanist.drawablepainter)
 
     implementation(libs.ktsh)
     implementation(libs.firebase.analytics)
@@ -79,4 +95,6 @@ dependencies {
     implementation(libs.firebase.perf)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.inappmessaging.display)
+
+    implementation("androidx.compose.material:material-icons-core:1.7.7")
 }

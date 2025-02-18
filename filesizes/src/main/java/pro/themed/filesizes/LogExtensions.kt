@@ -1,4 +1,5 @@
-package pro.themed.filesizes// Create a LogExtensions.kt file or add this code to an existing Kotlin file.
+package pro.themed.filesizes // Create a LogExtensions.kt file or add this code to an existing
+                             // Kotlin file.
 
 import android.util.*
 

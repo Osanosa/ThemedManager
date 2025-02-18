@@ -16,17 +16,14 @@ object GlobalVariables {
     var modulePath by mutableStateOf("/data/adb/modules/ThemedProject")
     var isdownloaded by mutableStateOf(false)
 
-    val whoami by lazy {
-        Shell.SH.run("su -c whoami").stdout()
-    }
+    val whoami by lazy { Shell.SH.run("su -c whoami").stdout() }
 
-    val suVersion by lazy {
-        Shell.SH.run("su -v").stdout()
-    }
+    val suVersion by lazy { Shell.SH.run("su -v").stdout() }
 
     val themedId by lazy {
-        Shell.SH.run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
+        Shell.SH.run(
+                """su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b"""
+            )
             .stdout()
     }
-
 }

@@ -16,7 +16,7 @@ android {
     compileSdk = 35
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\Users\\Osanosa\\Key.jks")
+            storeFile = file("${rootDir}/keystore/keystore.jks")
             storePassword = "HolyLumi"
             keyAlias = "key0"
             keyPassword = "HolyLumi"

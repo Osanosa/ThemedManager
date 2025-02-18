@@ -34,17 +34,19 @@ import com.google.firebase.crashlytics.ktx.*
 import com.google.firebase.database.*
 import com.google.firebase.ktx.*
 import com.jaredrummler.ktsh.*
+import java.security.*
+import kotlin.math.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.*
 import pro.themed.autorefreshrate.ui.theme.*
 import pro.themed.manager.autorefreshrate.R.*
-import java.security.*
-import kotlin.math.*
 
 @Suppress("DEPRECATION") // Deprecated for third party Services.
 fun <T> Context.isServiceForegrounded(service: Class<T>) =
-    (getSystemService(ACTIVITY_SERVICE) as? ActivityManager)?.getRunningServices(Integer.MAX_VALUE)
-        ?.find { it.service.className == service.name }?.foreground == true
+    (getSystemService(ACTIVITY_SERVICE) as? ActivityManager)
+        ?.getRunningServices(Integer.MAX_VALUE)
+        ?.find { it.service.className == service.name }
+        ?.foreground == true
 
 class AutoRefreshRateActivity : ComponentActivity() {
 
@@ -57,10 +59,11 @@ class AutoRefreshRateActivity : ComponentActivity() {
 
         fun shareStackTrace(stackTrace: String) {
             scope.launch {
-                val intent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, stackTrace)
-                }
+                val intent =
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, stackTrace)
+                    }
                 startActivity(Intent.createChooser(intent, "Share stack trace"))
             }
         }
@@ -69,242 +72,365 @@ class AutoRefreshRateActivity : ComponentActivity() {
             val stackTrace = Log.getStackTraceString(throwable)
             scope.launch { shareStackTrace(stackTrace) }
         }
-        val suVersion by lazy {
-            Shell.SH.run("su -v").stdout()
-        }
+        val suVersion by lazy { Shell.SH.run("su -v").stdout() }
         Firebase.crashlytics.setCustomKey("su version", suVersion)
 
-        fun String.sha256() = MessageDigest.getInstance("SHA-256").digest(toByteArray()).toHexString()
+        fun String.sha256() =
+            MessageDigest.getInstance("SHA-256").digest(toByteArray()).toHexString()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val sharedPreferences = this.applicationContext.getSharedPreferences("my_preferences", MODE_PRIVATE)
+            val sharedPreferences =
+                this.applicationContext.getSharedPreferences("my_preferences", MODE_PRIVATE)
             val context = LocalContext.current
             ThemedManagerTheme {
-                Toast.makeText(context,
-                    "YOUR FEEDBACK IS IMPORTANT AND VERY MUCH WELCOMED (on telegram or email)",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                        context,
+                        "YOUR FEEDBACK IS IMPORTANT AND VERY MUCH WELCOMED (on telegram or email)",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
 
                 FirebaseIsContributor(sharedPreferences, context)
                 Surface(Modifier.fillMaxSize()) {
                     val testCommand = "service call SurfaceFlinger 1035 i32"
-                    val displayManager = this.getSystemService(DisplayManager::class.java).displays[0]
-                    val unsupportedModes by remember { mutableStateOf(displayManager.supportedModes.distinctBy { it.refreshRate }.size < 2) }
+                    val displayManager =
+                        this.getSystemService(DisplayManager::class.java).displays[0]
+                    val unsupportedModes by remember {
+                        mutableStateOf(
+                            displayManager.supportedModes.distinctBy { it.refreshRate }.size < 2
+                        )
+                    }
 
-                    var currentRefreshRate by remember { mutableFloatStateOf(displayManager.refreshRate) }
+                    var currentRefreshRate by remember {
+                        mutableFloatStateOf(displayManager.refreshRate)
+                    }
                     LaunchedEffect(Unit) {
                         val database =
-                            FirebaseDatabase.getInstance("https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app")
+                            FirebaseDatabase.getInstance(
+                                "https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app"
+                            )
                         val gpShell = Shell.SH
-                        val gpList = gpShell.run("getprop").stdout //already split!!!
-//if returns empty alternative command
-                        val cpu = gpList.find { it.contains("ro.soc.model") }?.substringAfter(":")?.trim('[', ']', ' ')
-                            ?: gpList.find { it.contains("ro.hardware") }?.substringAfter(":")?.trim('[', ']', ' ')
-                            ?: gpList.find { it.contains("ro.boot.hardware") }?.substringAfter(":")?.trim('[', ']', ' ')
+                        val gpList = gpShell.run("getprop").stdout // already split!!!
+                        // if returns empty alternative command
+                        val cpu =
+                            gpList
+                                .find { it.contains("ro.soc.model") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.hardware") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.boot.hardware") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
                         val currentBuidId =
-                            gpList.find { it.contains("ro.build.id") }?.substringAfter(":")?.trim('[', ']', ' ')
-                                ?: gpList.find { it.contains("ro.system.build.id") }?.substringAfter(":")
+                            gpList
+                                .find { it.contains("ro.build.id") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.system.build.id") }
+                                    ?.substringAfter(":")
                                     ?.trim('[', ']', ' ')
                         val currentVersion =
-                            gpList.find { it.contains("ro.build.version.release") }?.substringAfter(":")
-                                ?.trim('[', ']', ' ') ?: gpList
-                                .find { it.contains("ro.build.version.release_or_codename") }?.substringAfter(":")
+                            gpList
+                                .find { it.contains("ro.build.version.release") }
+                                ?.substringAfter(":")
                                 ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.build.version.release_or_codename") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
                         val manufacturer =
-                            gpList.find { it.contains("ro.product.vendor.manufacturer") }?.substringAfter(":")
-                                ?.trim('[', ']', ' ') ?: gpList.find { it.contains("ro.carrier") }?.substringAfter(":")
+                            gpList
+                                .find { it.contains("ro.product.vendor.manufacturer") }
+                                ?.substringAfter(":")
                                 ?.trim('[', ']', ' ')
-                        val model = gpList.find { it.contains("ro.product.vendor.model") }?.substringAfter(":")
-                            ?.trim('[', ']', ' ') ?: gpList.find { it.contains("ro.build.fingerprint") }
-                            ?.substringAfter(":")?.substringAfter("/")?.substringBefore("/")?.trim('[', ']', ' ')
-                        val modes = displayManager.supportedModes.map { it.refreshRate.roundToInt() }.joinToString()
+                                ?: gpList
+                                    .find { it.contains("ro.carrier") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
+                        val model =
+                            gpList
+                                .find { it.contains("ro.product.vendor.model") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.build.fingerprint") }
+                                    ?.substringAfter(":")
+                                    ?.substringAfter("/")
+                                    ?.substringBefore("/")
+                                    ?.trim('[', ']', ' ')
+                        val modes =
+                            displayManager.supportedModes
+                                .map { it.refreshRate.roundToInt() }
+                                .joinToString()
                         val rom =
-                            gpList.find { it.contains("ro.product.name") }?.substringAfter(":")?.trim('[', ']', ' ')
-                                ?: gpList.find { it.contains("ro.build.product") }?.substringAfter(":")
+                            gpList
+                                .find { it.contains("ro.product.name") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.build.product") }
+                                    ?.substringAfter(":")
                                     ?.trim('[', ']', ' ')
                         val vendorBuildId =
-                            gpList.find { it.contains("ro.vendor.build.id") }?.substringAfter(":")?.trim('[', ']', ' ')
-                                ?: gpList.find { it.contains("ro.mediatek.version.release") }?.substringAfter(":")
-                                    ?.trim('[', ']', ' ') ?: gpList.find { it.contains("ro.fota.version") }
-                                    ?.substringAfter(":")?.trim('[', ']', ' ')
+                            gpList
+                                .find { it.contains("ro.vendor.build.id") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.mediatek.version.release") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.fota.version") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
                         val vendorVersion =
-                            gpList.find { it.contains("ro.vendor.build.version.release") }?.substringAfter(":")
-                                ?.trim('[', ']', ' ') ?: gpList.find { it.contains("ro.keymaster.xxx.release") }
-                                ?.substringAfter(":")?.trim('[', ']', ' ')
+                            gpList
+                                .find { it.contains("ro.vendor.build.version.release") }
+                                ?.substringAfter(":")
+                                ?.trim('[', ']', ' ')
+                                ?: gpList
+                                    .find { it.contains("ro.keymaster.xxx.release") }
+                                    ?.substringAfter(":")
+                                    ?.trim('[', ']', ' ')
 
                         val document = "$manufacturer/$model/$vendorBuildId/$currentVersion"
 
                         val ref = database.getReference("devices").child(document.sha256())
                         if (!ref.get().await().exists()) {
 
-                            ref.setValue(hashMapOf("ref" to document.sha256(),
-                                "cpu" to cpu,
-                                "currentBuildId" to currentBuidId,
-                                "currentVersion" to currentVersion,
-                                "manufacturer" to manufacturer,
-                                "model" to model,
-                                "modes" to modes,
-                                "rom" to rom,
-                                "vendorBuildId" to vendorBuildId,
-                                "vendorVersion" to vendorVersion))
+                            ref.setValue(
+                                hashMapOf(
+                                    "ref" to document.sha256(),
+                                    "cpu" to cpu,
+                                    "currentBuildId" to currentBuidId,
+                                    "currentVersion" to currentVersion,
+                                    "manufacturer" to manufacturer,
+                                    "model" to model,
+                                    "modes" to modes,
+                                    "rom" to rom,
+                                    "vendorBuildId" to vendorBuildId,
+                                    "vendorVersion" to vendorVersion
+                                )
+                            )
                         }
-
                     }
-                    LaunchedEffect(displayManager) {
-                        Log.d("DISPLAY", displayManager.toString())
-                    }
+                    LaunchedEffect(displayManager) { Log.d("DISPLAY", displayManager.toString()) }
                     var noRoot by remember { mutableStateOf(false) }
 
-
-                    Column(Modifier
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState())) {
+                    Column(
+                        Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
                         AnimatedVisibility(noRoot) {
                             Column {
-                                Surface(modifier = Modifier.fillMaxWidth(),
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
                                     color = MaterialTheme.colorScheme.error,
-                                    shape = MaterialTheme.shapes.medium) {
-                                    Text("Root access required",
+                                    shape = MaterialTheme.shapes.medium
+                                ) {
+                                    Text(
+                                        "Root access required",
                                         style = MaterialTheme.typography.headlineMedium,
-                                        modifier = Modifier.padding(16.dp))
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                 }
 
-                                Text("Supported modes: ", style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    "Supported modes: ",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
                                 if (!unsupportedModes) {
                                     displayManager.supportedModes.forEach {
                                         Text(text = it.refreshRate.roundToInt().toString())
                                     }
                                 }
                             }
-
                         }
-
-
-
 
                         AnimatedVisibility(noRoot && unsupportedModes) {
                             Spacer(Modifier.height(8.dp))
                         }
                         AnimatedVisibility(unsupportedModes) {
-                            Surface(modifier = Modifier.fillMaxWidth(),
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.error,
-                                shape = MaterialTheme.shapes.medium) {
-                                Text("Uh oh, looks like your device doesn't support multiple refresh rates",
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Text(
+                                    "Uh oh, looks like your device doesn't support multiple refresh rates",
                                     style = MaterialTheme.typography.headlineMedium,
-                                    modifier = Modifier.padding(16.dp))
+                                    modifier = Modifier.padding(16.dp)
+                                )
                             }
-
                         }
-
-
-
 
                         AnimatedVisibility(!noRoot && !unsupportedModes) {
                             Column {
-                                val clipboardManager: ClipboardManager = LocalClipboardManager.current
+                                val clipboardManager: ClipboardManager =
+                                    LocalClipboardManager.current
 
-                                Row(Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp), horizontalArrangement = Arrangement.Center) {
-                                    Text(text = "TMARR", style = MaterialTheme.typography.headlineLarge,
-
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .clickable {
-                                                clipboardManager.setText(AnnotatedString(Shell.SH
-                                                    .run("""su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b""")
-                                                    .stdout()))
-                                            }
-                                            .padding(4.dp)
-
+                                Row(
+                                    Modifier.fillMaxWidth().padding(4.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = "TMARR",
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        modifier =
+                                            Modifier.clip(RoundedCornerShape(8.dp))
+                                                .clickable {
+                                                    clipboardManager.setText(
+                                                        AnnotatedString(
+                                                            Shell.SH.run(
+                                                                    """su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b"""
+                                                                )
+                                                                .stdout()
+                                                        )
+                                                    )
+                                                }
+                                                .padding(4.dp)
                                     )
                                 }
                                 AdmobBanner(applicationContext)
-                                Image(painterResource(drawable.gridfps_00000),
+                                Image(
+                                    painterResource(drawable.gridfps_00000),
                                     null,
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .basicMarquee(iterations = Int.MAX_VALUE,
+                                    Modifier.fillMaxWidth()
+                                        .basicMarquee(
+                                            iterations = Int.MAX_VALUE,
                                             spacing = MarqueeSpacing(0.dp),
                                             initialDelayMillis = 0,
                                             repeatDelayMillis = 0,
-                                            velocity = 500.dp))
-                                Text(displayManager.name + ": " + currentRefreshRate.roundToInt()
-                                    .toString() + "Hz, " + displayManager.mode.physicalHeight.toString() + "x" + displayManager.mode.physicalWidth.toString(),
+                                            velocity = 500.dp
+                                        )
+                                )
+                                Text(
+                                    displayManager.name +
+                                        ": " +
+                                        currentRefreshRate.roundToInt().toString() +
+                                        "Hz, " +
+                                        displayManager.mode.physicalHeight.toString() +
+                                        "x" +
+                                        displayManager.mode.physicalWidth.toString(),
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(vertical = 8.dp))
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
 
                                 var isRunning by remember {
-                                    mutableStateOf(isServiceForegrounded(AutoRefreshRateForegroundService::class.java))
+                                    mutableStateOf(
+                                        isServiceForegrounded(
+                                            AutoRefreshRateForegroundService::class.java
+                                        )
+                                    )
                                 }
 
                                 Text(
-                                    if (isRunning) "Foreground service is running" else "Foreground service is not running",
+                                    if (isRunning) "Foreground service is running"
+                                    else "Foreground service is not running",
                                     color = if (isRunning) Color.Green else Color.Red,
                                 )
 
                                 AnimatedVisibility(unsupportedModes) {
-                                    Surface(modifier = Modifier.fillMaxWidth(),
+                                    Surface(
+                                        modifier = Modifier.fillMaxWidth(),
                                         color = MaterialTheme.colorScheme.error,
-                                        shape = MaterialTheme.shapes.medium) {
-                                        Text("Uh oh, looks like your device doesn't support multiple refresh rates",
+                                        shape = MaterialTheme.shapes.medium
+                                    ) {
+                                        Text(
+                                            "Uh oh, looks like your device doesn't support multiple refresh rates",
                                             style = MaterialTheme.typography.headlineMedium,
-                                            modifier = Modifier.padding(16.dp))
+                                            modifier = Modifier.padding(16.dp)
+                                        )
                                     }
-
                                 }
 
-                                val shell = Shell.SH.addOnStderrLineListener(object : Shell.OnLineListener {
-                                    override fun onLine(line: String) {
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            when {
-                                                line.contains("su: inaccessible or not found",
-                                                    ignoreCase = true) || line.contains("permission denied",
-                                                    ignoreCase = true) -> {
-                                                    noRoot = true
+                                val shell =
+                                    Shell.SH.addOnStderrLineListener(
+                                        object : Shell.OnLineListener {
+                                            override fun onLine(line: String) {
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    when {
+                                                        line.contains(
+                                                            "su: inaccessible or not found",
+                                                            ignoreCase = true
+                                                        ) ||
+                                                            line.contains(
+                                                                "permission denied",
+                                                                ignoreCase = true
+                                                            ) -> {
+                                                            noRoot = true
+                                                        }
+                                                        line.contains(
+                                                            "service stopped",
+                                                            ignoreCase = true
+                                                        ) -> {
+                                                            Toast.makeText(
+                                                                    context,
+                                                                    line,
+                                                                    Toast.LENGTH_SHORT
+                                                                )
+                                                                .show()
+                                                        }
+                                                        line.contains(
+                                                            "not stopped",
+                                                            ignoreCase = true
+                                                        ) -> {
+                                                            Toast.makeText(
+                                                                    context,
+                                                                    line,
+                                                                    Toast.LENGTH_SHORT
+                                                                )
+                                                                .show()
+                                                        }
+                                                        else -> shareStackTrace(line)
+                                                    }
                                                 }
-
-                                                line.contains("service stopped", ignoreCase = true) -> {
-                                                    Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                                }
-
-                                                line.contains("not stopped", ignoreCase = true) -> {
-                                                    Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                                }
-
-                                                else -> shareStackTrace(line)
                                             }
                                         }
-                                    }
-                                })
-                                LaunchedEffect(Unit) {
-                                    shell.run("su")
-                                }
+                                    )
+                                LaunchedEffect(Unit) { shell.run("su") }
                                 var showRate by remember {
-                                    mutableStateOf(shell.run("service call SurfaceFlinger 1034 i32 2").stdout()
-                                        .contains("1"))
+                                    mutableStateOf(
+                                        shell
+                                            .run("service call SurfaceFlinger 1034 i32 2")
+                                            .stdout()
+                                            .contains("1")
+                                    )
                                 }
 
-                                Row(verticalAlignment = Alignment.CenterVertically,
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier.fillMaxWidth()) {
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Text("Show rate: ")
-                                    Switch(checked = showRate, onCheckedChange = {
-                                        showRate = it
-                                        CoroutineScope(Dispatchers.IO).launch {
-
-                                            if (it) {
-                                                shell.run("service call SurfaceFlinger 1034 i32 1")
-                                            }
-                                            else {
-                                                shell.run("service call SurfaceFlinger 1034 i32 0")
+                                    Switch(
+                                        checked = showRate,
+                                        onCheckedChange = {
+                                            showRate = it
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                if (it) {
+                                                    shell.run(
+                                                        "service call SurfaceFlinger 1034 i32 1"
+                                                    )
+                                                } else {
+                                                    shell.run(
+                                                        "service call SurfaceFlinger 1034 i32 0"
+                                                    )
+                                                }
                                             }
                                         }
-
-                                    })
+                                    )
                                 }
                                 @Composable
                                 fun ModeSelectionButton(
@@ -314,16 +440,20 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                     onClick: () -> Unit
                                 ) {
                                     Button(
-                                        colors = ButtonColors(
-                                            containerColor = if (isSelected) {
-                                                MaterialTheme.colorScheme.tertiary
-                                            } else {
-                                                MaterialTheme.colorScheme.primary
-                                            },
-                                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                        ),
+                                        colors =
+                                            ButtonColors(
+                                                containerColor =
+                                                    if (isSelected) {
+                                                        MaterialTheme.colorScheme.tertiary
+                                                    } else {
+                                                        MaterialTheme.colorScheme.primary
+                                                    },
+                                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                                disabledContainerColor =
+                                                    MaterialTheme.colorScheme.surfaceVariant,
+                                                disabledContentColor =
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                            ),
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                         onClick = onClick
                                     ) {
@@ -336,10 +466,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                 FlowRow(
                                     horizontalArrangement = Arrangement.SpaceAround,
                                     modifier = Modifier.fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.primaryContainer,
-                                        RoundedCornerShape(8.dp))
                                 ) {
-                                    repeat(2){
                                     for ((index, mode) in supportedModesArray) {
                                         ModeSelectionButton(
                                             index = index,
@@ -353,12 +480,18 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                                 }
                                             }
                                         )
-                                    }}
+                                    }
                                 }
 
-                                Text("Foreground service settings:", fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 16.dp))
+                                Text(
+                                    "Foreground service settings:",
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 16.dp)
+                                )
                                 Text("Set max mode:")
-                                var maxRate by remember { mutableStateOf(sharedPreferences.getString("maxRate", "0")) }
+                                var maxRate by remember {
+                                    mutableStateOf(sharedPreferences.getString("maxRate", "0"))
+                                }
                                 FlowRow(
                                     horizontalArrangement = Arrangement.SpaceAround,
                                     modifier = Modifier.fillMaxWidth()
@@ -369,7 +502,10 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                             mode = mode,
                                             isSelected = maxRate?.toInt() == index,
                                             onClick = {
-                                                sharedPreferences.edit().putString("maxRate", index.toString()).apply()
+                                                sharedPreferences
+                                                    .edit()
+                                                    .putString("maxRate", index.toString())
+                                                    .apply()
                                                 maxRate = index.toString()
                                             }
                                         )
@@ -377,7 +513,9 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                 }
 
                                 Text("Set min mode:")
-                                var minRate by remember { mutableStateOf(sharedPreferences.getString("minRate", "0")) }
+                                var minRate by remember {
+                                    mutableStateOf(sharedPreferences.getString("minRate", "0"))
+                                }
                                 FlowRow(
                                     horizontalArrangement = Arrangement.SpaceAround,
                                     modifier = Modifier.fillMaxWidth()
@@ -388,7 +526,10 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                             mode = mode,
                                             isSelected = minRate?.toInt() == index,
                                             onClick = {
-                                                sharedPreferences.edit().putString("minRate", index.toString()).apply()
+                                                sharedPreferences
+                                                    .edit()
+                                                    .putString("minRate", index.toString())
+                                                    .apply()
                                                 minRate = index.toString()
                                             }
                                         )
@@ -399,92 +540,130 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                 }
                                 Text("Set timeout: $timeout")
                                 Slider(
-
                                     value = timeout.toFloat(),
                                     onValueChange = { timeout = it.roundToInt() },
                                     onValueChangeFinished = {
-                                        sharedPreferences.edit().putInt("countdown", timeout).apply()
+                                        sharedPreferences
+                                            .edit()
+                                            .putInt("countdown", timeout)
+                                            .apply()
                                     },
                                     valueRange = 1f..10f,
                                     steps = 8
-
                                 )
                                 var autoRateOnBoot by remember {
-                                    mutableStateOf(sharedPreferences.getBoolean("autoRateOnBoot", false))
+                                    mutableStateOf(
+                                        sharedPreferences.getBoolean("autoRateOnBoot", false)
+                                    )
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically,
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)) {
-
-                                    Text(text = "Auto rate on boot: $autoRateOnBoot",
-                                        style = MaterialTheme.typography.titleMedium)
-                                    Switch(checked = autoRateOnBoot, onCheckedChange = {
-                                        if (!noRoot) {
-                                            autoRateOnBoot = it
-                                            sharedPreferences.edit().putBoolean("autoRateOnBoot", it).apply()
+                                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                                ) {
+                                    Text(
+                                        text = "Auto rate on boot: $autoRateOnBoot",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Switch(
+                                        checked = autoRateOnBoot,
+                                        onCheckedChange = {
+                                            if (!noRoot) {
+                                                autoRateOnBoot = it
+                                                sharedPreferences
+                                                    .edit()
+                                                    .putBoolean("autoRateOnBoot", it)
+                                                    .apply()
+                                            } else {
+                                                Toast.makeText(
+                                                        applicationContext,
+                                                        "No root",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            }
                                         }
-                                        else {
-                                            Toast.makeText(applicationContext, "No root", Toast.LENGTH_SHORT).show()
-                                        }
-                                    })
+                                    )
                                 }
 
                                 var autoRestart by remember {
-                                    mutableStateOf(sharedPreferences.getBoolean("autoRestartService", false))
+                                    mutableStateOf(
+                                        sharedPreferences.getBoolean("autoRestartService", false)
+                                    )
                                 }
 
-                                Row(horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier.fillMaxWidth()) {
-                                    Button(onClick = {
-                                        if (!noRoot) shell.run("am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
-                                        showInterstitial(context)
-                                        CoroutineScope(Dispatchers.IO).launch {
-                                            isRunning =
-                                                isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
-                                            var retryCount = 0
-                                            while (retryCount < 10 && !isRunning) {
-                                                Thread.sleep(100)
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            if (!noRoot)
+                                                shell.run(
+                                                    "am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService"
+                                                )
+                                            showInterstitial(context)
+                                            CoroutineScope(Dispatchers.IO).launch {
                                                 isRunning =
-                                                    isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
-                                                retryCount++
+                                                    isServiceForegrounded(
+                                                        AutoRefreshRateForegroundService::class.java
+                                                    )
+                                                var retryCount = 0
+                                                while (retryCount < 10 && !isRunning) {
+                                                    Thread.sleep(100)
+                                                    isRunning =
+                                                        isServiceForegrounded(
+                                                            AutoRefreshRateForegroundService::class
+                                                                .java
+                                                        )
+                                                    retryCount++
+                                                }
                                             }
                                         }
-
-                                    }) {
+                                    ) {
                                         Text("Stop service")
                                     }
-                                    Button(onClick = {
-                                        if (!noRoot) shell.run("am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService")
-                                        showInterstitial(context)
-                                        CoroutineScope(Dispatchers.IO).launch {
-                                            isRunning =
-                                                isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
-                                            var retryCount = 0
-                                            while (retryCount < 10 && !isRunning) {
-                                                Thread.sleep(100)
+                                    Button(
+                                        onClick = {
+                                            if (!noRoot)
+                                                shell.run(
+                                                    "am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService"
+                                                )
+                                            showInterstitial(context)
+                                            CoroutineScope(Dispatchers.IO).launch {
                                                 isRunning =
-                                                    isServiceForegrounded(AutoRefreshRateForegroundService::class.java)
-                                                retryCount++
+                                                    isServiceForegrounded(
+                                                        AutoRefreshRateForegroundService::class.java
+                                                    )
+                                                var retryCount = 0
+                                                while (retryCount < 10 && !isRunning) {
+                                                    Thread.sleep(100)
+                                                    isRunning =
+                                                        isServiceForegrounded(
+                                                            AutoRefreshRateForegroundService::class
+                                                                .java
+                                                        )
+                                                    retryCount++
+                                                }
                                             }
                                         }
-                                    }) {
+                                    ) {
                                         Text("Start service")
                                     }
                                 }
-
                             }
                         }
-                        LinkButtons(Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 72.dp, vertical = 8.dp)
-                            .background(MaterialTheme.colorScheme.inversePrimary.copy(0.2f), CircleShape))
-
+                        LinkButtons(
+                            Modifier.fillMaxWidth()
+                                .padding(horizontal = 72.dp, vertical = 8.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.inversePrimary.copy(0.2f),
+                                    CircleShape
+                                )
+                        )
                     }
                 }
             }
         }
     }
 }
-

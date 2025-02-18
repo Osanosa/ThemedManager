@@ -36,17 +36,25 @@ class MainActivity : ComponentActivity() {
 
         lateinit var appContext: Context
             private set
-        var overlayList: OverlayListData by mutableStateOf(fetchOverlayList())
-        var isDark by mutableStateOf("")
 
+        var overlayList: OverlayListData by mutableStateOf(fetchOverlayList())
+        var allOverlayList: AllOverlayListData by mutableStateOf(fetchAllOverlayList())
+        var isDark by mutableStateOf("")
     }
 
     fun shareStackTrace(stackTrace: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, stackTrace)
-        }.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ContextCompat.startActivity(this@MainActivity, Intent.createChooser(intent, "Share stack trace"), null)
+        val intent =
+            Intent(Intent.ACTION_SEND)
+                .apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, stackTrace)
+                }
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ContextCompat.startActivity(
+            this@MainActivity,
+            Intent.createChooser(intent, "Share stack trace"),
+            null,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +78,6 @@ class MainActivity : ComponentActivity() {
             for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
                 if (MyForegroundService::class.java.name == service.service.className) {
                     return true
-
                 }
             }
             return false
@@ -79,12 +86,14 @@ class MainActivity : ComponentActivity() {
         if (foregroundServiceRunning()) {
             Shell("su").run("killall pro.themed.manager")
             Log.d("service", "attempting to stop")
-
         }
         setContent {
             enableEdgeToEdge()
             LaunchedEffect(Unit) {
-                if (!SharedPreferencesManager.getSharedPreferences().getBoolean("isContributor", false)) {
+                if (
+                    !SharedPreferencesManager.getSharedPreferences()
+                        .getBoolean("isContributor", false)
+                ) {
                     loadInterstitial(appContext)
                     loadRewarded(appContext)
                 }
@@ -99,7 +108,12 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         CoroutineScope(Dispatchers.IO).launch {
                             if ("root" !in whoami) {
-                                Toast.makeText(context, getString(R.string.no_root_access), Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                        context,
+                                        getString(R.string.no_root_access),
+                                        Toast.LENGTH_LONG,
+                                    )
+                                    .show()
                             }
                         }
                     }
@@ -110,12 +124,10 @@ class MainActivity : ComponentActivity() {
                         // Initialize Firebase Database reference
                         FirebaseIsContributor(sharedPreferences)
                     }
-                }
-                else {
+                } else {
                     splashScreen.setKeepOnScreenCondition { false }
                     OnBoardingPage()
                 }
-
             }
         }
     }
@@ -124,34 +136,25 @@ class MainActivity : ComponentActivity() {
         removeInterstitial()
         super.onDestroy()
     }
-
 }
 
-//@Preview
-@OptIn(ExperimentalMaterial3Api::class) @Composable fun Main() {
+// @Preview
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Main() {
     Column {
         val navController = rememberNavController()
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Row(modifier = Modifier.fillMaxWidth()) {
-                Box(modifier = Modifier
-                    .weight(1f)
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
-
-                ) {
+                Box(modifier = Modifier.weight(1f).windowInsetsPadding(WindowInsets.safeDrawing)) {
                     Navigation(navController)
                 }
-                Box(modifier = Modifier
-                    .zIndex(10f)
-                    .shadow(8.dp)
-
-                ) {
+                Box(modifier = Modifier.zIndex(10f).shadow(8.dp)) {
                     NavigationRailSample(navController)
                 }
             }
-
         }
-
     }
 }
 
@@ -166,4 +169,3 @@ fun getContrastColor(background: Int): Color {
     val luminance = (0.299 * background.red + 0.587 * background.green + 0.114 * background.blue)
     return if (luminance > threshold) Color.Black else Color.White
 }
-

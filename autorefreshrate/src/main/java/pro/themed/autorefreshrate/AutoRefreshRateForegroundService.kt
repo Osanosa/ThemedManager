@@ -3,106 +3,89 @@ package pro.themed.autorefreshrate
 import android.app.*
 import android.content.*
 import android.os.*
-import androidx.core.app.*
-import com.google.firebase.crashlytics.ktx.*
-import com.google.firebase.ktx.*
-import com.jaredrummler.ktsh.*
+import androidx.core.app.NotificationCompat
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
 import pro.themed.manager.autorefreshrate.R
-import java.util.concurrent.*
 
 class AutoRefreshRateForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
     private lateinit var sharedPreferences: SharedPreferences
-    var countdown = 3 // Initial countdown value
-    var countdownReset = 3
-    private var isMaxRate = false // Flag to track the rate state
+    private var countdownReset = 3
+    private var isMaxRate = false
     private val shell1 = Shell("su")
     private val shell2 = Shell("su")
-    private var isCountdownRunning = false // Flag to ensure countdown runs only once
+    private var isCountdownRunning = false
 
     override fun onCreate() {
         super.onCreate()
         sharedPreferences =
-            this.applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+            applicationContext.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         startForegroundService()
     }
 
     private fun startForegroundService() {
-        val notificationManager =
-            getSystemService(NotificationManager::class.java) as NotificationManager
-
         val notificationChannelId = "ForegroundServiceChannel"
-        val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
-            .setSmallIcon(R.drawable.autofps_select_24px).setContentTitle("AutoRefreshRate")
-            .setContentText("Service is running...")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        val notification =
+            NotificationCompat.Builder(this, notificationChannelId)
+                .setSmallIcon(R.drawable.autofps_select_24px)
+                .setContentTitle("AutoRefreshRate")
+                .setContentText("Service is running...")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build()
 
-        val notificationChannel = NotificationChannel(
-            notificationChannelId, notificationChannelId, NotificationManager.IMPORTANCE_LOW
+        val nm = getSystemService(NotificationManager::class.java)
+        nm?.createNotificationChannel(
+            NotificationChannel(
+                notificationChannelId,
+                notificationChannelId,
+                NotificationManager.IMPORTANCE_LOW
+            )
         )
 
-        notificationManager.createNotificationChannel(notificationChannel)
-
-        startForeground(1001, notificationBuilder.build())
+        startForeground(1001, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         countdownReset = sharedPreferences.getInt("countdown", 3)
-        val actualIntent = intent ?: Intent() // Use an empty intent if it's null
-        val minRate = sharedPreferences.getString(
-            "minRate", "0"
-        ).toString()
-        val maxRate = sharedPreferences.getString(
-            "maxRate", "0"
-        ).toString()
-        Thread {}.start()
+        val minRate = sharedPreferences.getString("minRate", "0") ?: "0"
+        val maxRate = sharedPreferences.getString("maxRate", "0") ?: "0"
+
         shell1.run("getevent") {
             onStdOut = {
-                countdown = countdownReset // Reset countdown to the initial value
                 serviceScope.launch {
+                    // Reset countdown each time output is received
+                    var countdown = countdownReset
                     if (!isCountdownRunning) {
-                        isCountdownRunning = true // Set flag to indicate countdown is running
+                        isCountdownRunning = true
                         if (!isMaxRate) {
                             isMaxRate = true
-
-                            shell2.run(
-                                "service call SurfaceFlinger 1035 i32 $maxRate"
-                            )
+                            shell2.run("service call SurfaceFlinger 1035 i32 $maxRate")
                         }
-                        while (countdown > 0) {
-                            delay(1000)
-                            countdown -= 1
+                        while (countdown-- > 0) delay(1000)
+                        if (isMaxRate) {
+                            shell2.run("service call SurfaceFlinger 1035 i32 $minRate")
+                            isMaxRate = false
                         }
-                        if (countdown == 0 && isMaxRate) {
-                            shell2.run(
-                                "service call SurfaceFlinger 1035 i32 $minRate"
-                            )
-                            isMaxRate = false // Toggle the rate state
-                        }
-                        isCountdownRunning = false // Reset the countdown flag
+                        isCountdownRunning = false
                     }
                 }
             }
-            onStdErr = { line: String ->
-                Firebase.crashlytics.log("StdErr: $line")
-            }
+            onStdErr = { line -> Firebase.crashlytics.log("StdErr: $line") }
             timeout = Shell.Timeout(1, TimeUnit.SECONDS)
         }
 
-        startForegroundService()
-        return super.onStartCommand(actualIntent, flags, startId)
+        return START_STICKY
     }
 
     override fun onDestroy() {
-        //MyTileService().qsTile.updateTile()
         serviceScope.cancel()
         super.onDestroy()
         stopSelf()
-        stopService(Intent(this, AutoRefreshRateForegroundService::class.java))
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return null
-    }
+    override fun onBind(intent: Intent): IBinder? = null
 }

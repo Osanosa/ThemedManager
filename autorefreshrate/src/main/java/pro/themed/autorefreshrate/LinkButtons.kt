@@ -16,8 +16,7 @@ import pro.themed.manager.autorefreshrate.R
 fun LinkButtons(modifier: Modifier = Modifier) {
     Row(horizontalArrangement = Arrangement.SpaceAround, modifier = modifier) {
         val context = LocalContext.current
-        val webIntent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
+        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
 
         IconButton(onClick = { context.startActivity(webIntent) }) {
             Image(
@@ -26,9 +25,8 @@ fun LinkButtons(modifier: Modifier = Modifier) {
             )
         }
 
-        val webIntent1 = Intent(
-            Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/")
-        )
+        val webIntent1 =
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/"))
 
         IconButton(onClick = { context.startActivity(webIntent1) }) {
             Image(

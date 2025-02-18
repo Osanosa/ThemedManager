@@ -20,23 +20,24 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import androidx.lifecycle.*
 import androidx.savedstate.*
-import kotlinx.coroutines.*
 import kotlin.math.*
 import kotlin.system.*
+import kotlinx.coroutines.*
 
 class DreamServiceCompat : DreamService(), SavedStateRegistryOwner, ViewModelStoreOwner {
 
-    @Suppress("LeakingThis")
-    private val lifecycleRegistry = LifecycleRegistry(this)
+    @Suppress("LeakingThis") private val lifecycleRegistry = LifecycleRegistry(this)
 
     @Suppress("LeakingThis")
-    private val savedStateRegistryController = SavedStateRegistryController.create(this).apply {
-        performAttach()
-    }
+    private val savedStateRegistryController =
+        SavedStateRegistryController.create(this).apply { performAttach() }
 
-    override val lifecycle: Lifecycle get() = lifecycleRegistry
+    override val lifecycle: Lifecycle
+        get() = lifecycleRegistry
+
     override val viewModelStore = ViewModelStore()
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
+    override val savedStateRegistry: SavedStateRegistry
+        get() = savedStateRegistryController.savedStateRegistry
 
     @CallSuper
     override fun onCreate() {
@@ -57,16 +58,21 @@ class DreamServiceCompat : DreamService(), SavedStateRegistryOwner, ViewModelSto
         view.setViewTreeSavedStateRegistryOwner(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.windowInsetsController?.hide(android.view.WindowInsets.Type.systemBars())
+            window.decorView.windowInsetsController?.hide(
+                android.view.WindowInsets.Type.systemBars()
+            )
         } else {
             @Suppress("DEPRECATION") // Older API support
             this@DreamServiceCompat.window.decorView.systemUiVisibility =
-                (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN)
+                (View.SYSTEM_UI_FLAG_IMMERSIVE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN)
         }
         // Set content composable
-        view.setContent  {
-            Random()
-        }
+        view.setContent { Random() }
 
         // Set content view
         setContentView(view)
@@ -79,7 +85,6 @@ class DreamServiceCompat : DreamService(), SavedStateRegistryOwner, ViewModelSto
 
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
     }
-
 }
 
 @Preview
@@ -90,7 +95,18 @@ fun Random() {
 
     val currentList by remember {
         mutableStateOf(
-            colorNoiseList + colorGradientsList + colorBlobsList + horizontalStripesList + verticalStripesList + horizontalLinesList + verticalLinesList + hueList + hueStrobeList + monochromeList + monochromeNoiseList + monochromeStrobeList
+            colorNoiseList +
+                colorGradientsList +
+                colorBlobsList +
+                horizontalStripesList +
+                verticalStripesList +
+                horizontalLinesList +
+                verticalLinesList +
+                hueList +
+                hueStrobeList +
+                monochromeList +
+                monochromeNoiseList +
+                monochromeStrobeList
         )
     }
     var delay by remember { mutableLongStateOf(1000 / 60) }
@@ -98,9 +114,15 @@ fun Random() {
     LaunchedEffect(Unit) {
         if (VERSION.SDK_INT >= VERSION_CODES.M) {
             delay =
-                (1000 / (context.getSystemService(_root_ide_package_.android.hardware.display.DisplayManager::class.java).displays[0].refreshRate.roundToLong()))
+                (1000 /
+                    (context
+                        .getSystemService(
+                            _root_ide_package_.android.hardware.display.DisplayManager::class.java
+                        )
+                        .displays[0]
+                        .refreshRate
+                        .roundToLong()))
         }
-
     }
     LaunchedEffect(Unit) {
         while (true) {
@@ -111,22 +133,14 @@ fun Random() {
 
     val imageBitmap = ImageBitmap.imageResource(currentList.shuffled()[currentFrame])
 
-    Canvas(
-        modifier = _root_ide_package_.androidx.compose.ui.Modifier.fillMaxSize()
-    ) {
-        val paint = Paint().asFrameworkPaint().apply {
-            isAntiAlias = false
-            shader = ImageShader(
+    Canvas(modifier = _root_ide_package_.androidx.compose.ui.Modifier.fillMaxSize()) {
+        val paint =
+            Paint().asFrameworkPaint().apply {
+                isAntiAlias = false
+                shader = ImageShader(imageBitmap, TileMode.Mirror, TileMode.Mirror)
+            }
 
-                imageBitmap, TileMode.Mirror, TileMode.Mirror
-            )
-        }
-
-        drawIntoCanvas {
-            it.nativeCanvas.drawPaint(paint)
-        }
+        drawIntoCanvas { it.nativeCanvas.drawPaint(paint) }
         paint.reset()
     }
-
 }
-

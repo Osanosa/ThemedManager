@@ -12,10 +12,9 @@ class MyBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED && sharedPreferences.getBoolean(
-                "autoRateOnBoot",
-                false
-            )
+        if (
+            intent.action == Intent.ACTION_BOOT_COMPLETED &&
+                sharedPreferences.getBoolean("autoRateOnBoot", false)
         ) {
             val serviceIntent = Intent(context, MyForegroundService::class.java)
             context.startForegroundService(serviceIntent)

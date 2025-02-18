@@ -43,30 +43,40 @@ class DownscaleWidget1x4 : GlanceAppWidget() {
                 Column(
                     modifier = GlanceModifier.wrapContentSize(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "1/4",
-                        modifier = GlanceModifier.padding(12.dp).background(GlanceTheme.colors.primary).wrapContentSize()
-                            .clickable(onClick = action {
+                        modifier =
+                            GlanceModifier.padding(12.dp)
+                                .background(GlanceTheme.colors.primary)
+                                .wrapContentSize()
+                                .clickable(
+                                    onClick =
+                                        action {
+                                            if (
+                                                Shell("su")
+                                                    .run("wm size")
+                                                    .stdout()
+                                                    .contains("Override")
+                                            ) {
+                                                Shell("su").run("wm size reset ; wm density reset")
+                                                Shell("su").run("killall com.android.systemui")
+                                            } else {
 
-                                if (Shell("su").run("wm size").stdout().contains("Override")) {
-                                    Shell("su").run("wm size reset ; wm density reset")
-                                    Shell("su").run("killall com.android.systemui")
-                                } else
-                                {
-
-                                    downscalebydivisor("4")
-                                    Shell("su").run("killall com.android.systemui")
-                                }
-
-                            }),
-                        style = TextStyle(color = GlanceTheme.colors.background, textAlign = TextAlign.Center)
+                                                downscalebydivisor("4")
+                                                Shell("su").run("killall com.android.systemui")
+                                            }
+                                        }
+                                ),
+                        style =
+                            TextStyle(
+                                color = GlanceTheme.colors.background,
+                                textAlign = TextAlign.Center,
+                            ),
                     )
-
                 }
             }
         }
     }
-
 }

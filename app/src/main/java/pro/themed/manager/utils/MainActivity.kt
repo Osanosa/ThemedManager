@@ -21,7 +21,26 @@ fun fetchOverlayList(): OverlayListData {
     } catch (e: Exception) {
         return OverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
     }
+}
 
+data class AllOverlayListData(
+    val overlayList: List<String>,
+    val unsupportedOverlays: List<String>,
+    val enabledOverlays: List<String>,
+    val disabledOverlays: List<String>,
+)
+
+fun fetchAllOverlayList(): AllOverlayListData {
+    return try {
+        val result = Shell("su").run("cmd overlay list").stdout()
+        val overlayList = result.lines().filter { !it.contains("themed") }.sorted()
+        val unsupportedOverlays = overlayList.filter { it.contains("---") }
+        val enabledOverlays = overlayList.filter { it.contains("[x]") }
+        val disabledOverlays = overlayList.filter { it.contains("[ ]") }
+        AllOverlayListData(overlayList, unsupportedOverlays, enabledOverlays, disabledOverlays)
+    } catch (e: Exception) {
+        return AllOverlayListData(emptyList(), emptyList(), emptyList(), emptyList())
+    }
 }
 
 object SharedPreferencesManager {

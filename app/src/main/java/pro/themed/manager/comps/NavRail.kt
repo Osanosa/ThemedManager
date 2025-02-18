@@ -35,19 +35,16 @@ import pro.themed.manager.utils.NavigationItems
 
 @Stable
 @Composable
-fun NavigationRailSample(
-    navController: NavController,
-) {
-    val itemsbottom = listOf(
-        NavigationItems.ColorsTab,
-        NavigationItems.QsPanel,
-        NavigationItems.FontsTab,
-        NavigationItems.IconsTab,
-        NavigationItems.MiscTab
-    )
-    val itemstop = listOf(
-        NavigationItems.About, NavigationItems.Settings, NavigationItems.Toolbox
-    )
+fun NavigationRailSample(navController: NavController) {
+    val itemsbottom =
+        listOf(
+            NavigationItems.ColorsTab,
+            NavigationItems.QsPanel,
+            NavigationItems.FontsTab,
+            NavigationItems.IconsTab,
+            NavigationItems.MiscTab,
+        )
+    val itemstop = listOf(NavigationItems.About, NavigationItems.Settings, NavigationItems.Toolbox)
 
     var topColumnHeight by rememberSaveable { mutableIntStateOf(0) }
     var bottomColumnHeight by rememberSaveable { mutableIntStateOf(0) }
@@ -57,46 +54,45 @@ fun NavigationRailSample(
     NavigationRail(
         containerColor = bordercol,
         contentColor = contentcol,
-
-        modifier = Modifier
-
-            .width(64.dp)
-            .onGloballyPositioned { layoutInfo ->
-                val newRailHeight = layoutInfo.size.height
-                if (railHeight != newRailHeight) {
-                    railHeight = newRailHeight
+        modifier =
+            Modifier.width(64.dp)
+                .onGloballyPositioned { layoutInfo ->
+                    val newRailHeight = layoutInfo.size.height
+                    if (railHeight != newRailHeight) {
+                        railHeight = newRailHeight
+                    }
                 }
-            }
-            .then(if (contentExceedsAvailableSpace) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-
+                .then(
+                    if (contentExceedsAvailableSpace) Modifier.verticalScroll(rememberScrollState())
+                    else Modifier
+                ),
     ) {
-        Column(modifier = Modifier.onGloballyPositioned { layoutInfo ->
-            val newTopColumnHeight = layoutInfo.size.height
-            if (topColumnHeight != newTopColumnHeight) {
-                topColumnHeight = newTopColumnHeight
-            }
-        }, verticalArrangement = Arrangement.Top) {
+        Column(
+            modifier =
+                Modifier.onGloballyPositioned { layoutInfo ->
+                    val newTopColumnHeight = layoutInfo.size.height
+                    if (topColumnHeight != newTopColumnHeight) {
+                        topColumnHeight = newTopColumnHeight
+                    }
+                },
+            verticalArrangement = Arrangement.Top,
+        ) {
             itemstop.forEachIndexed { _, item ->
-                CustomNavigationRailItem(
-                    item = item,
-                    navController = navController
-                )
+                CustomNavigationRailItem(item = item, navController = navController)
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Column(modifier = Modifier
-            .wrapContentHeight()
-            .onGloballyPositioned { layoutInfo ->
-                val newBottomColumnHeight = layoutInfo.size.height
-                if (bottomColumnHeight != newBottomColumnHeight) {
-                    bottomColumnHeight = newBottomColumnHeight
+        Column(
+            modifier =
+                Modifier.wrapContentHeight().onGloballyPositioned { layoutInfo ->
+                    val newBottomColumnHeight = layoutInfo.size.height
+                    if (bottomColumnHeight != newBottomColumnHeight) {
+                        bottomColumnHeight = newBottomColumnHeight
+                    }
                 }
-            }) {
+        ) {
             itemsbottom.forEachIndexed { _, item ->
-                CustomNavigationRailItem(
-                    item = item,
-                    navController = navController
-                )
+                CustomNavigationRailItem(item = item, navController = navController)
             }
         }
     }
@@ -110,35 +106,31 @@ fun NavigationRailSample(
 fun CustomNavigationRailItem(item: NavigationItems, navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val isSelected by remember {
-        derivedStateOf {
-            navBackStackEntry?.destination?.route == item.route
-        }
+        derivedStateOf { navBackStackEntry?.destination?.route == item.route }
     }
     NavigationRailItem(
-        colors = NavigationRailItemDefaults.colors(
-            selectedIconColor = contentcol,
-            selectedTextColor = contentcol,
-            unselectedTextColor = contentcol.copy(0.4f),
-            unselectedIconColor = contentcol.copy(0.4f),
-        ),
-
+        colors =
+            NavigationRailItemDefaults.colors(
+                selectedIconColor = contentcol,
+                selectedTextColor = contentcol,
+                unselectedTextColor = contentcol.copy(0.4f),
+                unselectedIconColor = contentcol.copy(0.4f),
+            ),
         icon = {
             Icon(
                 imageVector = ImageVector.vectorResource(id = item.icon),
                 contentDescription = item.title,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         },
         label = { Text(item.title) },
         selected = isSelected,
         onClick = {
             navController.navigate(item.route) {
-                popUpTo(navController.graph.startDestinationId) {
-                    saveState = true
-                }
+                popUpTo(navController.graph.startDestinationId) { saveState = true }
                 launchSingleTop = true
                 restoreState = true
             }
-        }
+        },
     )
 }

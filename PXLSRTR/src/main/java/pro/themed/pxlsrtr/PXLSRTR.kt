@@ -24,11 +24,11 @@ import androidx.compose.ui.window.*
 import com.google.firebase.analytics.*
 import com.google.firebase.analytics.ktx.*
 import com.google.firebase.ktx.*
+import kotlin.math.*
+import kotlin.system.*
 import kotlinx.coroutines.*
 import pro.themed.PXLSRTR.R
 import pro.themed.pxlsrtr.ui.theme.*
-import kotlin.math.*
-import kotlin.system.*
 
 class PXLSRTRactivity : ComponentActivity() {
 
@@ -43,7 +43,12 @@ class PXLSRTRactivity : ComponentActivity() {
         } else {
             @Suppress("DEPRECATION") // Older API support
             window.decorView.systemUiVisibility =
-                (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN)
+                (View.SYSTEM_UI_FLAG_IMMERSIVE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN)
         }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -51,11 +56,8 @@ class PXLSRTRactivity : ComponentActivity() {
             PXLSRTRTheme {
                 val context = applicationContext
 
-
                 NoiseTest()
-                LaunchedEffect(key1 = Unit) {
-                    showRewarded(context) {}
-                }
+                LaunchedEffect(key1 = Unit) { showRewarded(context) {} }
             }
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -66,7 +68,6 @@ class PXLSRTRactivity : ComponentActivity() {
 @Composable
 fun NoiseTest() {
     var showDialog by remember { mutableStateOf(true) }
-
 
     var currentFrame by remember { mutableIntStateOf(0) }
     val emptyFrame = R.drawable.emptyframe
@@ -102,26 +103,40 @@ fun NoiseTest() {
             if (isMonochromeChecked) addAll(monochromeList)
             if (isMonochromeNoiseChecked) addAll(monochromeNoiseList)
             if (isMonochromeStrobeChecked) addAll(monochromeStrobeList)
-            if (!isNoiseChecked && !isGradientsChecked && !isBlobsChecked && !isHorizontalStripesChecked && !isVerticalStripesChecked && !isHorizontalLinesChecked && !isVerticalLinesChecked && !isHorizontalGradientsChecked && !isVerticalGradientsChecked && !isHueChecked && !isHueStrobeChecked && !isMonochromeChecked && !isMonochromeNoiseChecked && !isMonochromeStrobeChecked) add(
-                emptyFrame
+            if (
+                !isNoiseChecked &&
+                    !isGradientsChecked &&
+                    !isBlobsChecked &&
+                    !isHorizontalStripesChecked &&
+                    !isVerticalStripesChecked &&
+                    !isHorizontalLinesChecked &&
+                    !isVerticalLinesChecked &&
+                    !isHorizontalGradientsChecked &&
+                    !isVerticalGradientsChecked &&
+                    !isHueChecked &&
+                    !isHueStrobeChecked &&
+                    !isMonochromeChecked &&
+                    !isMonochromeNoiseChecked &&
+                    !isMonochromeStrobeChecked
             )
+                add(emptyFrame)
         }
         return list
     }
 
-    var currentList by remember {
-        mutableStateOf(
-            buildList()
-        )
-    }
-    var delay by remember { mutableLongStateOf(1000/60) }
+    var currentList by remember { mutableStateOf(buildList()) }
+    var delay by remember { mutableLongStateOf(1000 / 60) }
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-         if (VERSION.SDK_INT >= VERSION_CODES.M) {
-            delay = (1000 /  (context.getSystemService(DisplayManager::class.java).displays[0].refreshRate
-                .roundToLong()))
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
+            delay =
+                (1000 /
+                    (context
+                        .getSystemService(DisplayManager::class.java)
+                        .displays[0]
+                        .refreshRate
+                        .roundToLong()))
         }
-
     }
     LaunchedEffect(Unit) {
         while (true) {
@@ -144,101 +159,127 @@ fun NoiseTest() {
                     "EPILEPSY WARNING",
                     style = MaterialTheme.typography.headlineLarge,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
                 )
                 AdmobBanner(LocalContext.current)
                 @Composable
                 fun CheckRow(name: String, isChecked: Boolean, onClick: () -> Unit) {
                     Row(
-                        Modifier
-                            .clickable { onClick() ; minutes = minutes }
+                        Modifier.clickable {
+                                onClick()
+                                minutes = minutes
+                            }
                             .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically) {
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Checkbox(isChecked, onCheckedChange = { onClick() })
                         Text(name)
                     }
                 }
                 Box {
-                    Column(
-                        Modifier
-                            .fillMaxHeight(0.5f)
-                            .verticalScroll(verticalScroll)
-                    ) {
+                    Column(Modifier.fillMaxHeight(0.5f).verticalScroll(verticalScroll)) {
                         CheckRow("Noise", isNoiseChecked) {
-                            isNoiseChecked = !isNoiseChecked; currentList = buildList()
+                            isNoiseChecked = !isNoiseChecked
+                            currentList = buildList()
                         }
                         CheckRow("Gradients", isGradientsChecked) {
-                            isGradientsChecked = !isGradientsChecked; currentList = buildList()
+                            isGradientsChecked = !isGradientsChecked
+                            currentList = buildList()
                         }
                         CheckRow("Blobs", isBlobsChecked) {
-                            isBlobsChecked = !isBlobsChecked; currentList = buildList()
+                            isBlobsChecked = !isBlobsChecked
+                            currentList = buildList()
                         }
                         CheckRow("Horizontal Stripes", isHorizontalStripesChecked) {
-                            isHorizontalStripesChecked = !isHorizontalStripesChecked; currentList = buildList()
+                            isHorizontalStripesChecked = !isHorizontalStripesChecked
+                            currentList = buildList()
                         }
                         CheckRow("Vertical Stripes", isVerticalStripesChecked) {
-                            isVerticalStripesChecked = !isVerticalStripesChecked; currentList = buildList()
+                            isVerticalStripesChecked = !isVerticalStripesChecked
+                            currentList = buildList()
                         }
                         CheckRow("Horizontal Lines", isHorizontalLinesChecked) {
-                            isHorizontalLinesChecked = !isHorizontalLinesChecked; currentList = buildList()
+                            isHorizontalLinesChecked = !isHorizontalLinesChecked
+                            currentList = buildList()
                         }
                         CheckRow("Vertical Lines", isVerticalLinesChecked) {
-                            isVerticalLinesChecked = !isVerticalLinesChecked; currentList = buildList()
+                            isVerticalLinesChecked = !isVerticalLinesChecked
+                            currentList = buildList()
                         }
                         CheckRow("Horizontal Gradients", isHorizontalGradientsChecked) {
-                            isHorizontalGradientsChecked = !isHorizontalGradientsChecked; currentList = buildList()
+                            isHorizontalGradientsChecked = !isHorizontalGradientsChecked
+                            currentList = buildList()
                         }
                         CheckRow("Vertical Gradients", isVerticalGradientsChecked) {
-                            isVerticalGradientsChecked = !isVerticalGradientsChecked; currentList = buildList()
+                            isVerticalGradientsChecked = !isVerticalGradientsChecked
+                            currentList = buildList()
                         }
-                        CheckRow("Hue", isHueChecked) { isHueChecked = !isHueChecked; currentList = buildList() }
+                        CheckRow("Hue", isHueChecked) {
+                            isHueChecked = !isHueChecked
+                            currentList = buildList()
+                        }
                         CheckRow("Hue Strobe", isHueStrobeChecked) {
-                            isHueStrobeChecked = !isHueStrobeChecked; currentList = buildList()
+                            isHueStrobeChecked = !isHueStrobeChecked
+                            currentList = buildList()
                         }
                         CheckRow("Monochrome", isMonochromeChecked) {
-                            isMonochromeChecked = !isMonochromeChecked; currentList = buildList()
+                            isMonochromeChecked = !isMonochromeChecked
+                            currentList = buildList()
                         }
                         CheckRow("Monochrome Noise", isMonochromeNoiseChecked) {
-                            isMonochromeNoiseChecked = !isMonochromeNoiseChecked; currentList = buildList()
+                            isMonochromeNoiseChecked = !isMonochromeNoiseChecked
+                            currentList = buildList()
                         }
                         CheckRow("Monochrome Strobe", isMonochromeStrobeChecked) {
-                            isMonochromeStrobeChecked = !isMonochromeStrobeChecked; currentList = buildList()
+                            isMonochromeStrobeChecked = !isMonochromeStrobeChecked
+                            currentList = buildList()
                         }
                     }
                     Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surface),
-                                    startY = 0f,
-                                    endY = 1000f,
-                                    tileMode = TileMode.Clamp
-                                ), alpha = 1f - (verticalScroll.value.toFloat() / verticalScroll.maxValue.toFloat())
-                            )
-                    ) {}
-                    Column(modifier = Modifier
-                        .graphicsLayer { scaleY = -1f }
-                        .align(Alignment.TopCenter)) {
-
-                        Column(
-                            modifier = Modifier
-
+                        modifier =
+                            Modifier.align(Alignment.BottomCenter)
                                 .fillMaxWidth()
                                 .height(100.dp)
                                 .background(
                                     Brush.verticalGradient(
-                                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surface),
+                                        colors =
+                                            listOf(
+                                                Color.Transparent,
+                                                MaterialTheme.colorScheme.surface
+                                            ),
                                         startY = 0f,
                                         endY = 1000f,
                                         tileMode = TileMode.Clamp
-                                    ), alpha = (verticalScroll.value.toFloat() / verticalScroll.maxValue.toFloat())
+                                    ),
+                                    alpha =
+                                        1f -
+                                            (verticalScroll.value.toFloat() /
+                                                verticalScroll.maxValue.toFloat())
                                 )
-
+                    ) {}
+                    Column(
+                        modifier =
+                            Modifier.graphicsLayer { scaleY = -1f }.align(Alignment.TopCenter)
+                    ) {
+                        Column(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .height(100.dp)
+                                    .background(
+                                        Brush.verticalGradient(
+                                            colors =
+                                                listOf(
+                                                    Color.Transparent,
+                                                    MaterialTheme.colorScheme.surface
+                                                ),
+                                            startY = 0f,
+                                            endY = 1000f,
+                                            tileMode = TileMode.Clamp
+                                        ),
+                                        alpha =
+                                            (verticalScroll.value.toFloat() /
+                                                verticalScroll.maxValue.toFloat())
+                                    )
                         ) {}
                     }
                 }
@@ -252,77 +293,74 @@ fun NoiseTest() {
                     )
                 }
                 Row(
-                    Modifier
-                        .fillMaxWidth()
+                    Modifier.fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-
-                    Button(onClick = {
-                        isNoiseChecked = true
-                        isGradientsChecked = true
-                        isBlobsChecked = true
-                        isHorizontalStripesChecked = true
-                        isVerticalStripesChecked = true
-                        isHorizontalLinesChecked = true
-                        isVerticalLinesChecked = true
-                        isHorizontalGradientsChecked = true
-                        isVerticalGradientsChecked = true
-                        isHueChecked = true
-                        isHueStrobeChecked = true
-                        isMonochromeChecked = true
-                        isMonochromeNoiseChecked = true
-                        isMonochromeStrobeChecked = true
-                        currentList = buildList()
-                        showDialog = false
-                        minutes = minutes
-                    }) {
+                    Button(
+                        onClick = {
+                            isNoiseChecked = true
+                            isGradientsChecked = true
+                            isBlobsChecked = true
+                            isHorizontalStripesChecked = true
+                            isVerticalStripesChecked = true
+                            isHorizontalLinesChecked = true
+                            isVerticalLinesChecked = true
+                            isHorizontalGradientsChecked = true
+                            isVerticalGradientsChecked = true
+                            isHueChecked = true
+                            isHueStrobeChecked = true
+                            isMonochromeChecked = true
+                            isMonochromeNoiseChecked = true
+                            isMonochromeStrobeChecked = true
+                            currentList = buildList()
+                            showDialog = false
+                            minutes = minutes
+                        }
+                    ) {
                         Text("Enable all")
                     }
-                    Button(onClick = {
-                        isNoiseChecked = true
-                        isGradientsChecked = true
-                        isBlobsChecked = true
-                        isHorizontalStripesChecked = true
-                        isVerticalStripesChecked = true
-                        isHorizontalLinesChecked = true
-                        isVerticalLinesChecked = true
-                        isHorizontalGradientsChecked = true
-                        isVerticalGradientsChecked = true
-                        isHueChecked = true
-                        isHueStrobeChecked = true
-                        isMonochromeChecked = true
-                        isMonochromeNoiseChecked = true
-                        isMonochromeStrobeChecked = true
-                        currentList = buildList().shuffled()
-                        showDialog = false
-                        minutes = minutes
-                    }) {
+                    Button(
+                        onClick = {
+                            isNoiseChecked = true
+                            isGradientsChecked = true
+                            isBlobsChecked = true
+                            isHorizontalStripesChecked = true
+                            isVerticalStripesChecked = true
+                            isHorizontalLinesChecked = true
+                            isVerticalLinesChecked = true
+                            isHorizontalGradientsChecked = true
+                            isVerticalGradientsChecked = true
+                            isHueChecked = true
+                            isHueStrobeChecked = true
+                            isMonochromeChecked = true
+                            isMonochromeNoiseChecked = true
+                            isMonochromeStrobeChecked = true
+                            currentList = buildList().shuffled()
+                            showDialog = false
+                            minutes = minutes
+                        }
+                    ) {
                         Text("Randomize!")
                     }
-
                 }
             }
         }
     }
-    val imageBitmap =  ImageBitmap.imageResource(currentList[if (currentList.size <= currentFrame) 0 else currentFrame])
+    val imageBitmap =
+        ImageBitmap.imageResource(
+            currentList[if (currentList.size <= currentFrame) 0 else currentFrame]
+        )
 
-    Canvas(modifier = Modifier
-        .fillMaxSize()
-        .clickable { showDialog = true }) {
-        val paint = Paint().asFrameworkPaint().apply {
-            isAntiAlias = false
-            shader = ImageShader(
+    Canvas(modifier = Modifier.fillMaxSize().clickable { showDialog = true }) {
+        val paint =
+            Paint().asFrameworkPaint().apply {
+                isAntiAlias = false
+                shader = ImageShader(imageBitmap, TileMode.Mirror, TileMode.Mirror)
+            }
 
-                imageBitmap, TileMode.Mirror, TileMode.Mirror
-            )
-        }
-
-        drawIntoCanvas {
-            it.nativeCanvas.drawPaint(paint)
-        }
+        drawIntoCanvas { it.nativeCanvas.drawPaint(paint) }
         paint.reset()
     }
-
 }

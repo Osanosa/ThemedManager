@@ -19,76 +19,78 @@ import androidx.compose.ui.unit.sp
 fun ThemedManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, content: @Composable () -> Unit
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
-    val DarkColorScheme = darkColorScheme(
-        surface = background,
-        background = background,
+    val DarkColorScheme =
+        darkColorScheme(
+            surface = background,
+            background = background,
+            onSurface = pro.themed.manager.ui.theme.contentcol,
+            onBackground = pro.themed.manager.ui.theme.contentcol,
+            onPrimary = pro.themed.manager.ui.theme.contentcol,
+            onPrimaryContainer = pro.themed.manager.ui.theme.contentcol,
+        )
 
-        onSurface = pro.themed.manager.ui.theme.contentcol,
-        onBackground = pro.themed.manager.ui.theme.contentcol,
-        onPrimary = pro.themed.manager.ui.theme.contentcol,
-        onPrimaryContainer = pro.themed.manager.ui.theme.contentcol,
-    )
+    val LightColorScheme =
+        lightColorScheme(
+            surface = background,
+            background = background,
+            onSurface = pro.themed.manager.ui.theme.contentcol,
+            onBackground = pro.themed.manager.ui.theme.contentcol,
 
-    val LightColorScheme = lightColorScheme(
-        surface = background,
-        background = background,
-        onSurface = pro.themed.manager.ui.theme.contentcol,
-        onBackground = pro.themed.manager.ui.theme.contentcol,
-
-        /* Other default colors to override
-        primary = Purple40,
-        secondary = PurpleGrey40,
-        tertiary = Pink40
-        background = Color(0xFFFFFBFE),
-        surface = Color(0xFFFFFBFE),
-        onPrimary = Color.White,
-        onSecondary = Color.White,
-        onTertiary = Color.White,
-        onBackground = Color(0xFF1C1B1F),
-        onSurface = Color(0xFF1C1B1F),
-        */
-    )
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            /* Other default colors to override
+            primary = Purple40,
+            secondary = PurpleGrey40,
+            tertiary = Pink40
+            background = Color(0xFFFFFBFE),
+            surface = Color(0xFFFFFBFE),
+            onPrimary = Color.White,
+            onSecondary = Color.White,
+            onTertiary = Color.White,
+            onBackground = Color(0xFF1C1B1F),
+            onSurface = Color(0xFF1C1B1F),
+            */
+        )
+    val colorScheme =
+        when {
+            dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                val context = LocalContext.current
+                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            }
+            darkTheme -> DarkColorScheme
+            else -> LightColorScheme
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     // Set of Material typography styles to start with
-    val Typography = Typography(
-        bodyLarge = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            letterSpacing = 0.5.sp,
-            color = pro.themed.manager.ui.theme.contentcol
+    val Typography =
+        Typography(
+            bodyLarge =
+                TextStyle(
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    letterSpacing = 0.5.sp,
+                    color = pro.themed.manager.ui.theme.contentcol,
+                )
+            /* Other default text styles to override
+            titleLarge = TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Normal,
+                fontSize = 22.sp,
+                lineHeight = 28.sp,
+                letterSpacing = 0.sp
+            ),
+            labelSmall = TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Medium,
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
+                letterSpacing = 0.5.sp
+            )
+            */
         )
-        /* Other default text styles to override
-        titleLarge = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
-            letterSpacing = 0.sp
-        ),
-        labelSmall = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Medium,
-            fontSize = 11.sp,
-            lineHeight = 16.sp,
-            letterSpacing = 0.5.sp
-        )
-        */
-    )
 
-    MaterialTheme(
-        colorScheme = colorScheme, typography = Typography, content = content
-    )
+    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }

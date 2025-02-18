@@ -33,11 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaredrummler.ktsh.Shell
+import kotlin.math.roundToInt
 import pro.themed.manager.MainActivity.Companion.overlayList
 import pro.themed.manager.R
 import pro.themed.manager.utils.overlayEnable
-import kotlin.math.roundToInt
-
 
 @Stable
 @ExperimentalMaterial3Api
@@ -49,7 +48,7 @@ fun Slideritem(
     sliderStepValue: Int,
     minSliderValue: Float,
     maxSliderValue: Float,
-    overlayName: String
+    overlayName: String,
 ) {
     val context = LocalContext.current
     var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
@@ -57,78 +56,70 @@ fun Slideritem(
 
     sliderPosition = sliderPosition.coerceIn(minSliderValue, maxSliderValue)
     intvalue = intvalue.coerceIn(minSliderValue.toInt(), maxSliderValue.toInt())
-    if (overlayList.overlayList.any { it.contains(overlayName) } && !overlayList.unsupportedOverlays.any {
-            it.contains(
-                overlayName
-            )
-        }) {
+    if (
+        overlayList.overlayList.any { it.contains(overlayName) } &&
+            !overlayList.unsupportedOverlays.any { it.contains(overlayName) }
+    ) {
 
         Column(
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         ) {
             Row(
                 Modifier.fillMaxWidth(),
                 // horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painterResource(id = drawable),
                     contentDescription = "",
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(24.dp)
+                    Modifier.padding(horizontal = 16.dp).size(24.dp),
                 )
                 Column {
-                    Text(
-                        text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp
-                    )
+                    Text(text = header, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "Value: $intvalue")
-
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(modifier = Modifier, onClick = {
-                    intvalue = 0; sliderPosition = intvalue.toFloat()
-                    Shell("su").run("for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done")
-                }) {
+                IconButton(
+                    modifier = Modifier,
+                    onClick = {
+                        intvalue = 0
+                        sliderPosition = intvalue.toFloat()
+                        Shell("su")
+                            .run(
+                                "for ol in \$(cmd overlay list | grep -E 'themed.$overlayName' | grep  -E '^.x'  | sed -E 's/^....//'); do cmd overlay disable \"\$ol\"; done"
+                            )
+                    },
+                ) {
                     Image(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .size(24.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp).size(24.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.reset),
                         contentDescription = null,
                     )
                 }
-
             }
-            Row(
-                Modifier, verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            intvalue -= sliderStepValue; sliderPosition = intvalue.toFloat()
-                            Toast
-                                .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                .show()
+                    modifier =
+                        Modifier.padding(horizontal = 16.dp).clickable {
+                            intvalue -= sliderStepValue
+                            sliderPosition = intvalue.toFloat()
+                            Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
                             overlayEnable("$overlayName$intvalue")
-
                         },
                     imageVector = ImageVector.vectorResource(id = R.drawable.remove_48px),
                     contentDescription = null,
                 )
 
-                Slider(modifier = Modifier
-                    .height(16.dp)
-                    .weight(1f)
-                    .padding(0.dp),
+                Slider(
+                    modifier = Modifier.height(16.dp).weight(1f).padding(0.dp),
                     value = sliderPosition,
-                    onValueChange = { sliderPosition = it; intvalue = it.roundToInt() },
+                    onValueChange = {
+                        sliderPosition = it
+                        intvalue = it.roundToInt()
+                    },
                     valueRange = minSliderValue..maxSliderValue,
                     onValueChangeFinished = {
                         Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
@@ -137,28 +128,27 @@ fun Slideritem(
                     steps = sliderSteps,
                     thumb = {
                         Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.fiber_manual_record_48px),
+                            imageVector =
+                                ImageVector.vectorResource(
+                                    id = R.drawable.fiber_manual_record_48px
+                                ),
                             contentDescription = null,
                         )
-
-                    })
+                    },
+                )
 
                 Image(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            intvalue += sliderStepValue; sliderPosition = intvalue.toFloat()
-                            Toast
-                                .makeText(context, "$intvalue", Toast.LENGTH_SHORT)
-                                .show()
+                    modifier =
+                        Modifier.padding(horizontal = 16.dp).clickable {
+                            intvalue += sliderStepValue
+                            sliderPosition = intvalue.toFloat()
+                            Toast.makeText(context, "$intvalue", Toast.LENGTH_SHORT).show()
                             overlayEnable("$overlayName$intvalue")
                         },
                     imageVector = ImageVector.vectorResource(id = R.drawable.add_48px),
                     contentDescription = null,
                 )
-
             }
         }
-
     }
 }

@@ -42,22 +42,26 @@ class SystemuiWidget : GlanceAppWidget() {
                 Column(
                     modifier = GlanceModifier.wrapContentSize(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "Restart systemUI",
-                        modifier = GlanceModifier.padding(12.dp)
-                            .background(GlanceTheme.colors.primary).wrapContentSize()
-                            .clickable(onClick = action { Shell("su").run("killall com.android.systemui") }),
-                        style = TextStyle(
-                            color = GlanceTheme.colors.background,
-                            textAlign = TextAlign.Center
-                        )
+                        modifier =
+                            GlanceModifier.padding(12.dp)
+                                .background(GlanceTheme.colors.primary)
+                                .wrapContentSize()
+                                .clickable(
+                                    onClick =
+                                        action { Shell("su").run("killall com.android.systemui") }
+                                ),
+                        style =
+                            TextStyle(
+                                color = GlanceTheme.colors.background,
+                                textAlign = TextAlign.Center,
+                            ),
                     )
-
                 }
             }
         }
     }
-
 }
