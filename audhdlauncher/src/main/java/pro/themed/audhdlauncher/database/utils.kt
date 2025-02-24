@@ -46,7 +46,7 @@ fun getSortedAppsByCategory(
     // Apps from categories that don’t meet the minimum threshold will be orphaned.
     val orphanApps = mutableListOf<ResolveInfo>()
     // Define a minimum count threshold; categories with fewer apps are discarded.
-    val minAppsPerCategory = 2
+    val minAppsPerCategory = 6
 
     categories.forEach { category ->
         // Get apps for this category (using your filtering logic).
