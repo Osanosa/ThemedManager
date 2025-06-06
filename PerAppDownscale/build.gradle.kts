@@ -1,5 +1,5 @@
-import java.text.*
-import java.util.*
+import java.text.SimpleDateFormat
+import java.util.Date
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,7 +12,7 @@ plugins {
 
 android {
     namespace = "pro.themed.perappdownscale"
-    compileSdk = 35
+    compileSdk = 36
     signingConfigs {
         create("release") {
             storeFile = file("${rootDir}/keystore/keystore.jks")
@@ -36,7 +36,7 @@ android {
     defaultConfig {
         applicationId = "pro.themed.perappdownscale"
         minSdk = 33
-        targetSdk = 35
+        targetSdk = 36
         versionCode = SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName = SimpleDateFormat("yy.MM.dd").format(Date()).toString()
 
@@ -71,7 +71,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -80,7 +80,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

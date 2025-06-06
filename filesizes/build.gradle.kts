@@ -1,5 +1,5 @@
-import java.text.*
-import java.util.*
+import java.text.SimpleDateFormat
+import java.util.Date
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,7 +12,7 @@ plugins {
 
 android {
     namespace = "pro.themed.filesizes"
-    compileSdk = 35
+    compileSdk = 36
 
     signingConfigs {
         create("release") {
@@ -27,7 +27,7 @@ android {
     defaultConfig {
         applicationId = "pro.themed.filesizes"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 36
         versionCode =  SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName =   SimpleDateFormat("yy.MM.dd").format(Date()).toString()
 
@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -72,7 +72,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -86,6 +86,8 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
     implementation (libs.firebase.firestore)
 
-    implementation ("com.google.accompanist:accompanist-permissions:0.37.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.37.2")
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+
 
 }

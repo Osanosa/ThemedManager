@@ -25,10 +25,11 @@ plugins {
 }
 
 rootProject.name = "Themed Manager"
-include(":app")
+include(":manager")
 include(":autorefreshrate")
 include(":PerAppDownscale")
 include(":PXLSRTR")
 include(":filesizes")
 
 include(":audhdlauncher")
+include(":mtk-bpf-patcher")
