@@ -66,7 +66,7 @@ class AppDataStoreRepository(private val context: Context) {
                 // Category exists - update its default include/exclude values
                 val existingCategory = getCategoryDetails(defaultCategory.name)
                 if (existingCategory != null) {
-                    // Update with default values but preserve customizations
+                    // Update default include/exclude fields from DefaultCategoryData, preserve other custom fields.
                     val updatedCategory =
                         existingCategory.copy(
                             defaultInclude = defaultCategory.defaultInclude,
@@ -92,56 +92,65 @@ class AppDataStoreRepository(private val context: Context) {
             .distinctUntilChanged()
 
     // Get apps sorted by category with launch counts
+    private fun performInitialCategorization(
+        categories: List<CategoryData>,
+        allApps: List<ResolveInfo>,
+        launchCounts: Map<String, Int>,
+        minAppsPerCategory: Int
+    ): Triple<MutableList<Pair<CategoryData, List<ResolveInfo>>>, MutableList<ResolveInfo>, MutableSet<String>> {
+        val categorizedAppLists = mutableListOf<Pair<CategoryData, List<ResolveInfo>>>()
+        val orphanApps = mutableListOf<ResolveInfo>()
+        val categorizedPackageNames = mutableSetOf<String>()
+
+        categories.forEach { category ->
+            val appsForCategory = filterAppsByCategory(category, allApps)
+            if (appsForCategory.isNotEmpty()) {
+                if (appsForCategory.size < minAppsPerCategory && category.name != "Uncategorized") { // Don't treat pre-existing "Uncategorized" as needing orphans
+                    orphanApps.addAll(appsForCategory)
+                } else {
+                    val sortedApps = appsForCategory.sortedByDescending {
+                        launchCounts["${it.activityInfo.packageName}_${category.name}"] ?: 0
+                    }.distinctBy { it.activityInfo.packageName }
+
+                    categorizedPackageNames.addAll(sortedApps.map { it.activityInfo.packageName })
+                    categorizedAppLists.add(category to sortedApps)
+                }
+            }
+        }
+        return Triple(categorizedAppLists, orphanApps, categorizedPackageNames)
+    }
+
+    private fun addUncategorizedApps(
+        allApps: List<ResolveInfo>,
+        orphanAppsFromCategorization: List<ResolveInfo>,
+        categorizedPackageNames: Set<String>,
+        finalCategorizedAppLists: MutableList<Pair<CategoryData, List<ResolveInfo>>>
+    ) {
+        val trulyUncategorizedApps = (allApps.filter { it.activityInfo.packageName !in categorizedPackageNames } +
+                                     orphanAppsFromCategorization.filter { it.activityInfo.packageName !in categorizedPackageNames })
+                                     .distinctBy { it.activityInfo.packageName }
+
+        if (trulyUncategorizedApps.isNotEmpty()) {
+            val uncategorizedCategory = CategoryData("Uncategorized") // Consider if this should be a predefined constant
+            finalCategorizedAppLists.add(uncategorizedCategory to trulyUncategorizedApps)
+        }
+    }
+
     fun getSortedAppsByCategory(): Flow<List<Pair<CategoryData, List<ResolveInfo>>>> =
         allCategories
             .combine(getAllLaunchCounts()) { categories, launchCounts ->
-                val totalTime1 = System.currentTimeMillis() - AuDHDLauncherActivity.startTime
-                Log.d("Performance", "started sorting apps: ${totalTime1}ms")
+                Log.d("Performance", "started sorting apps: ${System.currentTimeMillis() - AuDHDLauncherActivity.startTime}ms")
 
                 val allApps = getLaunchableApps(context)
-                val categorizedApps = mutableSetOf<String>()
-                val categoryAppLists = mutableListOf<Pair<CategoryData, List<ResolveInfo>>>()
-                val orphanApps = mutableListOf<ResolveInfo>()
-                val minAppsPerCategory = 6
+                val minAppsPerCategory = 6 // Could be a constant or configurable
 
-                // First pass - categorize apps based on filters
-                categories.forEach { category ->
-                    val apps = filterAppsByCategory(category, allApps)
+                val (initialCategorizedLists, orphanApps, categorizedPackages) =
+                    performInitialCategorization(categories, allApps, launchCounts, minAppsPerCategory)
 
-                    if (apps.isNotEmpty()) {
-                        if (apps.size < minAppsPerCategory) {
-                            orphanApps.addAll(apps)
-                        } else {
-                            // Sort by launch count
-                            val sortedApps =
-                                apps.sortedByDescending {
-                                    launchCounts["${it.activityInfo.packageName}_${category.name}"]
-                                        ?: 0
-                                }
-                            categorizedApps.addAll(sortedApps.map { it.activityInfo.packageName })
-                            categoryAppLists.add(
-                                category to sortedApps.distinctBy { it.activityInfo.packageName }
-                            )
-                        }
-                    }
-                }
+                addUncategorizedApps(allApps, orphanApps, categorizedPackages, initialCategorizedLists)
 
-                // Handle uncategorized apps
-                val uncategorizedApps =
-                    allApps.filter { it.activityInfo.packageName !in categorizedApps } +
-                        orphanApps.filter { it.activityInfo.packageName !in categorizedApps }
-
-                if (uncategorizedApps.isNotEmpty()) {
-                    val uncategorizedCategory = CategoryData("Uncategorized")
-                    categoryAppLists.add(
-                        uncategorizedCategory to
-                            uncategorizedApps.distinctBy { it.activityInfo.packageName }
-                    )
-                }
-
-                val totalTime2 = System.currentTimeMillis() - AuDHDLauncherActivity.startTime
-                Log.d("Performance", "finished sorting apps: ${totalTime2}ms")
-                categoryAppLists
+                Log.d("Performance", "finished sorting apps: ${System.currentTimeMillis() - AuDHDLauncherActivity.startTime}ms")
+                initialCategorizedLists // This is now the final list
             }
             .flowOn(Dispatchers.IO)
             .distinctUntilChanged()
@@ -233,37 +242,35 @@ class AppDataStoreRepository(private val context: Context) {
 
     private fun filterAppsByCategory(
         category: CategoryData,
-        apps: List<ResolveInfo>,
+        apps: List<ResolveInfo>
     ): List<ResolveInfo> {
         return apps.filter { app ->
             val packageName = app.activityInfo.packageName.lowercase()
 
-            // First pass - check default filters
-            val defaultIncluded =
-                category.defaultInclude?.split(",")?.any { packageName.contains(it.lowercase()) }
-                    ?: false
-            val defaultExcluded =
-                category.defaultExclude?.split(",")?.any { packageName.contains(it.lowercase()) }
-                    ?: false
-
-            // Only proceed to check custom filters if app passed default filters
-            if (defaultExcluded) return@filter false
-
-            // If not included by default filters, check custom filters
-            if (!defaultIncluded) {
-                val customIncluded =
-                    category.customInclude?.split(",")?.any { packageName.contains(it.lowercase()) }
-                        ?: false
-
-                if (!customIncluded) return@filter false
+            // Rule 1: Custom Exclude - if matched, always exclude.
+            if (category.customExclude?.split(",")?.any { packageName.contains(it.lowercase()) } == true) {
+                return@filter false
             }
 
-            // Final check - custom exclude overrides all includes
-            val customExcluded =
-                category.customExclude?.split(",")?.any { packageName.contains(it.lowercase()) }
-                    ?: false
+            // Rule 2: Default Exclude - if matched, always exclude (unless overridden by custom include).
+            val isDefaultExcluded = category.defaultExclude?.split(",")?.any { packageName.contains(it.lowercase()) } == true
+            val isCustomIncluded = category.customInclude?.split(",")?.any { packageName.contains(it.lowercase()) } == true
 
-            !customExcluded
+            if (isDefaultExcluded && !isCustomIncluded) {
+                return@filter false
+            }
+
+            // Rule 3: Inclusion logic
+            // If defaultInclude is specified, app must match it OR be customIncluded.
+            // If defaultInclude is NOT specified, app is considered included at this stage (unless customIncluded is specified and doesn't match).
+
+            val isDefaultIncluded = category.defaultInclude?.split(",")?.any { packageName.contains(it.lowercase()) }
+
+            when {
+                isCustomIncluded -> true // Custom include takes precedence
+                category.defaultInclude != null -> isDefaultIncluded == true // Must match default include if specified
+                else -> true // No default include specified, and not custom included (already checked), so included by default
+            }
         }
     }
 }

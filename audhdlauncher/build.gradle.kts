@@ -81,5 +81,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    // Koin for Android
+    implementation("io.insert-koin:koin-android:3.5.3")
+    // Koin for Jetpack Compose (if you're using Compose)
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
 }
