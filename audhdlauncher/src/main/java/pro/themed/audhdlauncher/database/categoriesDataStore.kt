@@ -83,13 +83,32 @@ class AppDataStoreRepository(private val context: Context) {
 
     // Get all categories as a Flow
     val allCategories: Flow<List<CategoryData>> =
-        context.categoriesDataStore.data
-            .map { preferences ->
-                val categoryNames = preferences[CATEGORY_NAMES_KEY] ?: emptySet()
-                categoryNames.mapNotNull { name -> getCategoryDetails(name) }
+        combine(
+            context.categoriesDataStore.data,
+            context.categoryDetailsDataStore.data // Add this
+        ) { categoryPrefs, detailPrefs -> // Preferences from both DataStores
+            val categoryNames = categoryPrefs[CATEGORY_NAMES_KEY] ?: emptySet()
+            categoryNames.mapNotNull { name ->
+                val detailKey = stringPreferencesKey(name)
+                val jsonString = detailPrefs[detailKey] // Read from the detailPrefs provided by combine
+                if (jsonString != null) {
+                    try {
+                        json.decodeFromString<CategoryData>(jsonString)
+                    } catch (e: Exception) {
+                        // Log error or handle corrupt data if necessary
+                        Log.e("AppDataStoreRepository", "Error decoding category: $name", e)
+                        null
+                    }
+                } else {
+                    // This case might happen if a category name exists but its details don't
+                    // Or if a detail key was removed but name list hasn't updated yet.
+                    // Depending on desired behavior, might log this.
+                    null
+                }
             }
-            .flowOn(Dispatchers.IO)
-            .distinctUntilChanged()
+        }
+        .flowOn(Dispatchers.IO)
+        .distinctUntilChanged()
 
     // Get apps sorted by category with launch counts
     private fun performInitialCategorization(
