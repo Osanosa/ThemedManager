@@ -3,6 +3,7 @@ package pro.themed.autorefreshrate
 import android.app.*
 import android.content.*
 import android.os.*
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -18,7 +19,13 @@ class AutoRefreshRateForegroundService : Service() {
     private var isMaxRate = false
     private val shell1 = Shell("su")
     private val shell2 = Shell("su")
-    private var isCountdownRunning = false
+    private var debounceJob: Job? = null
+    private var countdownJob: Job? = null
+    private val debounceTimeMillis = 100L // Debounce time in milliseconds
+
+    companion object {
+        private const val TAG = "AutoRefreshRateService"
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -56,21 +63,43 @@ class AutoRefreshRateForegroundService : Service() {
 
         shell1.run("getevent") {
             onStdOut = {
-                serviceScope.launch {
-                    // Reset countdown each time output is received
-                    var countdown = countdownReset
-                    if (!isCountdownRunning) {
-                        isCountdownRunning = true
+                debounceJob?.cancel() // Cancel any existing debounce job
+                debounceJob = serviceScope.launch {
+                    delay(debounceTimeMillis) // Wait for the debounce period
+
+                    countdownJob?.cancel() // Cancel existing countdown job
+                    countdownJob = serviceScope.launch {
+                        // Set to max rate if not already set
                         if (!isMaxRate) {
                             isMaxRate = true
-                            shell2.run("service call SurfaceFlinger 1035 i32 $maxRate")
+                            val command = "service call SurfaceFlinger 1035 i32 $maxRate"
+                            Log.d(TAG, "Executing: $command")
+                            val result = shell2.run(command)
+                            Log.d(TAG, "Command stdout: ${result.stdout()}")
+                            if (result.stderr().isNotBlank()) {
+                                Log.e(TAG, "Command stderr: ${result.stderr()}")
+                            }
+                            Log.d(TAG, "Command success: ${result.isSuccess}")
                         }
-                        while (countdown-- > 0) delay(1000)
-                        if (isMaxRate) {
-                            shell2.run("service call SurfaceFlinger 1035 i32 $minRate")
+
+                        // Start countdown
+                        var countdown = countdownReset
+                        while (countdown-- > 0) {
+                            delay(1000)
+                        }
+
+                        // If countdown finishes (not cancelled), set to min rate
+                        if (isMaxRate) { // Check ensures it was not cancelled and reset by another event
+                            val command = "service call SurfaceFlinger 1035 i32 $minRate"
+                            Log.d(TAG, "Executing: $command")
+                            val result = shell2.run(command)
+                            Log.d(TAG, "Command stdout: ${result.stdout()}")
+                            if (result.stderr().isNotBlank()) {
+                                Log.e(TAG, "Command stderr: ${result.stderr()}")
+                            }
+                            Log.d(TAG, "Command success: ${result.isSuccess}")
                             isMaxRate = false
                         }
-                        isCountdownRunning = false
                     }
                 }
             }
