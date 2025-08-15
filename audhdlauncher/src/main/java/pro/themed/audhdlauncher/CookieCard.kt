@@ -1,6 +1,6 @@
 package pro.themed.audhdlauncher
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +16,10 @@ import androidx.compose.ui.unit.dp
 import pro.themed.audhdlauncher.ui.theme.contentcol
 import pro.themed.audhdlauncher.ui.theme.cookieForeground
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xffffffff
+)
 @Composable
 fun CookieCard(
     modifier: Modifier = Modifier,
@@ -31,17 +34,21 @@ fun CookieCard(
     Surface(
         color = cookieForeground.copy(alpha = alpha), // Explicitly name alpha for clarity
         contentColor = contentcol,
-        shape = RoundedCornerShape(16.dp), // Apply shape directly to Surface
-        border = BorderStroke( // Use BorderStroke for clarity
+        shape = RoundedCornerShape(8.dp), // Apply shape directly to Surface
+
+        modifier = modifier.border(
+            // Use BorderStroke for clarity
             width = 8.dp,
+            shape = RoundedCornerShape(16.dp),
             color = cookieForeground.copy(alpha = (alpha - 0.2f).coerceAtLeast(0f)) // Ensure alpha doesn't go negative
-        ),
-        modifier = modifier, // Apply the passed-in modifier here
+
+
+        ).padding(8.dp), // Apply the passed-in modifier here
     ) {
         // The content is placed directly inside the Surface, padding can be part of the content's layout if needed,
         // or applied here if it's always required for CookieCard's content.
         // The manager version applies padding to an inner column. Let's follow that.
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier) {
             content()
         }
     }

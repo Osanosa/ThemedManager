@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PXLSRTR"
         tools:targetApi="31"
+
         >
         <service
             android:name="pro.themed.pxlsrtr.DreamServiceCompat"

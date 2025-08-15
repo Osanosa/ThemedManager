@@ -72,7 +72,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.accompanist.permissions)
-    implementation(libs.coil.compose)
     implementation(libs.accompanist.drawablepainter)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.rebugger)
@@ -82,8 +81,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Koin for Android
-    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-android:4.1.0")
     // Koin for Jetpack Compose (if you're using Compose)
-    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:4.1.0")
 
 }

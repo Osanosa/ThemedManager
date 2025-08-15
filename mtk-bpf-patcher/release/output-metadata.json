@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 250601,
-      "versionName": "25.06.01",
+      "versionCode": 250616,
+      "versionName": "25.06.16",
       "outputFile": "mtk-bpf-patcher-release.apk"
     }
   ],

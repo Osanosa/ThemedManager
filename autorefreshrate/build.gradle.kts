@@ -86,5 +86,5 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
     implementation (libs.firebase.firestore)
 
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
 }

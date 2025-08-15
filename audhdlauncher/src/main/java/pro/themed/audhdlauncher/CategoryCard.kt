@@ -2,6 +2,7 @@ package pro.themed.audhdlauncher
 
 import android.content.Context
 import android.content.pm.ResolveInfo
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -34,8 +35,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,12 +58,23 @@ fun CategoryCard(category: CategoryData, apps: List<ResolveInfo>, context: Conte
     var showdebugpopup by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
     val viewModel: LauncherViewModel = viewModel()
-    
+    val scope = rememberCoroutineScope()
+
+    // Trigger icon preloading when apps are available
+    LaunchedEffect(apps) {
+        if (apps.isNotEmpty()) {
+            Log.d("CategoryCard", "Preloading icons for ${category.name} (${apps.size} apps)")
+            IconLoader.preloadIcons(context, apps, scope) {
+                Log.d("CategoryCard", "Icon preload complete for ${category.name}")
+            }
+        }
+    }
+
     // Local state for the slider
-    var sliderPosition by remember(category.rows) { 
+    var sliderPosition by remember(category.rows) {
         mutableStateOf(category.rows.toFloat() - 1) // Convert to 0-4 range for slider
     }
-    
+
     // Show settings dialog on long click
     LaunchedEffect(showSettingsDialog) {
         if (showSettingsDialog) {
@@ -68,7 +82,7 @@ fun CategoryCard(category: CategoryData, apps: List<ResolveInfo>, context: Conte
             sliderPosition = category.rows.toFloat() - 1
         }
     }
-    
+
     CookieCard(
         modifier =
             Modifier.combinedClickable(
@@ -88,133 +102,119 @@ fun CategoryCard(category: CategoryData, apps: List<ResolveInfo>, context: Conte
             ) {
 
                 // Split apps into columns of 2 items each
-                apps.chunked(category.rows).forEach { columnApps ->
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-//                        // Add debug button for first column if uncategorized
-//                        if (
-//                            category.name == "Uncategorized" &&
-//                                columnApps == apps.chunked(category.rows).first()
-//                        ) {
-//                            IconButton(
-//                                onClick = { showdebugpopup = true },
-//                                colors =
-//                                    IconButtonDefaults.iconButtonColors(
-//                                        contentColor = Red,
-//                                        containerColor = White,
-//                                    ),
-//                            ) {
-//                                Icon(Icons.Default.Info, "Debug")
-//                            }
-//                            AnimatedVisibility(showdebugpopup) {
-//                                Dialog({ showdebugpopup = false }) {
-//                                    DebugList(category, apps, context)
-//                                }
-//                            }
-//                        }
-
-                        // Add the actual app icons
-                        columnApps.forEach { resolveInfo ->
-                            LaunchIcon(resolveInfo, category.name, context, Modifier)
+                apps.chunked(category.rows).forEachIndexed { columnIndex, columnApps ->
+                    key("column_${category.name}_$columnIndex") {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            // Add the actual app icons with keys for proper recomposition
+                            columnApps.forEach { resolveInfo ->
+                                key("${resolveInfo.activityInfo.packageName}_${category.name}") {
+                                    LaunchIcon(resolveInfo, category.name, context, Modifier)
+                                }
+                            }
                         }
                     }
                 }
             }
-        } else {
-            LazyHorizontalGrid(
-                rows = GridCells.Fixed(rowsInt),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier =
-                    Modifier.Companion.height((16 + (48 * rowsInt) + (8 * rowsInt - 1)).dp)
-                        .fillMaxWidth(),
-            ) {
-                if (category.name == "Uncategorized")
-                    item {
-                        IconButton(
-                            onClick = { showdebugpopup = true },
-                            colors =
-                                IconButtonDefaults.iconButtonColors(
-                                    contentColor = Red,
-                                    containerColor = White,
-                                ),
-                        ) {
-                            Icon(imageVector = Icons.Default.Info, contentDescription = "Debug")
-                        }
-                        AnimatedVisibility(showdebugpopup) {
-                            Dialog({ showdebugpopup = false }) {
-                                DebugList(category, apps, context)
+            } else {
+                LazyHorizontalGrid(
+                    rows = GridCells.Fixed(rowsInt),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier =
+                        Modifier.Companion.height((16 + (48 * rowsInt) + (8 * rowsInt - 1)).dp)
+                            .fillMaxWidth(),
+                ) {
+                    if (category.name == "Uncategorized")
+                        item {
+                            IconButton(
+                                onClick = { showdebugpopup = true },
+                                colors =
+                                    IconButtonDefaults.iconButtonColors(
+                                        contentColor = Red,
+                                        containerColor = White,
+                                    ),
+                            ) {
+                                Icon(imageVector = Icons.Default.Info, contentDescription = "Debug")
+                            }
+                            AnimatedVisibility(showdebugpopup) {
+                                Dialog({ showdebugpopup = false }) {
+                                    DebugList(category, apps, context)
+                                }
                             }
                         }
-                    }
-                items(apps, key = { it.activityInfo.packageName }) { resolveInfo ->
-                    Box(
-                        modifier =
-                            Modifier.animateItem(
-                                fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                                placementSpec =
-                                    spring(
-                                        stiffness = Spring.StiffnessVeryLow,
-                                        visibilityThreshold = IntOffset(1, 1),
-                                    ),
-                                fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                            )
-                    ) {
-                        LaunchIcon(resolveInfo, category.name, context, Modifier)
+
+                    items(apps) { resolveInfo ->
+                        key(resolveInfo) {
+
+                            Box(
+                                modifier =
+                                    Modifier.animateItem(
+                                        fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                                        placementSpec =
+                                            spring(
+                                                stiffness = Spring.StiffnessVeryLow,
+                                                visibilityThreshold = IntOffset(1, 1),
+                                            ),
+                                        fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                                    )
+                            ) {
+                                LaunchIcon(resolveInfo, category.name, context, Modifier)
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-    
-    // Category Settings Dialog
-    if (showSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showSettingsDialog = false },
-            title = { 
-                Text(
-                    "${category.name} Settings",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                ) 
-            },
-            text = {
-                Column {
-                    Text("Number of Rows: ${(sliderPosition + 1).toInt()}")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Slider(
-                        value = sliderPosition,
-                        onValueChange = { sliderPosition = it },
-                        valueRange = 0f..4f, // 1-5 rows (0-4 for 0-based)
-                        steps = 3, // Steps at 1, 2, 3, 4, 5
-                        modifier = Modifier.padding(horizontal = 8.dp)
+
+        // Category Settings Dialog
+        if (showSettingsDialog) {
+            AlertDialog(
+                onDismissRequest = { showSettingsDialog = false },
+                title = {
+                    Text(
+                        "${category.name} Settings",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
                     )
-                    // Add more settings here as needed
+                },
+                text = {
+                    Column {
+                        Text("Number of Rows: ${(sliderPosition + 1).toInt()}")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Slider(
+                            value = sliderPosition,
+                            onValueChange = { sliderPosition = it },
+                            valueRange = 0f..4f, // 1-5 rows (0-4 for 0-based)
+                            steps = 3, // Steps at 1, 2, 3, 4, 5
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                        // Add more settings here as needed
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val newRows = (sliderPosition + 1).toInt()
+                            if (newRows != category.rows) {
+                                viewModel.updateCategory(category.copy(rows = newRows))
+                            }
+                            showSettingsDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6200EE)
+                        )
+                    ) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showSettingsDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
                 }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val newRows = (sliderPosition + 1).toInt()
-                        if (newRows != category.rows) {
-                            viewModel.updateCategory(category.copy(rows = newRows))
-                        }
-                        showSettingsDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6200EE)
-                    )
-                ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showSettingsDialog = false }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
+            )
+        }
     }
-}

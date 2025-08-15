@@ -1,15 +1,31 @@
 package pro.themed.autorefreshrate
 
+<<<<<<< Updated upstream
 import android.app.*
 import android.content.*
 import android.os.*
+=======
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.IBinder
+import android.util.Log
+>>>>>>> Stashed changes
 import androidx.core.app.NotificationCompat
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jaredrummler.ktsh.Shell
-import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pro.themed.manager.autorefreshrate.R
+import java.util.concurrent.TimeUnit
 
 class AutoRefreshRateForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -18,7 +34,17 @@ class AutoRefreshRateForegroundService : Service() {
     private var isMaxRate = false
     private val shell1 = Shell("su")
     private val shell2 = Shell("su")
+<<<<<<< Updated upstream
     private var isCountdownRunning = false
+=======
+    private var debounceJob: Job? = null
+    private var countdownJob: Job? = null
+    private val debounceTimeMillis = 5L // Debounce time in milliseconds
+
+    companion object {
+        private const val TAG = "AutoRefreshRateService"
+    }
+>>>>>>> Stashed changes
 
     override fun onCreate() {
         super.onCreate()
@@ -51,9 +77,15 @@ class AutoRefreshRateForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         countdownReset = sharedPreferences.getInt("countdown", 3)
-        val minRate = sharedPreferences.getString("minRate", "0") ?: "0"
-        val maxRate = sharedPreferences.getString("maxRate", "0") ?: "0"
-
+        var minRate = sharedPreferences.getString("minRate", "0") ?: "0"
+        var maxRate = sharedPreferences.getString("maxRate", "0") ?: "0"
+        sharedPreferences.registerOnSharedPreferenceChangeListener { prefs, key ->
+            when (key) {
+                "countdown" -> countdownReset = prefs.getInt(key, 3)
+                "minRate" -> sharedPreferences.getString(key, "0")?.let { minRate = it }
+                "maxRate" -> sharedPreferences.getString(key, "0")?.let { maxRate = it }
+            }
+        }
         shell1.run("getevent") {
             onStdOut = {
                 serviceScope.launch {

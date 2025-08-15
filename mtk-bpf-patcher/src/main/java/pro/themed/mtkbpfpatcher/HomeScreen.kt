@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -38,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun HomeScreen(
@@ -71,6 +73,22 @@ fun HomeScreen(
     val viewModel: KernelPatcherViewModel = viewModel()
     val extractionLog = viewModel.getMagiskbootExtractionLog()
     
+    val context = LocalContext.current
+    
+    // SharedPreferences for first launch
+    val sharedPrefs = remember { 
+        context.getSharedPreferences("mtk_bpf_patcher_prefs", Context.MODE_PRIVATE)
+    }
+    var showAppInfoDialog by remember { mutableStateOf(false) }
+    
+    // Check for first launch
+    LaunchedEffect(Unit) {
+        val isFirstLaunch = !sharedPrefs.getBoolean("has_seen_info_dialog", false)
+        if (isFirstLaunch) {
+            showAppInfoDialog = true
+        }
+    }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +103,7 @@ fun HomeScreen(
             modifier = Modifier.padding(vertical = 8.dp),
             maxLines = 1
         )
-        val context = LocalContext.current
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -156,6 +174,11 @@ fun HomeScreen(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
         )
+        val versionName =
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        Text(
+            text = "v$versionName",
+        )
 
 
         Row(
@@ -171,7 +194,7 @@ fun HomeScreen(
                     context.startActivity(intent)
                 }) {
                 Text(text = "Join support group")
-            }
+            }   
             Button(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW)
@@ -180,8 +203,34 @@ fun HomeScreen(
                 }) {
                 Text(text = "Donate 😻")
             }
-
         }
+        
+        // App info button
+        OutlinedButton(
+            onClick = { showAppInfoDialog = true },
+            modifier = Modifier
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Info"
+                )
+                Text("What does this app do?")
+            }
+        }
+        
+        // Show app info dialog
+        AppInfoDialog(
+            showDialog = showAppInfoDialog,
+            onDismiss = { 
+                showAppInfoDialog = false
+                // Save that user has seen the dialog
+                sharedPrefs.edit().putBoolean("has_seen_info_dialog", true).apply()
+            }
+        )
 
 
         Divider(

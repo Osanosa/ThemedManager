@@ -18,14 +18,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import pro.themed.audhdlauncher.database.AppDataStoreRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +52,7 @@ fun InfoDialog(
     showpopup: Boolean,
     onDismiss: () -> Unit,
     context: Context,
+    categoryName: String = "",
 ) {
     AnimatedVisibility(showpopup) {
         Dialog({ onDismiss() }, DialogProperties(usePlatformDefaultWidth = true)) {
@@ -174,6 +182,46 @@ fun InfoDialog(
                         fontSize = 12.sp,
                         color = Color.Companion.Gray,
                     )
+                    
+                        // Launch count display and clear functionality
+    if (categoryName.isNotEmpty()) {
+        val scope = rememberCoroutineScope()
+        var launchCount by remember { mutableStateOf(0) }
+        val repository: AppDataStoreRepository = koinInject()
+        
+        // Load launch count for this app in this category using injected repository
+        LaunchedEffect(resolveInfo.activityInfo.packageName, categoryName) {
+            repository.getAllLaunchCounts().collect { launchCounts ->
+                launchCount = launchCounts["${resolveInfo.activityInfo.packageName}_$categoryName"] ?: 0
+            }
+        }
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Launch count: $launchCount",
+                                fontSize = 12.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.weight(1f)
+                            )
+                            
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Clear launch count",
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        scope.launch {
+                                            repository.clearAppLaunchCount(categoryName, resolveInfo.activityInfo.packageName)
+                                        }
+                                    }
+                            )
+                        }
+                    }
                 }
             }
         }

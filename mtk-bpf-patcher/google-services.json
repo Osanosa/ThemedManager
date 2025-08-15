@@ -1,0 +1,163 @@
+{
+  "project_info": {
+    "project_number": "379152595872",
+    "firebase_url": "https://themed-manager-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "themed-manager",
+    "storage_bucket": "themed-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:9f0971623de0773ab0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.PXLSRTR"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:8734b2367e3ce954b0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.filesizes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:3dde65de5a145845b0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-5920419856758740~3279041161"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:926a2acb3f242631b0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.manager.autorefreshrate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-5920419856758740~7975895306"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:83dbcfb3630ddeceb0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.mtkbpfpatcher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379152595872:android:d48297ea3faa6988b0c2c5",
+        "android_client_info": {
+          "package_name": "pro.themed.perappdownscale"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYR9NSde_EiSkX6--5povh8oWHzDENFGM"
+        },
+        {
+          "current_key": "AIzaSyAoq1ig0Q4QVVnuaQinzZGY6iJT2_VSrsg"
+        },
+        {
+          "current_key": "AIzaSyDh7rXdD_ENV_yV3YZqfh3cPxs9j2G2r8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

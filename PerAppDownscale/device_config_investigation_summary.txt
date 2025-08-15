@@ -1,0 +1,187 @@
+DEVICE_CONFIG INVESTIGATION SUMMARY
+=====================================
+Date: 2025-01-26
+App: PerAppDownscale (ThemedManager)
+
+OVERVIEW: ANDROID GAME PERFORMANCE CONTROL SYSTEMS
+
+Android has multiple game performance control mechanisms:
+1. Game Mode API (cmd game) - A12+ actual enforcement
+2. Game Mode Interventions (device_config game_overlay) - Storage only, no enforcement 
+3. ANGLE OpenGL driver control - A10+ functional
+
+TESTING RESULTS BY ANDROID VERSION
+
+Android 10-12 (API 29-32): NOT SUPPORTED (App min SDK is A13)
+
+Android 13+ (API 33+):
+- cmd game downscale: Reliable enforcement with visual effects, preset values (0.3-0.9, disable)
+- FPS throttling: Available via device_config game_overlay, ROM-dependent reliability
+- device_config syntax: mode=2,fps=90:mode=3,fps=30 (performance and battery modes)
+- Supported FPS values: 0,30,40,45,60,90,120 (depending on device)
+- ANGLE control: Fully functional via settings
+- Recommendation: Focus on cmd game downscale + ANGLE, FPS throttling optional
+
+CONFIRMED WORKING COMMANDS
+
+A13+ cmd game downscale (reliable enforcement):
+cmd game downscale 0.5 <package>  # Preset values: 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, disable
+cmd game mode battery <package>   # Modes: 1|2|3|standard|performance|battery
+
+A13+ ANGLE control:
+settings put global angle_gl_driver_selection_pkgs <package>
+settings put global angle_gl_driver_selection_values angle
+settings put global angle_gl_driver_selection_values native
+
+A13+ device_config commands (reference only, not useful for current implementation):
+device_config put game_overlay <package> "mode=2,fps=90:mode=3,fps=30"
+device_config put game_overlay <package> "mode=4,downscaleFactor=0.5,fps=30"
+device_config get game_overlay <package>
+device_config delete game_overlay <package>
+device_config list game_overlay
+
+CURRENT PERAPPDOWNSCALE IMPLEMENTATION ISSUES
+
+Current implementation uses non-functional commands:
+cmd game set --downscale 0.5 <package>     # Wrong syntax
+cmd game set --fps 60 <package>            # Wrong syntax  
+cmd game list-configs <package>            # Wrong syntax
+device_config put game_overlay <package> "downscale=0.5,fps=60"  # Wrong parameters
+
+Corrected A12+ implementation:
+cmd game downscale 0.5 <package>           # Correct syntax
+cmd game mode battery <package>            # Correct syntax
+device_config get game_overlay <package>   # Read-only system configs
+
+ARCHITECTURE CHANGES REQUIRED
+
+Version Detection:
+val hasGameService = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S // API 31+
+val hasFpsThrottling = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU // API 33+
+
+A13+ Implementation (Full Feature Set):
+- Primary: cmd game commands for downscale enforcement
+- Primary: device_config FPS throttling for frame rate control
+- Secondary: device_config reading for system config detection
+- Limitation: Preset downscale values, limited FPS options
+
+A12 Implementation (Limited):
+- Primary: cmd game commands for downscale enforcement only
+- Secondary: device_config reading for system config detection
+- Limitation: No FPS throttling support
+
+A10-A11 Implementation:
+- ANGLE controls only
+- Hide all downscale and FPS features
+- Version limitation message
+
+Game Intervention Manager:
+class GameInterventionManager {
+    fun setDownscale(packageName: String, downscale: Float) {
+        val presetValue = getClosestPreset(downscale)
+        shell.run("cmd game downscale $presetValue $packageName")
+    }
+    
+    fun setGameMode(packageName: String, mode: String) {
+        shell.run("cmd game mode $mode $packageName")
+    }
+    
+    fun getSystemConfigs(packageName: String): String? {
+        return shell.run("device_config get game_overlay $packageName").stdout()
+    }
+    
+    private fun getClosestPreset(value: Float): String {
+        val presets = listOf(0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.55f, 0.6f, 0.65f, 0.7f, 0.75f, 0.8f, 0.85f, 0.9f)
+        return presets.minByOrNull { kotlin.math.abs(it - value) }?.toString() ?: "disable"
+    }
+}
+
+UI CHANGES REQUIRED
+
+Replace granular slider (0.1-2.0) with preset buttons for A12+:
+- 0.3x, 0.35x, 0.4x, 0.45x, 0.5x, 0.55x, 0.6x, 0.65x, 0.7x, 0.75x, 0.8x, 0.85x, 0.9x, Reset
+
+Game mode buttons: Standard, Performance, Battery
+
+A10-A11: Only show ANGLE controls
+
+SYSTEM PRE-CONFIGURED GAMES
+
+A12 device had 100+ games pre-configured in device_config game_overlay with format:
+mode=3,downscaleFactor=0.75
+
+These are storage-only configurations, actual enforcement requires cmd game commands.
+
+IMPLEMENTATION PRIORITY
+
+1. Critical: Version detection and feature gating
+2. High: cmd game controls for A12+ enforcement  
+3. Medium: device_config reading for system config display
+4. Medium: ANGLE controls for all versions
+5. Low: Global game flags and diagnostics
+
+TESTING DEVICES
+
+Device 1 - Android 12+:
+- cmd game downscale: Visual effects confirmed
+- device_config game_overlay: Storage only, no visual effects
+- ANGLE control: Functional
+
+Device 2 - Android 11:  
+- device_config game_overlay: Storage only, no visual effects
+- cmd game: Service doesn't exist
+- ANGLE control: Functional
+
+Device 3 - Android 10:
+- device_config game_overlay: Storage only, no visual effects  
+- cmd game: Service doesn't exist
+- ANGLE control: Functional
+
+FINAL IMPLEMENTATION STRATEGY
+
+Based on extensive testing, PerAppDownscale should focus on reliable, working features:
+
+CORE FEATURES (RECOMMENDED):
+1. A13+ cmd game downscale - RELIABLE, consistent enforcement
+2. A13+ ANGLE control - RELIABLE, consistent functionality  
+3. Skip FPS throttling - UNRELIABLE, ROM-dependent, limited benefit
+4. Skip game mode system presets - UNNECESSARY complexity
+
+VERSION DETECTION:
+val hasGameDownscale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU // API 33+
+val hasAngleControl = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU // API 33+
+
+WORKING COMMANDS FOR IMPLEMENTATION:
+- cmd game downscale 0.5 <package>  (A13+ enforcement)
+- settings put global angle_gl_driver_selection_pkgs <package> (A13+ ANGLE)
+- settings put global angle_gl_driver_selection_values angle/native (A13+ ANGLE)
+
+DEVICE_CONFIG GAME FLAGS REFERENCE (A13+):
+
+ADPF (Android Dynamic Performance Framework) flags:
+- android.os.adpf_gpu_report_actual_work_duration: GPU performance reporting
+- android.os.adpf_prefer_power_efficiency: Prefer power efficiency over performance
+- android.os.adpf_use_fmq_channel: Use fast message queue for performance hints
+- android.os.allow_thermal_headroom_thresholds: Enable thermal management thresholds
+
+Game Mode and Frame Rate flags:
+- android.server.app.game_default_frame_rate: Enable game default frame rate management
+- android.server.app.disable_game_mode_when_app_top: Disable interventions when app is focused
+- com.android.graphics.surfaceflinger.flags.game_default_frame_rate: SurfaceFlinger game frame rate
+- com.android.settings.flags.development_game_default_frame_rate: Developer setting for frame rate
+
+Performance Hint flags:
+- com.android.server.power.hint.adpf_session_tag: Performance hint session tagging
+- com.android.server.power.hint.powerhint_thread_cleanup: Thread cleanup for power hints
+
+These flags control Android's game performance subsystem including:
+- Thermal management and power efficiency
+- Frame rate optimization and game mode interventions  
+- CPU/GPU performance hints and scheduling
+- Developer testing features
+
+CURRENT IMPLEMENTATION FIXES NEEDED:
+1. Replace cmd game set --downscale with cmd game downscale
+2. Remove all FPS-related controls (unreliable)
+3. Remove game mode buttons (unnecessary complexity)
+4. Focus UI on: downscale slider + ANGLE toggle + reset button 

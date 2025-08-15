@@ -2,44 +2,82 @@
 
 package pro.themed.autorefreshrate
 
-import android.app.*
-import android.content.*
-import android.content.Context.*
-import android.hardware.display.*
-import android.os.*
-import android.util.*
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
+import android.hardware.display.DisplayManager
+import android.os.Bundle
+import android.util.Log
 import android.view.Display
-import android.widget.*
-import androidx.activity.*
-import androidx.activity.compose.*
-import androidx.compose.animation.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.MarqueeSpacing
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.unit.*
-import com.google.firebase.analytics.*
-import com.google.firebase.analytics.ktx.*
-import com.google.firebase.crashlytics.ktx.*
-import com.google.firebase.database.*
-import com.google.firebase.ktx.*
-import com.jaredrummler.ktsh.*
-import java.security.*
-import kotlin.math.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.*
-import pro.themed.autorefreshrate.ui.theme.*
-import pro.themed.manager.autorefreshrate.R.*
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
+import com.jaredrummler.ktsh.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import pro.themed.autorefreshrate.ui.theme.ThemedManagerTheme
+import pro.themed.manager.autorefreshrate.R.drawable
+import java.security.MessageDigest
+import kotlin.math.roundToInt
 
 @Suppress("DEPRECATION") // Deprecated for third party Services.
 fun <T> Context.isServiceForegrounded(service: Class<T>) =
@@ -167,7 +205,11 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                     ?.trim('[', ']', ' ')
                         val modes =
                             displayManager.supportedModes
+
+                                .sortedByDescending { it.refreshRate }
+                                .distinctBy { it.refreshRate }
                                 .map { it.refreshRate.roundToInt() }
+
                                 .joinToString()
                         val rom =
                             gpList
@@ -461,7 +503,10 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                     }
                                 }
 
-                                val supportedModesArray = displayManager.supportedModes.withIndex()
+                                val supportedModesArray = displayManager.supportedModes
+                                    .withIndex()
+                                    .sortedByDescending { it.value.refreshRate }
+                                    .distinctBy { it.value.refreshRate }
                                 Text("Test supported modes:")
                                 FlowRow(
                                     horizontalArrangement = Arrangement.SpaceAround,
@@ -480,6 +525,50 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                                 }
                                             }
                                         )
+                                    }
+                                }
+                                var expanded by remember { mutableStateOf(false) }
+//TODO: перенести изменения в основную ветку
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 16.dp)
+                                ) {
+                                    Text(if (expanded) "Collapse all modes:" else "Expand all modes:",
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)).clickable {
+                                            expanded = !expanded
+                                        }.padding(16.dp)
+                                    )
+                                    AnimatedVisibility(visible = expanded) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            for ((index, mode) in supportedModesArray) {
+Row(
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.SpaceBetween,
+    modifier = Modifier.fillMaxWidth()
+        .clip(RoundedCornerShape(8.dp))
+        .background(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+        .clickable {
+        CoroutineScope(Dispatchers.IO).launch {
+            shell.run("$testCommand $index")
+            Thread.sleep(100)
+            currentRefreshRate = displayManager.refreshRate
+        }
+    }.padding(8.dp)
+) {
+    Column{
+        Text("Mode: ${mode.modeId -1}; Refresh rate: ${mode.refreshRate}")
+        Text("${mode.physicalHeight}x${mode.physicalWidth}")
+
+    }
+}                                            }
+                                        }
                                     }
                                 }
 

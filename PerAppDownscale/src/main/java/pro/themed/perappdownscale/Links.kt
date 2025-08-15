@@ -1,16 +1,18 @@
 package pro.themed.perappdownscale
 
-import android.content.*
-import android.net.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.vector.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import pro.themed.perappdownscale.R
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 
 @Composable
 fun LinkButtons(modifier: Modifier = Modifier) {
@@ -18,29 +20,43 @@ fun LinkButtons(modifier: Modifier = Modifier) {
         val context = LocalContext.current
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.t.me/ThemedSupport"))
 
-        IconButton(onClick = { context.startActivity(webIntent) }) {
+        IconButton(
+            onClick = { context.startActivity(webIntent) },
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+        ) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.telegram_logo),
-                contentDescription = "Telegram support group"
+                contentDescription = "Telegram support group",
             )
         }
 
         val webIntent1 =
             Intent(Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Osanosa/ThemedProject/"))
 
-        IconButton(onClick = { context.startActivity(webIntent1) }) {
+        IconButton(onClick = { context.startActivity(webIntent1) },
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.iconmonstr_github_1),
-                contentDescription = null
+                contentDescription = null,
             )
         }
 
         val webIntent2 = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themed.pro/"))
 
-        IconButton(onClick = { context.startActivity(webIntent2) }) {
+        IconButton(onClick = { context.startActivity(webIntent2) },
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.baseline_language_24),
-                contentDescription = null
+                contentDescription = null,
             )
         }
     }

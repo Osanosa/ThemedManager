@@ -253,10 +253,12 @@ class KernelPatcherViewModel : ViewModel() {
                 // Try to extract boot header information
                 var outputFilename = "patched_boot_${System.currentTimeMillis()}.img"
                 try {
-                    val headerInfo = magiskBootHelper.extractBootHeaderInfo(bootImage)
-                    if (headerInfo != null) {
-                        outputFilename = headerInfo.generateOutputFilename() + ".img"
-                        log("Generated output filename from boot header: $outputFilename", LogType.INFO)
+                    appContext?.let { context ->
+                        val headerInfo = magiskBootHelper.extractBootHeaderInfo(bootImage, context)
+                        if (headerInfo != null) {
+                            outputFilename = headerInfo.generateOutputFilename() + ".img"
+                            log("Generated output filename from boot header: $outputFilename", LogType.INFO)
+                        }
                     }
                 } catch (e: Exception) {
                     log("Failed to extract boot header info: ${e.message}", LogType.WARNING)
@@ -318,10 +320,12 @@ class KernelPatcherViewModel : ViewModel() {
                     // For boot images, try to extract header info
                     if (fileType == FileType.BOOT_IMAGE) {
                         try {
-                            val headerInfo = magiskBootHelper.extractBootHeaderInfo(inputFile)
-                            if (headerInfo != null) {
-                                outputFilename = headerInfo.generateOutputFilename() + ".img"
-                                log("Generated output filename from boot header: $outputFilename", LogType.INFO)
+                            appContext?.let { context ->
+                                val headerInfo = magiskBootHelper.extractBootHeaderInfo(inputFile, context)
+                                if (headerInfo != null) {
+                                    outputFilename = headerInfo.generateOutputFilename() + ".img"
+                                    log("Generated output filename from boot header: $outputFilename", LogType.INFO)
+                                }
                             }
                         } catch (e: Exception) {
                             log("Failed to extract boot header info: ${e.message}", LogType.WARNING)

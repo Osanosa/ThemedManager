@@ -271,4 +271,6 @@ val gamesList = listOf("adventure.rpg.anime.game.vng.ys6",
     "tw.sonet.allbw",
     "vng.games.revelation.mobile",
     "xd.sce.promotion",
-    "xyz.aethersx2.android",)
+    "xyz.aethersx2.android",
+    "com.mediocre.smashhit",
+    "com.mmo.android")

@@ -13,10 +13,10 @@ class LauncherViewModel(
     private val settingsDataStore: AppSettingsDataStore,
 ) : ViewModel() {
 
-    // UI state for categories and their apps
+    // UI state for categories and their apps - now using progressive loading
     val categorizedApps: StateFlow<List<Pair<CategoryData, List<ResolveInfo>>>> =
         repository
-            .getSortedAppsByCategory()
+            .getProgressivelySortedAppsByCategory()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),

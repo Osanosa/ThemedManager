@@ -15,11 +15,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +37,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,16 +55,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.firebase.FirebaseApp
 import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.flow.update
 import java.io.File
@@ -250,8 +257,10 @@ class BinaryPatcher {
                 }
             }
 
-            // If we match at least 75% of bytes, consider it a partial match
-            if (matches > pattern.size * 0.75 && matches > bestMatches) {
+
+
+            // If we match at least 50% of bytes, consider it a partial match
+            if (matches > pattern.size * 0.50 && matches > bestMatches) {
                 bestMatches = matches
                 bestOffset = i
             }
@@ -385,14 +394,14 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
      * Extract header information from boot image
      * @return BootHeaderInfo object with extracted information
      */
-    suspend fun extractBootHeaderInfo(bootImage: File): BootHeaderInfo? {
+    suspend fun extractBootHeaderInfo(bootImage: File, context: Context): BootHeaderInfo? {
         // Verify magiskboot is available first
         if (!verifyMagiskbootAvailable()) {
             logger("ERROR: Magiskboot is not available. Cannot extract header information.", LogType.ERROR)
             return null
         }
-        // Create a temporary directory for extraction
-        val tempDir = File("/data/local/tmp/header_extract").apply {
+        // Create a temporary directory for extraction in app cache
+        val tempDir = File(context.cacheDir, "header_extract_${System.currentTimeMillis()}").apply {
             if (exists()) deleteRecursively()
             mkdirs()
         }
@@ -403,7 +412,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
             
             // Create the unpack command with -h flag to output header info
             val headerCommand = "cd ${tempDir.absolutePath} && $magiskbootPath unpack -h ${bootImage.absolutePath}"
-            val result = executeWithRoot(headerCommand, "Extracting boot header info")
+            val result = shellHelper.runAndLog(headerCommand, "Extracting boot header info")
             
             // Header info is in the stdout/stderr output
             val output = result.stdout() + result.stderr()
@@ -500,15 +509,9 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
             }
 
             // Test the binary
-            val testResult = shellHelper.runAndLog("$magiskbootPath --help", "Test magiskboot")
+            val testResult = shell.run("$magiskbootPath --help")
             logBoth("Test exit code: ${testResult.exitCode}", LogType.INFO)
-            if (testResult.stdout().isNotEmpty()) {
-                val out = testResult.stdout()
-                logBoth("Test stdout: ${if (out.length > 100) out.substring(0, 100) + "..." else out}", LogType.INFO)
-            }
-            if (testResult.stderr().isNotEmpty()) {
-                logBoth("Test stderr: ${testResult.stderr()}", LogType.INFO)
-            }
+            // Don't log help output as it's verbose and not useful in logs
 
             val helpOk = testResult.isSuccess ||
                     testResult.stdout().contains("MagiskBoot") ||
@@ -582,7 +585,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
         // Verify the binary works by checking help text
         // No need for root here since we're running our bundled binary
         val testCommand = "$magiskbootPath --help"
-        val testResult = shellHelper.runAndLog(testCommand, "Verify magiskboot functionality")
+        val testResult = shell.run(testCommand)
         val helpTextPresent = testResult.stderr().contains("MagiskBoot") || 
                               testResult.stdout().contains("MagiskBoot")
         
@@ -613,7 +616,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
         }
         
         // Try a simple help command to verify the binary works
-        val testResult = shellHelper.runAndLog("$magiskbootPath --help", "Testing magiskboot binary")
+        val testResult = shell.run("$magiskbootPath --help")
         val helpTextPresent = testResult.stderr().contains("MagiskBoot") || 
                               testResult.stdout().contains("MagiskBoot")
         
@@ -638,13 +641,6 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
         // Log the magiskboot path to verify it's correct
         logger("Using magiskboot path: $magiskbootPath", LogType.INFO)
 
-        // Make sure we're in the extract directory
-        val cdResult = executeWithRoot("cd ${extractDir.absolutePath}", "Change to extract directory")
-        if (!cdResult.isSuccess) {
-            logger("Failed to change to extract directory", LogType.ERROR)
-            return false
-        }
-
         // Run magiskboot unpack command
         logger("Unpacking boot image using magiskboot", LogType.INFO)
         logger("Boot image: ${bootImage.absolutePath}", LogType.DEBUG)
@@ -653,7 +649,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
         val unpackCommand = "cd ${extractDir.absolutePath} && $magiskbootPath unpack -h ${bootImage.absolutePath}"
         logger("Running command: $unpackCommand", LogType.DEBUG)
         
-        val unpackResult = executeWithRoot(unpackCommand, "Unpacking boot image with magiskboot")
+        val unpackResult = shellHelper.runAndLog(unpackCommand, "Unpacking boot image with magiskboot")
 
         // Check output for compression format issues first
         val outputText = unpackResult.stderr() + unpackResult.stdout()
@@ -673,8 +669,8 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
                 if (format.isNotEmpty() && !supportedFormats.contains(format.lowercase())) {
                     logger("ERROR: Unsupported kernel compression format: $format", LogType.ERROR)
                     if (format.lowercase() == "xz" || format.lowercase() == "lzma") {
-                        logger("This boot image uses $format compression which is only partially supported.", LogType.ERROR)
-                        logger("This specific kernel can't be decompressed with our tools.", LogType.ERROR)
+                        logger("This boot image uses $format compression which is not supported.", LogType.ERROR)
+                        logger("This specific kernel can't be decompressed in current version.", LogType.ERROR)
                     } else {
                         logger("This boot image uses a compression format that magiskboot cannot decompress.", LogType.ERROR)
                     }
@@ -723,7 +719,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
             
             // Now extract with -n to get the compressed kernel
             logger("Trying unpack with -n flag (skip decompression)", LogType.INFO)
-            val noDecompressResult = executeWithRoot("cd ${extractDir.absolutePath} && $magiskbootPath unpack -n ${bootImage.absolutePath}", "Unpacking boot image without decompression")
+            val noDecompressResult = shellHelper.runAndLog("cd ${extractDir.absolutePath} && $magiskbootPath unpack -n ${bootImage.absolutePath}", "Unpacking boot image without decompression")
             shellHelper.logShellResult(noDecompressResult, "Unpacking boot image without decompression")
             
             // Check if the kernel was extracted (still compressed)
@@ -737,7 +733,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
                 // Try manual decompression with magiskboot
                 logger("Attempting manual decompression", LogType.INFO)
                 val decompressedKernel = File(extractDir, "kernel_decompressed")
-                val decompressResult = executeWithRoot(
+                val decompressResult = shellHelper.runAndLog(
                     "cd ${extractDir.absolutePath} && $magiskbootPath decompress ${compressedKernel.absolutePath} ${decompressedKernel.absolutePath}",
                     "Manually decompressing kernel"
                 )
@@ -746,7 +742,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
                 if (decompressResult.isSuccess && decompressedKernel.exists() && decompressedKernel.length() > 0) {
                     logger("Successfully decompressed kernel manually (${decompressedKernel.length()} bytes)", LogType.SUCCESS)
                     // Replace the original kernel with the decompressed one
-                    val moveResult = executeWithRoot("mv ${decompressedKernel.absolutePath} ${compressedKernel.absolutePath}", "Replacing compressed kernel")
+                    val moveResult = shellHelper.runAndLog("mv ${decompressedKernel.absolutePath} ${compressedKernel.absolutePath}", "Replacing compressed kernel")
                     if (!moveResult.isSuccess) {
                         logger("CRITICAL ERROR: Failed to replace compressed kernel with decompressed version", LogType.ERROR)
                         criticalErrorDetected = true
@@ -813,20 +809,13 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
         // Log the magiskboot path to verify it's correct
         logger("Using magiskboot path: $magiskbootPath", LogType.INFO)
 
-        // Make sure we're in the extract directory
-        val cdResult = executeWithRoot("cd ${extractDir.absolutePath}", "Change to extract directory")
-        if (!cdResult.isSuccess) {
-            logger("Failed to change to extract directory", LogType.ERROR)
-            return false
-        }
-
         // Run magiskboot repack command
         logger("Repacking boot image using magiskboot", LogType.INFO)
         logger("Original boot image: ${originalBootImage.absolutePath}", LogType.DEBUG)
         logger("Output boot image: ${outputBootImage.absolutePath}", LogType.DEBUG)
 
         val repackCommand = "cd ${extractDir.absolutePath} && $magiskbootPath repack ${originalBootImage.absolutePath} ${outputBootImage.absolutePath}"
-        val repackResult = executeWithRoot(repackCommand, "Repacking boot image with magiskboot")
+        val repackResult = shellHelper.runAndLog(repackCommand, "Repacking boot image with magiskboot")
 
         if (!repackResult.isSuccess) {
             logger("Failed to repack boot image", LogType.ERROR)
@@ -865,7 +854,7 @@ class MagiskBootHelper(private val shell: Shell, var logger: (String, LogType) -
             logger("Trying pattern: $pattern → $replacement", LogType.DEBUG)
 
             val hexpatchCommand = "$magiskbootPath hexpatch ${kernelFile.absolutePath} $pattern $replacement"
-            val hexpatchResult = executeWithRoot(hexpatchCommand, "magiskboot hexpatch")
+            val hexpatchResult = shellHelper.runAndLog(hexpatchCommand, "magiskboot hexpatch")
 
             if (hexpatchResult.isSuccess) {
                 val output = hexpatchResult.stdout().trim()
@@ -1231,7 +1220,7 @@ fun LogScreen(
                             "This boot image uses $formatMatch compression which is only partially supported." 
                         else 
                             "This boot image uses an unsupported compression format.",
-                        color = Color.Yellow,
+                        color = Color.Black,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -1240,7 +1229,7 @@ fun LogScreen(
                     if (isXzOrLzma) {
                         Text(
                             text = "This specific kernel can't be properly decompressed with our current tools.",
-                            color = Color.Yellow,
+                            color = Color.Black,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -1249,7 +1238,7 @@ fun LogScreen(
                     
                     Text(
                         text = "Please report this to the support group for assistance.",
-                        color = Color.Yellow,
+                        color = Color.Black,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -1353,6 +1342,164 @@ fun log(message: String, type: LogType) {
     android.util.Log.d("MTK-BPF-PATCHER", "[$type] $message")
 }
 
+/**
+ * CookieCard component for consistent card styling
+ */
+@Composable
+fun CookieCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .border(
+                width = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+            ),
+    ) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .padding(8.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * App information dialog explaining what the app does
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun AppInfoDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+
+    // SharedPreferences for first launch
+    val sharedPrefs = remember {
+        context.getSharedPreferences("mtk_bpf_patcher_prefs", Context.MODE_PRIVATE)
+    }
+    AnimatedVisibility(
+        visible = showDialog,
+        enter = fadeIn(animationSpec = tween(300)),
+        exit = fadeOut(animationSpec = tween(300))
+    ) {
+        Dialog(onDismissRequest = { if (!sharedPrefs.getBoolean("has_seen_info_dialog", false)) onDismiss}) {
+            CookieCard {
+                Column(
+                    modifier = Modifier.heightIn(max = 500.dp)
+                ) {
+
+                    
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {item{Text(
+                        text = "FAQ",
+                        style = MaterialTheme.typography.headlineLargeEmphasized,
+                        modifier = Modifier.padding( 16.dp)
+                    )}
+                        item {
+                            InfoSection(
+                                title = "What does this app do?",
+                                content = "This app patches MediaTek kernel images to fix connectivity issues on Android 12+ custom ROMs.\n\nMediaTek added a commit to fix memory errors but it accidentally broke network functionality.\n\nThis app reverts that problematic commit by replacing the bad code with NOPs."
+                            )
+                        }
+
+                        item {
+                            InfoSection(
+                                title = "What is BPF?",
+                                content = "BPF stands for Berkeley Packet Filter.\n\nIt acts like a firewall system in the Linux kernel that controls network packet filtering and processing.\n\nBPF decides which network packets are allowed through and which are blocked.\n\nWhen BPF breaks, your device can connect to WiFi or mobile networks but all internet requests get blocked because the firewall system is not working correctly."
+                            )
+                        }
+
+                        item {
+                            InfoSection(
+                                title = "What is the issue?",
+                                content = "MediaTek tried to fix ubsan errors in their BPF arraymap code but the fix they implemented broke memcpy calls.\n\nThis causes the BPF firewall system to malfunction.\n\nYour device shows connected to WiFi or mobile data but no network requests work - websites don't load, apps can't connect to internet, downloads fail.\n\nThe device appears connected but all traffic is silently dropped."
+                            )
+                        }
+
+                        item {
+                            InfoSection(
+                                title = "How the fix works",
+                                content = "The app looks for specific byte patterns in your kernel that match the problematic MediaTek commit.\n\nWhen found, it replaces those bytes with NOP instructions.\n\nNOP means \"no operation\" - it tells the processor to skip that function entirely.\n\nThis allows the original working memcpy function to run instead of the broken MediaTek fix."
+                            )
+                        }
+
+                        item {
+                            InfoSection(
+                                title = "When will this help?",
+                                content = "You have a MediaTek device running Android 12+ custom ROM based on LineageOS (most commonly) and you are experiencing network connectivity issues where you can connect to networks but cannot access internet.\n\nYour device kernel version is 4.14.x or 4.19.x.\n\nThe problems became much more common with Android 15 based ROMs but can occur on Android 12+ in some cases."
+                            )
+                        }
+
+                        item {
+                            InfoSection(
+                                title = "When won't this help?",
+                                content = "Your device is not MediaTek.\n\nYou are running stock ROM.\n\nYou are on Android 11 or older.\n\nYour network issues are caused by something else like DNS problems or other firewall blocking.\n\nYour kernel version is not 4.14.x or 4.19.x.\n\nYou cannot connect to networks at all or your SIM card is not detected.\n\nYour connectivity issues are different from the BPF arraymap bug."
+                            )
+                        }
+                        
+                        item {
+                            InfoSection(
+                                title = "Important notes",
+                                content = "This tool has only been tested with 4.14.x and 4.19.x kernels.\n\nOther kernel versions may use different instruction patterns.\n\nEven if you have 4.14 or 4.19, your kernel may have a different implementation which app won't know about, or use (at the moment) incompatible compression algorithm for kernel.\n\nYou need root access to flash the patched boot image back to your device if you wanna do it directly from the app (still requires testing but presumably works but if it doesnt just use twrp/fastboot/spft/whatever the fuck your device needs).\n\nIf boot was succesufully patched but you still have the issue try patching stock boot if you were trying it on rooted one.\n\nAlways backup your original boot image before flashing.\n\nThe issue became dramatically more frequent starting with Android 15 based custom ROMs."
+                            )
+                        }
+                        
+                        item {
+                            Button(
+                                onClick = onDismiss,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp)
+                            ) {
+                                Text("Close")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Helper composable for info sections
+ */
+@Composable
+private fun InfoSection(
+    title: String,
+    content: String
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = content,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
 class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -1364,6 +1511,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             val context = LocalContext.current
 

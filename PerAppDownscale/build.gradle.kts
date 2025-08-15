@@ -96,5 +96,5 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.inappmessaging.display)
 
-    implementation("androidx.compose.material:material-icons-core:1.7.7")
+    implementation(libs.androidx.material.icons.core)
 }
