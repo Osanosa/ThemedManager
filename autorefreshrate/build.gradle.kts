@@ -54,6 +54,8 @@ android {
     }
     buildFeatures {
         compose = true
+        aidl = true
+
     }
 }
 
@@ -78,6 +80,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.ktsh)
+    implementation("dev.rikka.shizuku:api:12.1.0")
+    implementation("dev.rikka.shizuku:provider:12.1.0")
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
     implementation(libs.firebase.crashlytics)
@@ -87,4 +91,7 @@ dependencies {
     implementation (libs.firebase.firestore)
 
     implementation("androidx.work:work-runtime-ktx:2.10.1")
+
+    implementation(libs.androidx.material.icons.core)
+
 }

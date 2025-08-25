@@ -15,11 +15,11 @@
       </SelectionState>
       <SelectionState runConfigName="PerAppDownscale">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-08-29T19:35:33.389845100Z">
+        <DropdownSelection timestamp="2025-08-22T08:52:49.512793400Z">
           <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.220.61:5555;connection=3cedb633" />
-            </handle>
+            <template>
+              <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=tokay/36" />
+            </template>
           </Target>
         </DropdownSelection>
         <DialogSelection />

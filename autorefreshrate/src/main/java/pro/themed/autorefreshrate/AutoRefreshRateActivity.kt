@@ -6,6 +6,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
@@ -64,11 +65,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ktx.Firebase
 import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import pro.themed.autorefreshrate.ui.theme.ThemedManagerTheme
 import pro.themed.manager.autorefreshrate.R.drawable
+import rikka.shizuku.Shizuku
 import java.security.MessageDigest
 import kotlin.math.roundToInt
 
@@ -89,6 +91,22 @@ fun <T> Context.isServiceForegrounded(service: Class<T>) =
 class AutoRefreshRateActivity : ComponentActivity() {
 
     private lateinit var analytics: FirebaseAnalytics
+    private lateinit var privilegedCommandHelper: PrivilegedCommandHelper
+    
+    private val shizukuPermissionResultListener = 
+        Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+            if (requestCode == REQUEST_CODE_SHIZUKU) {
+                if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Shizuku permission granted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Shizuku permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    
+    companion object {
+        private const val REQUEST_CODE_SHIZUKU = 1001
+    }
 
     @OptIn(ExperimentalStdlibApi::class, ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,11 +136,44 @@ class AutoRefreshRateActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        privilegedCommandHelper = PrivilegedCommandHelper(this)
+        Shizuku.addRequestPermissionResultListener(shizukuPermissionResultListener)
         setContent {
             val sharedPreferences =
                 this.applicationContext.getSharedPreferences("my_preferences", MODE_PRIVATE)
             val context = LocalContext.current
             ThemedManagerTheme {
+                var showModeDialog by remember { mutableStateOf(false) }
+                var selectedExecutionMode by remember { 
+                    mutableStateOf<PrivilegedCommandHelper.ExecutionMode?>(null) 
+                }
+                
+                // Check if we need to show the mode selection dialog
+                LaunchedEffect(Unit) {
+                    val savedMode = sharedPreferences.getInt("execution_mode", -1)
+                    if (savedMode == -1) {
+                        showModeDialog = true
+                    } else {
+                        selectedExecutionMode = when (savedMode) {
+                            0 -> PrivilegedCommandHelper.ExecutionMode.ROOT
+                            1 -> PrivilegedCommandHelper.ExecutionMode.SHIZUKU
+                            else -> null
+                        }
+                    }
+                }
+                
+                if (showModeDialog) {
+                    PrivilegedModeDialog(
+                        onDismiss = { showModeDialog = false },
+                        onModeSelected = { mode -> 
+                            selectedExecutionMode = mode
+                            showModeDialog = false
+                        },
+                        helper = privilegedCommandHelper
+                    )
+                }
+                
                 Toast.makeText(
                         context,
                         "YOUR FEEDBACK IS IMPORTANT AND VERY MUCH WELCOMED (on telegram or email)",
@@ -265,7 +316,6 @@ class AutoRefreshRateActivity : ComponentActivity() {
                         }
                     }
                     LaunchedEffect(displayManager) { Log.d("DISPLAY", displayManager.toString()) }
-                    var noRoot by remember { mutableStateOf(false) }
 
                     Column(
                         Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
@@ -273,7 +323,10 @@ class AutoRefreshRateActivity : ComponentActivity() {
                             .padding(horizontal = 16.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        AnimatedVisibility(noRoot) {
+                        // Check if we have a valid execution mode
+                        val hasPrivilegedAccess = selectedExecutionMode != null
+                        
+                        AnimatedVisibility(!hasPrivilegedAccess) {
                             Column {
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
@@ -299,7 +352,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                             }
                         }
 
-                        AnimatedVisibility(noRoot && unsupportedModes) {
+                        AnimatedVisibility(!hasPrivilegedAccess && unsupportedModes) {
                             Spacer(Modifier.height(8.dp))
                         }
                         AnimatedVisibility(unsupportedModes) {
@@ -316,7 +369,7 @@ class AutoRefreshRateActivity : ComponentActivity() {
                             }
                         }
 
-                        AnimatedVisibility(!noRoot && !unsupportedModes) {
+                        AnimatedVisibility(hasPrivilegedAccess && !unsupportedModes) {
                             Column {
                                 val clipboardManager: ClipboardManager =
                                     LocalClipboardManager.current
@@ -396,58 +449,16 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                     }
                                 }
 
-                                val shell =
-                                    Shell.SH.addOnStderrLineListener(
-                                        object : Shell.OnLineListener {
-                                            override fun onLine(line: String) {
-                                                CoroutineScope(Dispatchers.Main).launch {
-                                                    when {
-                                                        line.contains(
-                                                            "su: inaccessible or not found",
-                                                            ignoreCase = true
-                                                        ) ||
-                                                            line.contains(
-                                                                "permission denied",
-                                                                ignoreCase = true
-                                                            ) -> {
-                                                            noRoot = true
-                                                        }
-                                                        line.contains(
-                                                            "service stopped",
-                                                            ignoreCase = true
-                                                        ) -> {
-                                                            Toast.makeText(
-                                                                    context,
-                                                                    line,
-                                                                    Toast.LENGTH_SHORT
-                                                                )
-                                                                .show()
-                                                        }
-                                                        line.contains(
-                                                            "not stopped",
-                                                            ignoreCase = true
-                                                        ) -> {
-                                                            Toast.makeText(
-                                                                    context,
-                                                                    line,
-                                                                    Toast.LENGTH_SHORT
-                                                                )
-                                                                .show()
-                                                        }
-                                                        else -> shareStackTrace(line)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    )
-                                LaunchedEffect(Unit) { shell.run("su") }
-                                var showRate by remember {
-                                    mutableStateOf(
-                                        shell
-                                            .run("service call SurfaceFlinger 1034 i32 2")
-                                            .stdout()
-                                            .contains("1")
-                                    )
+                                var showRate by remember { mutableStateOf(false) }
+                                
+                                // Initialize show rate status
+                                LaunchedEffect(selectedExecutionMode) {
+                                    selectedExecutionMode?.let { mode ->
+                                        val result = privilegedCommandHelper.executeCommand(
+                                            "service call SurfaceFlinger 1034 i32 2", mode
+                                        )
+                                        showRate = result.output.contains("1")
+                                    }
                                 }
 
                                 Row(
@@ -461,14 +472,13 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                         onCheckedChange = {
                                             showRate = it
                                             CoroutineScope(Dispatchers.IO).launch {
-                                                if (it) {
-                                                    shell.run(
+                                                selectedExecutionMode?.let { mode ->
+                                                    val command = if (it) {
                                                         "service call SurfaceFlinger 1034 i32 1"
-                                                    )
-                                                } else {
-                                                    shell.run(
+                                                    } else {
                                                         "service call SurfaceFlinger 1034 i32 0"
-                                                    )
+                                                    }
+                                                    privilegedCommandHelper.executeCommand(command, mode)
                                                 }
                                             }
                                         }
@@ -519,9 +529,11 @@ class AutoRefreshRateActivity : ComponentActivity() {
                                             isSelected = displayManager.mode.modeId == index + 1,
                                             onClick = {
                                                 CoroutineScope(Dispatchers.IO).launch {
-                                                    shell.run("$testCommand $index")
-                                                    Thread.sleep(100)
-                                                    currentRefreshRate = displayManager.refreshRate
+                                                    selectedExecutionMode?.let { execMode ->
+                                                        privilegedCommandHelper.executeCommand("$testCommand $index", execMode)
+                                                        Thread.sleep(100)
+                                                        currentRefreshRate = displayManager.refreshRate
+                                                    }
                                                 }
                                             }
                                         )
@@ -556,9 +568,11 @@ Row(
         .background(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
         .clickable {
         CoroutineScope(Dispatchers.IO).launch {
-            shell.run("$testCommand $index")
-            Thread.sleep(100)
-            currentRefreshRate = displayManager.refreshRate
+            selectedExecutionMode?.let { execMode ->
+                privilegedCommandHelper.executeCommand("$testCommand $index", execMode)
+                Thread.sleep(100)
+                currentRefreshRate = displayManager.refreshRate
+            }
         }
     }.padding(8.dp)
 ) {
@@ -657,7 +671,7 @@ Row(
                                     Switch(
                                         checked = autoRateOnBoot,
                                         onCheckedChange = {
-                                            if (!noRoot) {
+                                            if (hasPrivilegedAccess) {
                                                 autoRateOnBoot = it
                                                 sharedPreferences
                                                     .edit()
@@ -687,10 +701,14 @@ Row(
                                 ) {
                                     Button(
                                         onClick = {
-                                            if (!noRoot)
-                                                shell.run(
-                                                    "am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService"
-                                                )
+                                            selectedExecutionMode?.let { execMode ->
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    privilegedCommandHelper.executeCommand(
+                                                        "am stop-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService",
+                                                        execMode
+                                                    )
+                                                }
+                                            }
                                             showInterstitial(context)
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 isRunning =
@@ -714,10 +732,14 @@ Row(
                                     }
                                     Button(
                                         onClick = {
-                                            if (!noRoot)
-                                                shell.run(
-                                                    "am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService"
-                                                )
+                                            selectedExecutionMode?.let { execMode ->
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    privilegedCommandHelper.executeCommand(
+                                                        "am start-foreground-service pro.themed.manager.autorefreshrate/pro.themed.autorefreshrate.AutoRefreshRateForegroundService",
+                                                        execMode
+                                                    )
+                                                }
+                                            }
                                             showInterstitial(context)
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 isRunning =
@@ -754,5 +776,10 @@ Row(
                 }
             }
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        Shizuku.removeRequestPermissionResultListener(shizukuPermissionResultListener)
     }
 }

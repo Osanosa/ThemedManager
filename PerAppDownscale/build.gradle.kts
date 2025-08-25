@@ -97,4 +97,8 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
 
     implementation(libs.androidx.material.icons.core)
+    
+    // Shizuku support
+    implementation("dev.rikka.shizuku:api:12.1.0")
+    implementation("dev.rikka.shizuku:provider:12.1.0")
 }

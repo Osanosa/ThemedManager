@@ -2,6 +2,7 @@
 
 package pro.themed.perappdownscale
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -44,6 +45,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -55,6 +57,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
@@ -72,6 +75,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -100,20 +104,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.jaredrummler.ktsh.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.themed.perappdownscale.ui.theme.ThemedManagerTheme
+import rikka.shizuku.Shizuku
 import kotlin.math.roundToInt
 
 class PerAppDownscaleActivity : ComponentActivity() {
     private lateinit var analytics: FirebaseAnalytics
+    
+    // Shizuku permission request result listener
+    private val permissionResultListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+            // Permission granted, handle accordingly
+            Toast.makeText(this, "Shizuku permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            // Permission denied
+            Toast.makeText(this, "Shizuku permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    // Shizuku binder received listener
+    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
+        // Shizuku binder is available - notify about status change
+        runOnUiThread {
+            Toast.makeText(this, "Shizuku service available", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    // Shizuku binder dead listener 
+    private val binderDeadListener = Shizuku.OnBinderDeadListener {
+        // Shizuku binder died - notify about status change
+        runOnUiThread {
+            Toast.makeText(this, "Shizuku service disconnected", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         analytics = Firebase.analytics
@@ -137,96 +172,150 @@ class PerAppDownscaleActivity : ComponentActivity() {
             val stackTrace = Log.getStackTraceString(throwable)
             scope.launch { shareStackTrace(stackTrace) }
         }
+        
+        // Add Shizuku listeners
+        Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        Shizuku.addBinderReceivedListener(binderReceivedListener)
+        Shizuku.addBinderDeadListener(binderDeadListener)
+        
         enableEdgeToEdge()
         setContent {
-            var noRoot by remember { mutableStateOf(false) }
             val context = LocalContext.current
             val prefs: SharedPreferences =
                 context.getSharedPreferences("app_tips", MODE_PRIVATE)
-            var showTip by remember {
-                mutableStateOf(!prefs.getBoolean("tip_dismissed", false))
+            
+            // Tips data
+            data class Tip(val id: String, val text: String)
+            val tips = listOf(
+                Tip("app_launch_tip", "💡 Tap any app icon to launch it directly"),
+                Tip("incompatibility_tip", "⚠️ If your device's ROM/OS has built-in game optimization features like Game Space, it is recommended to disable them altogether or remove selected games to avoid conflicts that might result in broken scaling")
+            )
+            
+            // Get active tips (not dismissed) - reactive to changes
+            var dismissedTips by remember { mutableStateOf(setOf<String>()) }
+            val activeTips = remember(dismissedTips) {
+                tips.filter { tip ->
+                    !prefs.getBoolean("${tip.id}_dismissed", false) && !dismissedTips.contains(tip.id)
+                }
             }
+            
             @Composable
-            fun TipBanner() {
-
-
-
-                    Surface(
-                        modifier =
-                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(12.dp),
+            fun TipBanner(tip: Tip) {
+                Surface(
+                    modifier =
+                        Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                        Text(
+                            text = tip.text,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(
+                            onClick = {
+                                prefs.edit().putBoolean("${tip.id}_dismissed", true).apply()
+                                dismissedTips = dismissedTips + tip.id
+                            },
+                            modifier = Modifier.size(32.dp),
                         ) {
-                            Text(
-                                text = "💡 Tip: Tap any app icon to launch it directly",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f),
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Dismiss tip",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
-                            IconButton(
-                                onClick = {
-                                    showTip = false
-                                    prefs.edit().putBoolean("tip_dismissed", true).apply()
-                                },
-                                modifier = Modifier.size(32.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Close,
-                                    contentDescription = "Dismiss tip",
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
-                            }
                         }
                     }
-
+                }
             }
 
             @Composable
             fun PerAppDownscale(modifier: Modifier = Modifier) {
 
                 val context = LocalContext.current
+                
+                // Privileged command helper and dialog states
+                val privilegedHelper = remember { PrivilegedCommandHelper() }
+                var showModeDialog by remember { mutableStateOf(false) }
+                var showSettingsDialog by remember { mutableStateOf(false) }
+                var shizukuAvailable by remember { mutableStateOf(false) }
+                var shizukuInstalled by remember { mutableStateOf(false) }
+                var rootAvailable by remember { mutableStateOf(false) }
+                var rootPermissionDenied by remember { mutableStateOf(false) }
+                val lifecycleOwner = LocalLifecycleOwner.current
+                val coroutineScope = rememberCoroutineScope()
+                
+                // Function to check availability status
+                suspend fun checkAvailabilityStatus(skipRootIfDenied: Boolean = false) {
+                    val status = privilegedHelper.checkAvailability(context, skipRootIfDenied)
+                    shizukuInstalled = status.shizukuInstalled
+                    shizukuAvailable = status.shizukuAvailable && status.shizukuPermissionGranted
+                    rootAvailable = status.rootAvailable
+                    rootPermissionDenied = status.rootPermissionDenied
+                }
+                
+                // Lifecycle observer for resume events
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            coroutineScope.launch {
+                                checkAvailabilityStatus(skipRootIfDenied = true)
+                            }
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
+                    }
+                }
+                
+                // Startup and periodic status checking
+                LaunchedEffect(Unit) {
+                    // Initial startup check
+                    val sharedPref = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                    val savedMode = sharedPref.getInt("execution_mode", -1)
+                    
+                    // Check availability status immediately
+                    val status = privilegedHelper.checkAvailability(context)
+                    shizukuInstalled = status.shizukuInstalled
+                    shizukuAvailable = status.shizukuAvailable && status.shizukuPermissionGranted
+                    rootAvailable = status.rootAvailable
+                    rootPermissionDenied = status.rootPermissionDenied
+                    
+                    if (savedMode == -1) {
+                        // No mode selected yet, show dialog
+                        showModeDialog = true
+                    } else {
+                        // Mode was previously selected, use it
+                        val mode = when (savedMode) {
+                            0 -> PrivilegedCommandHelper.ExecutionMode.ROOT
+                            1 -> PrivilegedCommandHelper.ExecutionMode.SHIZUKU
+                            else -> PrivilegedCommandHelper.ExecutionMode.NONE
+                        }
+                        privilegedHelper.setExecutionMode(mode)
+                        
+                        // If saved mode is root but permission is denied, show dialog again
+                        if (savedMode == 0 && status.rootPermissionDenied) {
+                            showModeDialog = true
+                        }
+                    }
+                    
+                    // Periodic status checking (every 5 seconds, only when app is active)
+                    while (true) {
+                        delay(5000) // Wait 5 seconds
+                        // Only check if the app is in the foreground
+                        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                            checkAvailabilityStatus(skipRootIfDenied = true)
+                        }
+                    }
+                }
                 val displayMetrics = context.resources.displayMetrics
-                val shell = Shell.SH
-                shell.run("su")
-                shell.addOnStderrLineListener(
-                    object : Shell.OnLineListener {
-                        override fun onLine(line: String) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                when {
-                                    line.contains(
-                                        "su: inaccessible or not found",
-                                        ignoreCase = true,
-                                    ) || line.contains("permission denied", ignoreCase = true) -> {
-                                        noRoot = true
-                                    }
-                                    line.contains("service stopped", ignoreCase = true) -> {
-                                        Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                    }
-                                    line.contains("not stopped", ignoreCase = true) -> {
-                                        Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                                    }
-                                    else -> shareStackTrace(line)
-                                }
-                            }
-                        }
-                    }
-                )
-                shell.addOnStdoutLineListener(
-                    object : Shell.OnLineListener {
-                        override fun onLine(line: String) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                if (line.contains("set")) // showInterstitial(context) {}
-                                // line.log()
-                                if (line.contains("not supported"))
-                                        Toast.makeText(context, line, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                )
 
                 val pm = context.packageManager
                 val mainIntent = Intent(Intent.ACTION_MAIN, null)
@@ -288,12 +377,23 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             // val standardIconBitmap = AppIconUtils.getStandardAppIconBitmap(appIcon, displayMetrics)
                             // val customSizeBitmap = appIcon.toBitmapWithDpSize(64f, 64f, displayMetrics)
                             
+                            val interventions = if (privilegedHelper.getCurrentMode() != PrivilegedCommandHelper.ExecutionMode.NONE) {
+                                try {
+                                    val result = privilegedHelper.executeCommand("cmd game list-configs $packageName")
+                                    result.output
+                                } catch (e: Exception) {
+                                    ""
+                                }
+                            } else {
+                                ""
+                            }
+                            
                             items.putIfAbsent(
                                 packageName,
                                 AppInfo(
                                     it.loadLabel(pm).toString(),
                                     appIcon,
-                                    shell.run("cmd game list-configs $packageName").stdout(),
+                                    interventions,
                                 ),
                             )
                         }
@@ -309,24 +409,106 @@ class PerAppDownscaleActivity : ComponentActivity() {
                         val refreshScope = rememberCoroutineScope()
                         var isRefreshing by remember { mutableStateOf(false) }
 
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        // Topbar with title and settings icon
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Status indicator
+                            Column(
+                                modifier = Modifier.size(48.dp)
+                                    .clickable {
+                                        val statusMessage = buildString {
+                                            append("Execution Modes:\n")
+                                            if (rootAvailable) {
+                                                append("✓ Root Available\n")
+                                            } else if (rootPermissionDenied) {
+                                                append("✗ Root Permission Denied\n")
+                                            } else {
+                                                append("✗ Root Not Available\n")
+                                            }
+                                            if (shizukuAvailable) {
+                                                append("✓ Shizuku Ready\n")
+                                            } else if (shizukuInstalled) {
+                                                append("⚙ Shizuku Installed (needs configuration)\n")
+                                            } else {
+                                                append("✗ Shizuku Not Installed\n")
+                                            }
+                                            if (!rootAvailable && !shizukuAvailable) {
+                                                append("⚠ No privileged access ready")
+                                            }
+                                        }
+                                        Toast.makeText(context, statusMessage, Toast.LENGTH_LONG).show()
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                if (rootAvailable) {
+                                    Text(
+                                        text = "R",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Green
+                                    )
+                                } else if (rootPermissionDenied) {
+                                    Text(
+                                        text = "R",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Red
+                                    )
+                                }
+                                if (shizukuAvailable) {
+                                    Text(
+                                        text = "S",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Blue
+                                    )
+                                } else if (shizukuInstalled) {
+                                    Text(
+                                        text = "S",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Yellow
+                                    )
+                                }
+                                if (!rootAvailable && !shizukuAvailable && !shizukuInstalled && !rootPermissionDenied) {
+                                    Text(
+                                        text = "⚠",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Red
+                                    )
+                                }
+                            }
+                            
+                            // Title
                             Text(
                                 text = "TMPAD",
                                 style = MaterialTheme.typography.headlineLarge,
                                 modifier =
                                     Modifier.clip(RoundedCornerShape(8.dp))
                                         .clickable {
-                                            clipboardManager.setText(
-                                                AnnotatedString(
-                                                    Shell.SH.run(
-                                                            """su -c getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b"""
-                                                        )
-                                                        .stdout()
-                                                )
-                                            )
+                                            if (privilegedHelper != null) {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    val result = privilegedHelper.executeCommand(
+                                                        """getprop | grep '\[ro\.serialno\]' | sed 's/.*\[\(.*\)\]/\1/' | md5sum -b"""
+                                                    )
+                                                    clipboardManager.setText(AnnotatedString(result.output))
+                                                }
+                                            }
                                         }
                                         .padding(4.dp),
                             )
+                            
+                            // Settings icon
+                            IconButton(
+                                onClick = { showSettingsDialog = true },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = "Settings",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         }
                         TabRow(selectedTabIndex = selectedIndex) {
                             tabs.forEachIndexed { index, title ->
@@ -384,21 +566,30 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                             PackageManager.ResolveInfoFlags.of(0L),
                                         )
                                     items.clear()
-                                    resolvedInfos.forEach {
-                                        val packageName = it.activityInfo.packageName
-                                        val appIcon = it.loadIcon(pm)
+                                    for (info in resolvedInfos) {
+                                        val packageName = info.activityInfo.packageName
+                                        val appIcon = info.loadIcon(pm)
                                         
                                         // Example: Convert app icon to fixed dp bitmap during refresh
                                         // val iconBitmap = AppIconUtils.getAppIconBitmap(appIcon, displayMetrics)
                                         
+                                        val interventions = if (privilegedHelper.getCurrentMode() != PrivilegedCommandHelper.ExecutionMode.NONE) {
+                                            try {
+                                                val result = privilegedHelper.executeCommand("cmd game list-configs $packageName")
+                                                result.output
+                                            } catch (e: Exception) {
+                                                ""
+                                            }
+                                        } else {
+                                            ""
+                                        }
+                                        
                                         items.putIfAbsent(
                                             packageName,
                                             AppInfo(
-                                                it.loadLabel(pm).toString(),
+                                                info.loadLabel(pm).toString(),
                                                 appIcon,
-                                                shell
-                                                    .run("cmd game list-configs $packageName")
-                                                    .stdout(),
+                                                interventions,
                                             ),
                                         )
                                     }
@@ -439,7 +630,10 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                            if (showTip)  item { TipBanner() }
+                            // Show all active tips
+                            items(activeTips) { tip ->
+                                TipBanner(tip)
+                            }
                             if (visibleList.isEmpty() && finishedLoading) {
                                 item {
                                     Surface(
@@ -479,7 +673,7 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             itemsIndexed(items = visibleList, key = { _, app -> app.first }) {
                                 index,
                                 app ->
-                                Box(Modifier) { Item(index, app, shell) }
+                                Box(Modifier) { Item(index, app, privilegedHelper) }
                             }
                             if (selectedIndex == 0) {
                                 item {
@@ -514,27 +708,49 @@ class PerAppDownscaleActivity : ComponentActivity() {
                         Row { AdmobBanner(context) }
                     }
                 }
+                
+                // Mode Selection Dialog
+                if (showModeDialog) {
+                    ModeSelectionDialog(
+                        onDismiss = { /* Don't allow dismissal on startup */ },
+                        onModeSelected = { mode ->
+                            privilegedHelper.setExecutionMode(mode)
+                            showModeDialog = false
+                        },
+                        helper = privilegedHelper
+                    )
+                }
+                
+                // Settings Dialog
+                if (showSettingsDialog) {
+                    SettingsDialog(
+                        onDismiss = { showSettingsDialog = false },
+                        onChangeModeClicked = {
+                            showSettingsDialog = false
+                            showModeDialog = true
+                        }
+                    )
+                }
             }
 
             ThemedManagerTheme {
-                if (noRoot)
-                    Surface(
-                        modifier =
-                            Modifier.padding(32.dp)
-                                .fillMaxWidth()
-                                .windowInsetsPadding(WindowInsets.safeDrawing),
-                        color = MaterialTheme.colorScheme.error,
-                        shape = MaterialTheme.shapes.medium,
-                    ) {
-                        Text(
-                            "Root access required",
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(16.dp),
-                        )
-                    }
-                else PerAppDownscale()
+                PerAppDownscale()
             }
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Remove Shizuku listeners to prevent memory leaks
+        Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        Shizuku.removeBinderReceivedListener(binderReceivedListener)
+        Shizuku.removeBinderDeadListener(binderDeadListener)
+    }
+    
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Handle regular Android permissions here if needed
+        // Shizuku permissions are handled by the permissionResultListener above
     }
 }
 
@@ -690,7 +906,7 @@ fun RefreshIndicator(state: PullToRefreshState) {
             val text =
                 when {
                     state.distanceFraction < 1f -> "Pull to refresh"
-                    state.distanceFraction < 1.5f -> "Release to refresh"
+                    state.distanceFraction < 1.5f -> "Release to refresh ✅"
                     state.distanceFraction < 1.8f -> "Release to refresh 🦎"
                     else ->
                         List(state.distanceFraction.times(100).minus(180).toInt()) { "🦎" }
@@ -702,25 +918,28 @@ fun RefreshIndicator(state: PullToRefreshState) {
 }
 
 @Composable
-fun Item(index: Int, app: Pair<String, AppInfo>, shell: Shell) {
+fun Item(index: Int, app: Pair<String, AppInfo>,  privilegedHelper: PrivilegedCommandHelper? = null) {
 
     var interventions by rememberSaveable { mutableStateOf(app.second.interventions) }
     var availableModes by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(key1 = app.first) {
-        if (interventions.isEmpty())
-            interventions = shell.run("cmd game list-configs ${app.first}").stdout()
+        if (interventions.isEmpty() && privilegedHelper != null) {
+            val result = privilegedHelper.executeCommand("cmd game list-configs ${app.first}")
+            interventions = result.output
+        }
 
         // Get available game modes
-        if (availableModes.isEmpty() && !interventions.contains("not of game type")) {
-            val modesResult = shell.run("cmd game list-modes ${app.first}").stdout()
+        if (availableModes.isEmpty() && !interventions.contains("not of game type") && privilegedHelper != null) {
+            val modesResult = privilegedHelper.executeCommand("cmd game list-modes ${app.first}")
+            val output = modesResult.output
             // Parse: "package current mode: custom, available game modes: [standard,custom]"
-            val modesStart = modesResult.indexOf("available game modes: [")
+            val modesStart = output.indexOf("available game modes: [")
             if (modesStart != -1) {
-                val modesEnd = modesResult.indexOf("]", modesStart)
+                val modesEnd = output.indexOf("]", modesStart)
                 if (modesEnd != -1) {
-                    val modesString = modesResult.substring(modesStart + 23, modesEnd)
+                    val modesString = output.substring(modesStart + 23, modesEnd)
                     availableModes = modesString.split(",").map { it.trim() }
                 }
             } else {
@@ -746,7 +965,12 @@ fun Item(index: Int, app: Pair<String, AppInfo>, shell: Shell) {
         Row(
             Modifier.fillMaxWidth().clickable {
                 expanded = !expanded
-                interventions = shell.run("cmd game list-configs ${app.first}").stdout()
+                if (privilegedHelper != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val result = privilegedHelper.executeCommand("cmd game list-configs ${app.first}")
+                        interventions = result.output
+                    }
+                }
             },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -769,7 +993,7 @@ fun Item(index: Int, app: Pair<String, AppInfo>, shell: Shell) {
                         )
                 }
             ) {
-                ClickableIcon(app.first, app.second.drawable)
+                ClickableIcon(app.first, app.second.drawable, privilegedHelper)
             }
             Column {
                 Text(text = app.second.label)
@@ -778,8 +1002,13 @@ fun Item(index: Int, app: Pair<String, AppInfo>, shell: Shell) {
             Spacer(Modifier.weight(1f))
         }
 
-        Controls(expanded, interventions, availableModes, shell, app.first) {
-            interventions = shell.run("cmd game list-configs ${app.first}").stdout()
+        Controls(expanded, interventions, availableModes,  app.first, privilegedHelper) {
+            if (privilegedHelper != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = privilegedHelper.executeCommand("cmd game list-configs ${app.first}")
+                    interventions = result.output
+                }
+            }
         }
     }
 }
@@ -795,7 +1024,7 @@ private fun Icon(icon: Drawable) {
 }
 
 @Composable
-private fun ClickableIcon(packageName: String, icon: Drawable) {
+private fun ClickableIcon(packageName: String, icon: Drawable, privilegedHelper: PrivilegedCommandHelper? = null) {
     val context = LocalContext.current
 
     Image(
@@ -805,17 +1034,20 @@ private fun ClickableIcon(packageName: String, icon: Drawable) {
             Modifier.size(56.dp).padding(8.dp).bounceClick().clickable {
                 try {
                     // Force stop the app first, then launch it
-                    val shell = Shell.SH
-                    shell.run("am force-stop $packageName")
-
-                    val intent = context.packageManager.getLaunchIntentForPackage(packageName)
-                    if (intent != null) {
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        context.startActivity(intent)
-                    } else {
-                        Toast.makeText(context, "Cannot launch $packageName", Toast.LENGTH_SHORT)
-                            .show()
+                    if (privilegedHelper != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            privilegedHelper.executeCommand("am force-stop $packageName")
+                            val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+                            if (intent != null) {
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                context.startActivity(intent)
+                            } else {
+                                Toast.makeText(context, "Cannot launch $packageName", Toast.LENGTH_SHORT)
+                                    .show()
+                            }}
                     }
+
+
                 } catch (e: Exception) {
                     Toast.makeText(context, "Error launching app: ${e.message}", Toast.LENGTH_SHORT)
                         .show()
@@ -856,8 +1088,9 @@ private fun ColumnScope.Controls(
     expanded: Boolean,
     interventions: String,
     availableModes: List<String>,
-    shell: Shell,
+
     packageName: String?,
+    privilegedHelper: PrivilegedCommandHelper? = null,
     callback: () -> Unit = {},
 ) {
 
@@ -893,14 +1126,14 @@ private fun ColumnScope.Controls(
             var angleEnabled by remember { mutableStateOf(false) }
 
             // Function to check ANGLE state
-            fun checkAngleState() {
-                val currentPkgs =
-                    shell.run("settings get global angle_gl_driver_selection_pkgs").stdout().trim()
-                val currentValues =
-                    shell
-                        .run("settings get global angle_gl_driver_selection_values")
-                        .stdout()
-                        .trim()
+            suspend fun checkAngleState() {
+                if (privilegedHelper == null) return
+                
+                val pkgsResult = privilegedHelper.executeCommand("settings get global angle_gl_driver_selection_pkgs")
+                val currentPkgs = pkgsResult.output.trim()
+                
+                val valuesResult = privilegedHelper.executeCommand("settings get global angle_gl_driver_selection_values")
+                val currentValues = valuesResult.output.trim()
 
                 angleEnabled =
                     if (
@@ -959,13 +1192,18 @@ private fun ColumnScope.Controls(
                 var systemOverride by remember { mutableStateOf<String?>(null) }
                 var overrideCheckFailed by remember { mutableStateOf(false) }
 
-                fun checkSystemOverride() {
+                suspend fun checkSystemOverride() {
                     // Check standard device_config game_overlay with root
-                    val standardResult =
-                        shell
-                            .run("su -c \"device_config get game_overlay $packageName\"")
-                            .stdout()
-                            .trim()
+                    val standardResult = if (privilegedHelper != null) {
+                        try {
+                            val result = privilegedHelper.executeCommand("device_config get game_overlay $packageName")
+                            result.output.trim()
+                        } catch (e: Exception) {
+                            ""
+                        }
+                    } else {
+                        ""
+                    }
 
                     // Check if any meaningful configuration exists
                     systemOverride =
@@ -1005,12 +1243,14 @@ private fun ColumnScope.Controls(
                                 Button(
                                     onClick = {
                                         // Try to delete with root privileges
-                                        shell.run(
-                                            "su -c \"device_config delete game_overlay $packageName\""
-                                        )
-                                        checkSystemOverride()
-                                        if (systemOverride != null) {
-                                            overrideCheckFailed = true
+                                        if (privilegedHelper != null) {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                privilegedHelper.executeCommand("device_config delete game_overlay $packageName")
+                                                checkSystemOverride()
+                                                if (systemOverride != null) {
+                                                    overrideCheckFailed = true
+                                                }
+                                            }
                                         }
                                     },
                                     modifier = Modifier.padding(start = 8.dp),
@@ -1035,20 +1275,18 @@ private fun ColumnScope.Controls(
                     Switch(
                         checked = angleEnabled,
                         onCheckedChange = { enabled ->
-                            // Ensure ANGLE debug package is set for rooted devices
-                            shell.run("settings put global angle_debug_package com.android.angle")
+                            if (privilegedHelper == null) return@Switch
+                            
+                            CoroutineScope(Dispatchers.IO).launch {
+                                // Ensure ANGLE debug package is set for rooted devices
+                                privilegedHelper.executeCommand("settings put global angle_debug_package com.android.angle")
 
-                            // Get current package list
-                            val currentPkgs =
-                                shell
-                                    .run("settings get global angle_gl_driver_selection_pkgs")
-                                    .stdout()
-                                    .trim()
-                            val currentValues =
-                                shell
-                                    .run("settings get global angle_gl_driver_selection_values")
-                                    .stdout()
-                                    .trim()
+                                // Get current package list
+                                val pkgsResult = privilegedHelper.executeCommand("settings get global angle_gl_driver_selection_pkgs")
+                                val currentPkgs = pkgsResult.output.trim()
+                                
+                                val valuesResult = privilegedHelper.executeCommand("settings get global angle_gl_driver_selection_values")
+                                val currentValues = valuesResult.output.trim()
 
                             val pkgList =
                                 if (currentPkgs == "null" || currentPkgs.isEmpty()) {
@@ -1087,18 +1325,21 @@ private fun ColumnScope.Controls(
                             }
 
                             // Set the new lists
-                            if (newPkgList.isNotEmpty()) {
-                                shell.run(
-                                    "settings put global angle_gl_driver_selection_pkgs ${newPkgList.joinToString(",")}"
-                                )
-                                shell.run(
-                                    "settings put global angle_gl_driver_selection_values ${newValueList.joinToString(",")}"
-                                )
+                            if (newPkgList.isNotEmpty() && privilegedHelper != null) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    privilegedHelper.executeCommand(
+                                        "settings put global angle_gl_driver_selection_pkgs ${newPkgList.joinToString(",")}"
+                                    )
+                                    privilegedHelper.executeCommand(
+                                        "settings put global angle_gl_driver_selection_values ${newValueList.joinToString(",")}"
+                                    )
+                                    // Refresh ANGLE state to verify the change
+                                    checkAngleState()
+                                }
                             }
 
-                            // Refresh ANGLE state to verify the change
-                            checkAngleState()
                             callback()
+                            }
                         },
                     )
                 }
@@ -1117,7 +1358,7 @@ private fun ColumnScope.Controls(
                         Column(
                             modifier =
                                 Modifier.padding(16.dp)
-                                    .background(Color.White, shape = MaterialTheme.shapes.large)
+                                    .background(MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large)
                                     .padding(16.dp)
                         ) {
                             Text(
@@ -1139,10 +1380,14 @@ private fun ColumnScope.Controls(
                                 trailingIcon = {
                                     IconButton(
                                         onClick = {
-                                            shell.run("cmd game set --downscale $temp $packageName")
-                                            currentDownscale = temp
-                                            appliedDownscale = temp
-                                            callback()
+                                            if (privilegedHelper != null) {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    privilegedHelper.executeCommand("cmd game set --downscale $temp $packageName")
+                                                    currentDownscale = temp
+                                                    appliedDownscale = temp
+                                                    callback()
+                                                }
+                                            }
                                         }
                                     ) {
                                         Icon(
@@ -1153,6 +1398,13 @@ private fun ColumnScope.Controls(
                                     }
                                 },
                             )
+                            AnimatedVisibility(temp > 2f) {
+                                Text(
+                                    "You sure about that?",
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp).background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                        MaterialTheme.shapes.large).padding(16.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -1186,12 +1438,12 @@ private fun ColumnScope.Controls(
                         Column(
                             modifier =
                                 Modifier.padding(16.dp)
-                                    .background(Color.White, shape = MaterialTheme.shapes.large)
+                                    .background(MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large)
                                     .padding(16.dp)
                         ) {
                             Text(
                                 text =
-                                    "Enter FPS value manually. This will limit the app's frame rate to the specified value. PLease note that not all apps/roms support this feature.",
+                                    "Enter FPS value manually. This will limit the app's frame rate to the specified value. Please note that not all apps/roms support this feature.",
                                 modifier = Modifier.padding(bottom = 8.dp),
                             )
                             var temp by remember {
@@ -1212,10 +1464,14 @@ private fun ColumnScope.Controls(
                                 trailingIcon = {
                                     IconButton(
                                         onClick = {
-                                            shell.run("cmd game set --fps $temp $packageName")
-                                            currentFps = temp.toFloat()
-                                            appliedFps = temp.toFloat()
-                                            callback()
+                                            if (privilegedHelper != null) {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    privilegedHelper.executeCommand("cmd game set --fps $temp $packageName")
+                                                    currentFps = temp.toFloat()
+                                                    appliedFps = temp.toFloat()
+                                                    callback()
+                                                }
+                                            }
                                         }
                                     ) {
                                         Icon(
@@ -1229,172 +1485,36 @@ private fun ColumnScope.Controls(
                         }
                     }
                 }
-                /*
-                                Box(contentAlignment = Alignment.CenterStart) {
-                                    Slider(
-                                        value = currentDownscale,
-                                        onValueChange = { currentDownscale = ((it * 100).toInt()).toFloat() / 100 },
-                                        onValueChangeFinished = {
-                                            shell.run("cmd game set --downscale $currentDownscale $packageName")
-                                            appliedDownscale = currentDownscale
-                                            callback()
-                                        },
-                                        valueRange = 0f..2f,
-                                        steps = 199,
-                                    )
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                    ) {
-                                        Text(
-                                            text = "0×",
-                                            style =
-                                                MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    shadow =
-                                                        Shadow(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            offset = Offset(0f, 0f),
-                                                            blurRadius = 8f,
-                                                        ),
-                                                ),
-                                        )
-                                        Text(
-                                            text = "0.5×",
-                                            style =
-                                                MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    shadow =
-                                                        Shadow(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            offset = Offset(0f, 0f),
-                                                            blurRadius = 8f,
-                                                        ),
-                                                ),
-                                        )
-                                        Text(
-                                            text = "1×",
-                                            style =
-                                                MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    shadow =
-                                                        Shadow(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            offset = Offset(0f, 0f),
-                                                            blurRadius = 8f,
-                                                        ),
-                                                ),
-                                        )
-                                        Text(
-                                            text = "1.5×",
-                                            style =
-                                                MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    shadow =
-                                                        Shadow(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            offset = Offset(0f, 0f),
-                                                            blurRadius = 8f,
-                                                        ),
-                                                ),
-                                        )
-                                        Text(
-                                            text = "2×",
-                                            style =
-                                                MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    shadow =
-                                                        Shadow(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            offset = Offset(0f, 0f),
-                                                            blurRadius = 8f,
-                                                        ),
-                                                ),
-                                        )
-                                    }
-                                }
-                */
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                 ) {
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 0.5 $packageName")
-                            currentDownscale = 0.5f
-                            appliedDownscale = 0.5f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "0.5×")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 0.33 $packageName")
-                            currentDownscale = 0.33f
-                            appliedDownscale = 0.33f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "0.33×")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 0.25 $packageName")
-                            currentDownscale = 0.25f
-                            appliedDownscale = 0.25f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "0.25×")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 0.20 $packageName")
-                            currentDownscale = 0.2f
-                            appliedDownscale = 0.2f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "0.2×")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 0.10 $packageName")
-                            currentDownscale = 0.1f
-                            appliedDownscale = 0.1f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "0.1×")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --downscale 1.0 $packageName")
-                            currentDownscale = 1f
-                            appliedDownscale = 1f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "Reset")
+                    val downscaleValues = listOf(
+                        0.5f to "0.5×",
+                        0.33f to "0.33×", 
+                        0.25f to "0.25×",
+                        0.2f to "0.2×",
+                        0.1f to "0.1×",
+                        1.0f to "Reset"
+                    )
+                    
+                    downscaleValues.forEach { (value, label) ->
+                        Button(
+                            contentPadding = PaddingValues(0.dp),
+                            onClick = {
+                                if (privilegedHelper != null) {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        privilegedHelper.executeCommand("cmd game set --downscale $value $packageName")
+                                        currentDownscale = value
+                                        appliedDownscale = value
+                                        callback()
+                                    }
+                                }
+                            },
+                        ) {
+                            Text(text = label)
+                        }
                     }
                 }
                 Row {
@@ -1418,85 +1538,40 @@ private fun ColumnScope.Controls(
                         modifier = Modifier.size(24.dp).clickable(onClick = { showFpsInfo = true }),
                     )
                 }
-                /*
-                                Slider(
-                                    value = currentFps,
-                                    onValueChange = { currentFps = ((it * 100).toInt()).toFloat() / 100 },
-                                    onValueChangeFinished = {
-                                        val fpsValue = currentFps.toInt()
-                                        shell.run("cmd game set --fps $fpsValue $packageName")
-                                        appliedFps = currentFps
-                                        callback()
-                                    },
-                                    valueRange = 0f..500f,
-                                    steps = 49,
-                                )
-                */
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                 ) {
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --fps 30 $packageName")
-                            currentFps = 30f
-                            appliedFps = 30f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "30")
+                    val fpsValues = listOf(30, 40, 60, 90, 120)
+                    
+                    fpsValues.forEach { fps ->
+                        Button(
+                            contentPadding = PaddingValues(0.dp),
+                            onClick = {
+                                if (privilegedHelper != null) {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        privilegedHelper.executeCommand("cmd game set --fps $fps $packageName")
+                                        currentFps = fps.toFloat()
+                                        appliedFps = fps.toFloat()
+                                        callback()
+                                    }
+                                }
+                            },
+                        ) {
+                            Text(text = fps.toString())
+                        }
                     }
+                    
                     Button(
                         contentPadding = PaddingValues(0.dp),
                         onClick = {
-                            shell.run("cmd game set --fps 40 $packageName")
-                            currentFps = 40f
-                            appliedFps = 40f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "40")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --fps 60 $packageName")
-                            currentFps = 60f
-                            appliedFps = 60f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "60")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --fps 90 $packageName")
-                            currentFps = 90f
-                            appliedFps = 90f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "90")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game set --fps 120 $packageName")
-                            currentFps = 120f
-                            appliedFps = 120f
-                            callback()
-                        },
-                    ) {
-                        Text(text = "120")
-                    }
-                    Button(
-                        contentPadding = PaddingValues(0.dp),
-                        onClick = {
-                            shell.run("cmd game reset $packageName")
-                            callback() // This will trigger LaunchedEffect to update all states
+                            if (privilegedHelper != null) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    privilegedHelper.executeCommand("cmd game reset $packageName")
+                                    callback()
+                                }
+                            }
                         },
                     ) {
                         Text(text = "Reset")
@@ -1505,8 +1580,12 @@ private fun ColumnScope.Controls(
 
                 Button(
                     onClick = {
-                        shell.run("cmd game reset $packageName")
-                        callback() // This will trigger LaunchedEffect to update all states
+                        if (privilegedHelper != null) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                privilegedHelper.executeCommand("cmd game reset $packageName")
+                                callback() // This will trigger LaunchedEffect to update all states
+                            }
+                        }
                     }
                 ) {
                     Text(text = "Reset all")
