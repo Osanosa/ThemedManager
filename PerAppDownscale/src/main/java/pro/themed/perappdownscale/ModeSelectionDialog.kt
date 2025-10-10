@@ -5,6 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +17,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -38,8 +46,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
@@ -48,17 +58,200 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun SelfTestDialog(
+    onDismiss: () -> Unit,
+    helper: PrivilegedCommandHelper,
+    mode: PrivilegedCommandHelper.ExecutionMode,
+) {
+    rememberCoroutineScope()
+    var isRunning by remember { mutableStateOf(true) }
+    var currentCommand by remember { mutableStateOf("") }
+    var testResults by remember { mutableStateOf<List<TestResult>>(emptyList()) }
+
+    val testCommands =
+        listOf(
+            "whoami",
+            "cmd game",
+            "cmd game list-modes",
+            "cmd game list-configs",
+            "cmd game set",
+            "dumpsys game",
+            "settings list system | grep game",
+            "settings list secure | grep game",
+            "settings list global | grep game",
+        )
+
+    LaunchedEffect(Unit) {
+        for ((_, command) in testCommands.withIndex()) {
+            currentCommand = command
+            delay(500) // Small delay between commands
+
+            val result = helper.executeCommand(command)
+            val testResult =
+                TestResult(
+                    command = command,
+                    output = result.output,
+                    error = result.error,
+                    success = result.success,
+                )
+
+            testResults = testResults + testResult
+            delay(300) // Delay before next command
+        }
+
+        isRunning = false
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+    ) {
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = if (isRunning) "Self Test running" else "Self Test complete",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+
+                // Loading indicator row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AnimatedVisibility(visible = isRunning, enter = scaleIn(), exit = scaleOut()) {
+                        LoadingIndicator()
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = if (isRunning) "Running: $currentCommand" else "Done",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                Divider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                )
+
+                // Command results
+                Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                    testResults.forEach { result ->
+                        CommandResultItem(result = result)
+                        Spacer(Modifier.padding(vertical = 8.dp))
+                    }
+
+                    if (isRunning && currentCommand.isNotEmpty()) {
+                        Text(
+                            text = "Running: $currentCommand",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                    }
+                    AnimatedVisibility(!isRunning) {
+                        Column {
+                            Text(
+                                text = "All commands are expected to run without errors.\nIf that is not the case, please report it to the support group.",
+                                style = MaterialTheme.typography.bodyLargeEmphasized,
+
+                                )
+                            // Close button
+                            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("Close") }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun CommandResultItem(result: TestResult) {
+    val isError =
+        result.error.contains("Can't find service:", ignoreCase = true) ||
+            result.error.contains("inaccessible", ignoreCase = true) ||
+            result.error.contains("Unknown command", ignoreCase = true) ||
+            result.output.contains("Can't find service::", ignoreCase = true) ||
+            result.output.contains("inaccessible", ignoreCase = true) ||
+            result.output.contains("Unknown command", ignoreCase = true)
+
+    val textColor = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
+
+    Column {
+        // Command
+        Text(
+            text = ":/ # ${result.command}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 12.sp,
+        )
+
+        // Output
+        if (result.output.isNotEmpty()) {
+            Text(
+                text = result.output.replace("Error: java.lang.IllegalArgumentException:", ""),
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = textColor,
+                fontSize = 10.sp,
+            )
+        }
+
+        // Error
+        if (result.error.isNotEmpty()) {
+            Text(
+                text = result.error,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = Color.Red,
+                fontSize = 10.sp,
+            )
+        }
+
+        if (isError) {
+            Text(
+                text =
+                    "^^^EXECUTION OF THIS COMMAND FAILED\n^^^APP MIGHT NOT WORK PROPERLY\n^^^PLEASE REPORT THIS TO SUPPORT GROUP",
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = Color.Red,
+                fontSize = 10.sp,
+            )
+        }
+    }
+}
+
+data class TestResult(
+    val command: String,
+    val output: String,
+    val error: String,
+    val success: Boolean,
+)
+
 @Composable
 fun ModeSelectionDialog(
     onDismiss: () -> Unit,
     onModeSelected: (PrivilegedCommandHelper.ExecutionMode) -> Unit,
-    helper: PrivilegedCommandHelper
+    helper: PrivilegedCommandHelper,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-    var availabilityStatus by remember { mutableStateOf<PrivilegedCommandHelper.AvailabilityStatus?>(null) }
-    
+    var availabilityStatus by remember {
+        mutableStateOf<PrivilegedCommandHelper.AvailabilityStatus?>(null)
+    }
+    var showSelfTest by remember { mutableStateOf(false) }
+    var selectedExecutionMode by remember {
+        mutableStateOf<PrivilegedCommandHelper.ExecutionMode?>(null)
+    }
+
     // Read current mode from SharedPreferences to show correct selection
     val currentSavedMode = remember {
         val sharedPref = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
@@ -71,69 +264,81 @@ fun ModeSelectionDialog(
     fun updateStatus(skipRootIfDenied: Boolean = false) {
         scope.launch {
             try {
-                Log.d("ModeSelectionDialog", "Starting status update (skipRootIfDenied=$skipRootIfDenied)...")
+                Log.d(
+                    "ModeSelectionDialog",
+                    "Starting status update (skipRootIfDenied=$skipRootIfDenied)...",
+                )
                 val newStatus = helper.checkAvailability(context, skipRootIfDenied)
                 Log.d("ModeSelectionDialog", "Status update successful: $newStatus")
                 availabilityStatus = newStatus
                 isLoading = false
-                
+
                 // Auto-select best available option only if no mode was previously saved
                 if (currentSavedMode == -1 && selectedMode == -1) {
-                    selectedMode = when {
-                        newStatus.rootAvailable -> 0
-                        newStatus.shizukuAvailable && newStatus.shizukuPermissionGranted -> 1
-                        else -> -1
-                    }
+                    selectedMode =
+                        when {
+                            newStatus.rootAvailable -> 0
+                            newStatus.shizukuAvailable && newStatus.shizukuPermissionGranted -> 1
+                            else -> -1
+                        }
                     Log.d("ModeSelectionDialog", "Auto-selected mode: $selectedMode")
                 }
             } catch (e: Exception) {
                 Log.e("ModeSelectionDialog", "Status update failed", e)
                 // If check fails completely, create a fallback status
-                availabilityStatus = PrivilegedCommandHelper.AvailabilityStatus(
-                    rootAvailable = false,
-                    rootVersion = null,
-                    rootPermissionDenied = true, // Assume permission denied if check fails
-                    shizukuInstalled = false,
-                    shizukuAvailable = false,
-                    shizukuPermissionGranted = false
-                )
+                availabilityStatus =
+                    PrivilegedCommandHelper.AvailabilityStatus(
+                        rootAvailable = false,
+                        rootVersion = null,
+                        rootPermissionDenied = true, // Assume permission denied if check fails
+                        shizukuInstalled = false,
+                        shizukuAvailable = false,
+                        shizukuPermissionGranted = false,
+                    )
                 isLoading = false
             }
         }
     }
-    
+
     // Function to install Shizuku with fallback
     fun installShizuku() {
         try {
             // Try Play Store first
-            val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://details?id=moe.shizuku.privileged.api")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
+            val playStoreIntent =
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("market://details?id=moe.shizuku.privileged.api")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
             context.startActivity(playStoreIntent)
         } catch (e: Exception) {
             try {
                 // Fallback to browser Play Store
-                val browserIntent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api")
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
+                val browserIntent =
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data =
+                            Uri.parse(
+                                "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
+                            )
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
                 context.startActivity(browserIntent)
             } catch (e2: Exception) {
                 // Final fallback to GitHub releases
-                val githubIntent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://github.com/RikkaApps/Shizuku/releases")
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
+                val githubIntent =
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("https://github.com/RikkaApps/Shizuku/releases")
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
                 context.startActivity(githubIntent)
             }
         }
     }
-    
+
     // Function to open Shizuku app for configuration
     fun openShizukuApp() {
         try {
-            val shizukuIntent = context.packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
+            val shizukuIntent =
+                context.packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
             if (shizukuIntent != null) {
                 shizukuIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(shizukuIntent)
@@ -146,10 +351,8 @@ fun ModeSelectionDialog(
     }
 
     // Initial status check
-    LaunchedEffect(Unit) {
-        updateStatus()
-    }
-    
+    LaunchedEffect(Unit) { updateStatus() }
+
     // Periodic status updates every 5 seconds (only when app is active)
     LaunchedEffect(Unit) {
         while (true) {
@@ -160,7 +363,7 @@ fun ModeSelectionDialog(
             }
         }
     }
-    
+
     // Lifecycle-based updates (on resume) - skip root if previously denied
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -169,31 +372,21 @@ fun ModeSelectionDialog(
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "Choose Operation Mode",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
                 when {
@@ -204,115 +397,153 @@ fun ModeSelectionDialog(
                         // Status is null - show error state with retry
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = "Failed to check device capabilities",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 8.dp),
                             )
-                            Button(
-                                onClick = { updateStatus() }
-                            ) {
-                                Text("Retry")
-                            }
+                            Button(onClick = { updateStatus() }) { Text("Retry") }
                         }
                     }
                     else -> {
                         val status = availabilityStatus!!
-                        
+
                         // Root option - always shown
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { 
-                                    if (status.rootAvailable) {
-                                        selectedMode = 0
-                                    } else {
-                                        Toast.makeText(context, "Root access not available on this device", Toast.LENGTH_SHORT).show()
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .clickable {
+                                        if (status.rootAvailable) {
+                                            selectedMode = 0
+                                        } else {
+                                            Toast.makeText(
+                                                    context,
+                                                    "Root access not available on this device",
+                                                    Toast.LENGTH_SHORT,
+                                                )
+                                                .show()
+                                        }
                                     }
-                                }
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                    .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
                                 selected = selectedMode == 0,
-                                onClick = { 
+                                onClick = {
                                     if (status.rootAvailable) {
                                         selectedMode = 0
                                     } else {
-                                        Toast.makeText(context, "Root access not available on this device", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                                context,
+                                                "Root access not available on this device",
+                                                Toast.LENGTH_SHORT,
+                                            )
+                                            .show()
                                     }
                                 },
-                                enabled = status.rootAvailable
+                                enabled = status.rootAvailable,
                             )
                             Spacer(Modifier.width(8.dp))
                             Column {
                                 Text(
-                                    text = if (status.rootAvailable) "Root (Recommended)" else "Root",
+                                    text =
+                                        if (status.rootAvailable) "Root (Recommended)" else "Root",
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (status.rootAvailable) MaterialTheme.colorScheme.onSurface 
-                                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    color =
+                                        if (status.rootAvailable)
+                                            MaterialTheme.colorScheme.onSurface
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 )
                                 Text(
-                                    text = when {
-                                        status.rootAvailable && !status.rootPermissionDenied -> status.rootVersion ?: "Available"
-                                        status.rootAvailable && status.rootPermissionDenied -> "Permission denied"
-                                        status.rootAvailable -> "Ready to test"
-                                        else -> "Not available"
-                                    },
+                                    text =
+                                        when {
+                                            status.rootAvailable && !status.rootPermissionDenied ->
+                                                status.rootVersion ?: "Available"
+                                            status.rootAvailable && status.rootPermissionDenied ->
+                                                "Permission denied"
+                                            status.rootAvailable -> "Ready to test"
+                                            else -> "Not available"
+                                        },
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = when {
-                                        status.rootAvailable && !status.rootPermissionDenied -> Color.Green
-                                        status.rootAvailable && status.rootPermissionDenied -> MaterialTheme.colorScheme.error
-                                        status.rootAvailable -> MaterialTheme.colorScheme.primary
-                                        else -> MaterialTheme.colorScheme.error
-                                    }
+                                    color =
+                                        when {
+                                            status.rootAvailable && !status.rootPermissionDenied ->
+                                                Color.Green
+                                            status.rootAvailable && status.rootPermissionDenied ->
+                                                MaterialTheme.colorScheme.error
+                                            status.rootAvailable ->
+                                                MaterialTheme.colorScheme.primary
+                                            else -> MaterialTheme.colorScheme.error
+                                        },
                                 )
                             }
                         }
 
                         // Shizuku option - always shown
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    when {
-                                        status.shizukuAvailable && status.shizukuPermissionGranted -> {
-                                            selectedMode = 1
-                                        }
-                                        status.shizukuAvailable -> {
-                                            helper.requestShizukuPermission(1001)
-                                            Toast.makeText(context, "Please grant Shizuku permission", Toast.LENGTH_SHORT).show()
-                                            // Update status after permission request
-                                            scope.launch {
-                                                delay(1500)
-                                                updateStatus()
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .clickable {
+                                        when {
+                                            status.shizukuAvailable &&
+                                                status.shizukuPermissionGranted -> {
+                                                selectedMode = 1
+                                            }
+                                            status.shizukuAvailable -> {
+                                                helper.requestShizukuPermission(1001)
+                                                Toast.makeText(
+                                                        context,
+                                                        "Please grant Shizuku permission",
+                                                        Toast.LENGTH_SHORT,
+                                                    )
+                                                    .show()
+                                                // Update status after permission request
+                                                scope.launch {
+                                                    delay(1500)
+                                                    updateStatus()
+                                                }
+                                            }
+                                            status.shizukuInstalled -> {
+                                                Toast.makeText(
+                                                        context,
+                                                        "Please start Shizuku service first",
+                                                        Toast.LENGTH_LONG,
+                                                    )
+                                                    .show()
+                                            }
+                                            else -> {
+                                                Toast.makeText(
+                                                        context,
+                                                        "Please install Shizuku first",
+                                                        Toast.LENGTH_LONG,
+                                                    )
+                                                    .show()
                                             }
                                         }
-                                        status.shizukuInstalled -> {
-                                            Toast.makeText(context, "Please start Shizuku service first", Toast.LENGTH_LONG).show()
-                                        }
-                                        else -> {
-                                            Toast.makeText(context, "Please install Shizuku first", Toast.LENGTH_LONG).show()
-                                        }
                                     }
-                                }
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                    .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
                                 selected = selectedMode == 1,
-                                onClick = { 
+                                onClick = {
                                     when {
-                                        status.shizukuAvailable && status.shizukuPermissionGranted -> {
+                                        status.shizukuAvailable &&
+                                            status.shizukuPermissionGranted -> {
                                             selectedMode = 1
                                         }
                                         status.shizukuAvailable -> {
                                             helper.requestShizukuPermission(1001)
-                                            Toast.makeText(context, "Please grant Shizuku permission", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                    context,
+                                                    "Please grant Shizuku permission",
+                                                    Toast.LENGTH_SHORT,
+                                                )
+                                                .show()
                                             // Update status after permission request
                                             scope.launch {
                                                 delay(1500)
@@ -320,14 +551,24 @@ fun ModeSelectionDialog(
                                             }
                                         }
                                         status.shizukuInstalled -> {
-                                            Toast.makeText(context, "Please start Shizuku service first", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(
+                                                    context,
+                                                    "Please start Shizuku service first",
+                                                    Toast.LENGTH_LONG,
+                                                )
+                                                .show()
                                         }
                                         else -> {
-                                            Toast.makeText(context, "Please install Shizuku first", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(
+                                                    context,
+                                                    "Please install Shizuku first",
+                                                    Toast.LENGTH_LONG,
+                                                )
+                                                .show()
                                         }
                                     }
                                 },
-                                enabled = status.shizukuAvailable && status.shizukuPermissionGranted
+                                enabled = status.shizukuAvailable && status.shizukuPermissionGranted,
                             )
                             Spacer(Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
@@ -335,35 +576,47 @@ fun ModeSelectionDialog(
                                     text = "Shizuku",
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (status.shizukuAvailable && status.shizukuPermissionGranted) 
-                                               MaterialTheme.colorScheme.onSurface
-                                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    color =
+                                        if (
+                                            status.shizukuAvailable &&
+                                                status.shizukuPermissionGranted
+                                        )
+                                            MaterialTheme.colorScheme.onSurface
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 )
                                 Text(
-                                    text = when {
-                                        status.shizukuAvailable && status.shizukuPermissionGranted -> "Ready"
-                                        status.shizukuAvailable -> "Permission required"
-                                        status.shizukuInstalled -> "Please configure Shizuku first"
-                                        else -> "Not installed"
-                                    },
+                                    text =
+                                        when {
+                                            status.shizukuAvailable &&
+                                                status.shizukuPermissionGranted -> "Ready"
+                                            status.shizukuAvailable -> "Permission required"
+                                            status.shizukuInstalled ->
+                                                "Please configure Shizuku first"
+                                            else -> "Not installed"
+                                        },
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = when {
-                                        status.shizukuAvailable && status.shizukuPermissionGranted -> Color.Green
-                                        status.shizukuAvailable -> MaterialTheme.colorScheme.primary
-                                        status.shizukuInstalled -> MaterialTheme.colorScheme.primary
-                                        else -> MaterialTheme.colorScheme.error
-                                    }
+                                    color =
+                                        when {
+                                            status.shizukuAvailable &&
+                                                status.shizukuPermissionGranted -> Color.Green
+                                            status.shizukuAvailable ->
+                                                MaterialTheme.colorScheme.primary
+                                            status.shizukuInstalled ->
+                                                MaterialTheme.colorScheme.primary
+                                            else -> MaterialTheme.colorScheme.error
+                                        },
                                 )
                             }
-                            
+
                             // Action icons based on Shizuku status
                             when {
                                 // Install icon - show if not installed
                                 !status.shizukuInstalled -> {
                                     IconButton(
-                                        onClick = { 
+                                        onClick = {
                                             installShizuku()
-                                            // Update status after a short delay to check if install started
+                                            // Update status after a short delay to check if install
+                                            // started
                                             scope.launch {
                                                 delay(1000)
                                                 updateStatus()
@@ -373,14 +626,14 @@ fun ModeSelectionDialog(
                                         Icon(
                                             painter = painterResource(R.drawable.apk_install_24px),
                                             contentDescription = "Install Shizuku",
-                                            tint = MaterialTheme.colorScheme.primary
+                                            tint = MaterialTheme.colorScheme.primary,
                                         )
                                     }
                                 }
                                 // Configuration icon - show if installed but not configured
                                 status.shizukuInstalled && !status.shizukuAvailable -> {
                                     IconButton(
-                                        onClick = { 
+                                        onClick = {
                                             openShizukuApp()
                                             // Update status after user returns
                                             scope.launch {
@@ -390,99 +643,174 @@ fun ModeSelectionDialog(
                                         }
                                     ) {
                                         Icon(
-                                            painter = painterResource(R.drawable.mobile_wrench_24px),
+                                            painter =
+                                                painterResource(R.drawable.mobile_wrench_24px),
                                             contentDescription = "Configure Shizuku",
-                                            tint = MaterialTheme.colorScheme.primary
+                                            tint = MaterialTheme.colorScheme.primary,
                                         )
                                     }
                                 }
                             }
                         }
 
-
-
                         // Proceed button - always shown
                         Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
+                            modifier =
+                                Modifier.fillMaxWidth()
                                     .clickable {
                                         scope.launch {
-                                            val mode = when (selectedMode) {
-                                                0 -> PrivilegedCommandHelper.ExecutionMode.ROOT
-                                                1 -> PrivilegedCommandHelper.ExecutionMode.SHIZUKU
-                                                else -> PrivilegedCommandHelper.ExecutionMode.NONE
-                                            }
-                                            
+                                            val mode =
+                                                when (selectedMode) {
+                                                    0 -> PrivilegedCommandHelper.ExecutionMode.ROOT
+                                                    1 ->
+                                                        PrivilegedCommandHelper.ExecutionMode
+                                                            .SHIZUKU
+                                                    else ->
+                                                        PrivilegedCommandHelper.ExecutionMode.NONE
+                                                }
+
                                             when (selectedMode) {
                                                 0 -> {
-                                                    // Test root permissions only when user proceeds with root
+                                                    // Test root permissions only when user proceeds
+                                                    // with root
                                                     if (status.rootAvailable) {
-                                                        Log.d("ModeSelectionDialog", "Testing root permissions...")
-                                                        val hasRootPermission = helper.testRootPermissions()
+                                                        Log.d(
+                                                            "ModeSelectionDialog",
+                                                            "Testing root permissions...",
+                                                        )
+                                                        val hasRootPermission =
+                                                            helper.testRootPermissions()
                                                         if (hasRootPermission) {
-                                                            // Save preference and proceed
-                                                            val sharedPref = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                                                            sharedPref.edit().putInt("execution_mode", selectedMode).apply()
-                                                            onModeSelected(mode)
-                                                            onDismiss()
+                                                            // Save preference and show self-test
+                                                            val sharedPref =
+                                                                context.getSharedPreferences(
+                                                                    "my_preferences",
+                                                                    Context.MODE_PRIVATE,
+                                                                )
+                                                            sharedPref
+                                                                .edit()
+                                                                .putInt(
+                                                                    "execution_mode",
+                                                                    selectedMode,
+                                                                )
+                                                                .apply()
+                                                            helper.setExecutionMode(mode)
+                                                            selectedExecutionMode = mode
+                                                            showSelfTest = true
                                                         } else {
-                                                            Toast.makeText(context, "Root permission denied", Toast.LENGTH_SHORT).show()
+                                                            Toast.makeText(
+                                                                    context,
+                                                                    "Root permission denied",
+                                                                    Toast.LENGTH_SHORT,
+                                                                )
+                                                                .show()
                                                             // Update status to reflect the denial
                                                             updateStatus(skipRootIfDenied = false)
                                                         }
                                                     } else {
-                                                        Toast.makeText(context, "Root access not available on this device", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                                context,
+                                                                "Root access not available on this device",
+                                                                Toast.LENGTH_SHORT,
+                                                            )
+                                                            .show()
                                                     }
                                                 }
                                                 1 -> {
                                                     // Check if Shizuku is ready
-                                                    if (status.shizukuAvailable && status.shizukuPermissionGranted) {
-                                                        // Save preference and proceed
-                                                        val sharedPref = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                                                        sharedPref.edit().putInt("execution_mode", selectedMode).apply()
-                                                        onModeSelected(mode)
-                                                        onDismiss()
+                                                    if (
+                                                        status.shizukuAvailable &&
+                                                            status.shizukuPermissionGranted
+                                                    ) {
+                                                        // Save preference and show self-test
+                                                        val sharedPref =
+                                                            context.getSharedPreferences(
+                                                                "my_preferences",
+                                                                Context.MODE_PRIVATE,
+                                                            )
+                                                        sharedPref
+                                                            .edit()
+                                                            .putInt("execution_mode", selectedMode)
+                                                            .apply()
+                                                        helper.setExecutionMode(mode)
+                                                        selectedExecutionMode = mode
+                                                        showSelfTest = true
                                                     } else if (!status.shizukuInstalled) {
-                                                        Toast.makeText(context, "Please install Shizuku first", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                                context,
+                                                                "Please install Shizuku first",
+                                                                Toast.LENGTH_SHORT,
+                                                            )
+                                                            .show()
                                                     } else if (!status.shizukuAvailable) {
-                                                        Toast.makeText(context, "Please start Shizuku service", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                                context,
+                                                                "Please start Shizuku service",
+                                                                Toast.LENGTH_SHORT,
+                                                            )
+                                                            .show()
                                                     } else if (!status.shizukuPermissionGranted) {
-                                                        Toast.makeText(context, "Please grant Shizuku permission", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                                context,
+                                                                "Please grant Shizuku permission",
+                                                                Toast.LENGTH_SHORT,
+                                                            )
+                                                            .show()
                                                     }
                                                 }
                                                 else -> {
-                                                    Toast.makeText(context, "Please select a mode", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(
+                                                            context,
+                                                            "Please select a mode",
+                                                            Toast.LENGTH_SHORT,
+                                                        )
+                                                        .show()
                                                 }
                                             }
                                         }
                                     }
                                     .background(
-                                        color = if (selectedMode >= 0) Color.hsl(140f, 1f, 0.5f) 
-                                               else MaterialTheme.colorScheme.surfaceVariant,
-                                        shape = RoundedCornerShape(8.dp)
+                                        color =
+                                            if (selectedMode >= 0) Color.hsl(140f, 0.7f, 0.5f)
+                                            else MaterialTheme.colorScheme.surfaceVariant,
+                                        shape = RoundedCornerShape(8.dp),
                                     )
                                     .padding(16.dp),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    tint = if (selectedMode >= 0) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    text = "Proceed",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = if (selectedMode >= 0) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                tint =
+                                    if (selectedMode >= 0) Color.White
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Proceed",
+                                style = MaterialTheme.typography.titleMedium,
+                                color =
+                                    if (selectedMode >= 0) Color.White
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
             }
         }
+    }
 
+    // Show self-test dialog when needed
+    if (showSelfTest && selectedExecutionMode != null) {
+        SelfTestDialog(
+            onDismiss = {
+                showSelfTest = false
+                onModeSelected(selectedExecutionMode!!)
+                onDismiss()
+            },
+            helper = helper,
+            mode = selectedExecutionMode!!,
+        )
+    }
 }
-
-

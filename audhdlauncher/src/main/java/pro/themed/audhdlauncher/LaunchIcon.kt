@@ -4,7 +4,9 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
+import android.window.SplashScreen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -101,7 +103,13 @@ fun AppIcon(
         derivedStateOf {
             ActivityOptions.makeScaleUpAnimation(
                 activity?.window?.peekDecorView(), centerX.value, centerY.value, 0, 0
-            )
+            ).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+
+                    setSplashScreenStyle(SplashScreen.SPLASH_SCREEN_STYLE_ICON)
+
+                }
+            }
         }
     }
 
@@ -126,7 +134,7 @@ fun AppIcon(
                 contentDescription = null, 
                 modifier = Modifier.Companion
                     .fillMaxSize()
-                    .bounceClick()
+                    .bounceClick().clip(CircleShape)
             )
         } else {
             // Placeholder while loading

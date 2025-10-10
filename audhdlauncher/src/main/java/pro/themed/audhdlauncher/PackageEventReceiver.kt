@@ -54,11 +54,7 @@ class PackageEventReceiver : BroadcastReceiver(), KoinComponent {
             }
             
             Intent.ACTION_PACKAGE_REMOVED -> {
-                val isReplacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
-                if (!isReplacing) {
-                    Log.d("PackageEvent", "❌ App uninstalled: $packageName")
-                    handleAppUninstall(context, packageName)
-                }
+               //SKIP
             }
             
             Intent.ACTION_PACKAGE_REPLACED -> {
@@ -101,46 +97,7 @@ class PackageEventReceiver : BroadcastReceiver(), KoinComponent {
         triggerAppListRefresh(context, "App updated: $packageName")
     }
     
-    private fun handleAppUninstall(context: Context, packageName: String) {
-        Log.d("PackageEvent", "🗑️ Processing app uninstall: $packageName")
-        
-        // Clean up launch count data for the uninstalled app using injected repository
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Get all launch counts to find entries for this package
-                repository.getAllLaunchCounts().collect { launchCounts ->
-                    val keysToRemove = launchCounts.keys.filter { key ->
-                        key.startsWith("${packageName}_")
-                    }
-                    
-                    Log.d("PackageEvent", "🧹 Found ${keysToRemove.size} launch count entries to clean up for $packageName")
-                    
-                    if (keysToRemove.isNotEmpty()) {
-                        // Clear launch counts for each category this app was in
-                        keysToRemove.forEach { key ->
-                            val categoryName = key.substringAfter("${packageName}_")
-                            if (categoryName.isNotEmpty()) {
-                                Log.d("PackageEvent", "🗑️ Clearing launch count for $packageName in category $categoryName")
-                                repository.clearAppLaunchCount(categoryName, packageName)
-                            }
-                        }
-                        Log.d("PackageEvent", "✅ Cleanup completed for uninstalled app: $packageName")
-                    } else {
-                        Log.d("PackageEvent", "ℹ️ No launch count data found for $packageName")
-                    }
-                    
-                    // Stop collecting after processing
-                    return@collect
-                }
-                
-            } catch (e: Exception) {
-                Log.e("PackageEvent", "❌ Error cleaning up data for uninstalled app $packageName", e)
-            }
-        }
-        
-        triggerAppListRefresh(context, "App uninstalled: $packageName")
-    }
-    
+
     private fun triggerAppListRefresh(context: Context, reason: String) {
         Log.d("PackageEvent", "🔄 Triggering app list refresh: $reason")
         Log.d("PackageEvent", "📱 Current time: ${System.currentTimeMillis()}")

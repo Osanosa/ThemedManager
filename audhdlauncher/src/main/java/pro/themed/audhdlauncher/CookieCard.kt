@@ -1,6 +1,7 @@
 package pro.themed.audhdlauncher
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,32 +12,34 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import pro.themed.audhdlauncher.ui.theme.contentcol
 import pro.themed.audhdlauncher.ui.theme.cookieForeground
 
-@Preview(
-    showBackground = true,
-    backgroundColor = 0xffffffff
-)
 @Composable
 fun CookieCard(
     modifier: Modifier = Modifier,
     alpha: Float = 0.5f, // Keep this for existing behavior
+    onLongClick: () -> Unit = {},
     content: @Composable () -> Unit = {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CircularProgressIndicator()
             Text(text = "Loading...")
         }
-    }
+    },
+
 ) {
     Surface(
         color = cookieForeground.copy(alpha = alpha), // Explicitly name alpha for clarity
         contentColor = contentcol,
         shape = RoundedCornerShape(8.dp), // Apply shape directly to Surface
 
-        modifier = modifier.border(
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).combinedClickable(
+                onClick = {},
+        onLongClick = { onLongClick() }
+    )
+        .border(
             // Use BorderStroke for clarity
             width = 8.dp,
             shape = RoundedCornerShape(16.dp),

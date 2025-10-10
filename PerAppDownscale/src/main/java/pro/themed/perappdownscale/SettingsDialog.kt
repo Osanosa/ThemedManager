@@ -12,7 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +29,8 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun SettingsDialog(
     onDismiss: () -> Unit,
-    onChangeModeClicked: () -> Unit
+    onChangeModeClicked: () -> Unit,
+    onCommandModeClicked: () -> Unit
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -57,7 +59,7 @@ fun SettingsDialog(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
-                
+
                 // Change Mode Button
                 Row(
                     modifier = Modifier
@@ -72,14 +74,14 @@ fun SettingsDialog(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Settings,
+                        imageVector = Icons.Filled.Build,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Change Operation Mode",
+                            text = "Permissions",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium
@@ -91,7 +93,43 @@ fun SettingsDialog(
                         )
                     }
                 }
-                
+
+                Spacer(modifier = Modifier.height(12.dp))
+                // Command Mode Button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onCommandModeClicked() }
+                        .background(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "Commands",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "Select default or alternative command mode",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+
+
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // Close Button

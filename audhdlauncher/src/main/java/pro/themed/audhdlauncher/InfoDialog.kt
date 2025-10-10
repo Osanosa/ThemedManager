@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
@@ -30,9 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
-import pro.themed.audhdlauncher.database.AppDataStoreRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import pro.themed.audhdlauncher.database.AppDataStoreRepository
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,7 +56,7 @@ fun InfoDialog(
 ) {
     AnimatedVisibility(showpopup) {
         Dialog({ onDismiss() }, DialogProperties(usePlatformDefaultWidth = true)) {
-            CookieCard(alpha = 0.9f) {
+            CookieCard(alpha = 0.9f,) {
                 Column(
                     modifier = Modifier.Companion.fillMaxWidth().padding(8.dp),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -148,10 +148,10 @@ fun InfoDialog(
                     Text(
                         text =
                             "Last Update: ${
-                            SimpleDateFormat(
-                                "HH:mm dd MMM yyyy", Locale.getDefault(),
-                            ).format(Date(lastUpdateTime))
-                        }",
+                                SimpleDateFormat(
+                                    "HH:mm dd MMM yyyy", Locale.getDefault(),
+                                ).format(Date(lastUpdateTime))
+                            }",
                         fontSize = 12.sp,
                         color = Color.Companion.Gray,
                     )
@@ -182,20 +182,21 @@ fun InfoDialog(
                         fontSize = 12.sp,
                         color = Color.Companion.Gray,
                     )
-                    
-                        // Launch count display and clear functionality
-    if (categoryName.isNotEmpty()) {
-        val scope = rememberCoroutineScope()
-        var launchCount by remember { mutableStateOf(0) }
-        val repository: AppDataStoreRepository = koinInject()
-        
-        // Load launch count for this app in this category using injected repository
-        LaunchedEffect(resolveInfo.activityInfo.packageName, categoryName) {
-            repository.getAllLaunchCounts().collect { launchCounts ->
-                launchCount = launchCounts["${resolveInfo.activityInfo.packageName}_$categoryName"] ?: 0
-            }
-        }
-                        
+
+                    // Launch count display and clear functionality
+                    if (categoryName.isNotEmpty()) {
+                        val scope = rememberCoroutineScope()
+                        var launchCount by remember { mutableStateOf(0) }
+                        val repository: AppDataStoreRepository = koinInject()
+
+                        // Load launch count for this app in this category using injected repository
+                        LaunchedEffect(resolveInfo.activityInfo.packageName, categoryName) {
+                            repository.getAllLaunchCounts().collect { launchCounts ->
+                                launchCount =
+                                    launchCounts["${resolveInfo.activityInfo.packageName}_$categoryName"] ?: 0
+                            }
+                        }
+
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -207,16 +208,18 @@ fun InfoDialog(
                                 color = Color.Gray,
                                 modifier = Modifier.weight(1f)
                             )
-                            
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = "Clear launch count",
+
+                            Text(
+                                text = "Clear",
                                 modifier = Modifier
-                                    .size(20.dp)
+                                    .height(20.dp)
                                     .clip(CircleShape)
                                     .clickable {
                                         scope.launch {
-                                            repository.clearAppLaunchCount(categoryName, resolveInfo.activityInfo.packageName)
+                                            repository.clearAppLaunchCount(
+                                                categoryName,
+                                                resolveInfo.activityInfo.packageName
+                                            )
                                         }
                                     }
                             )

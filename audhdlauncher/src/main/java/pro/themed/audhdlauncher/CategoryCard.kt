@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,12 +83,7 @@ fun CategoryCard(category: CategoryData, apps: List<ResolveInfo>, context: Conte
     }
 
     CookieCard(
-        modifier =
-            Modifier.combinedClickable(
-                onClick = {},
-                onLongClick = { showSettingsDialog = true }
-            )
-    ) {
+onLongClick = { showSettingsDialog = true }    ) {
         val rowsInt = category.rows
         if (true) {
             Row(

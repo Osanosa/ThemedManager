@@ -32,7 +32,7 @@ import pro.themed.audhdlauncher.database.CategoryData
 internal fun DebugList(category: CategoryData, apps: List<ResolveInfo>, context: Context) {
     val clipboardManager =
         LocalContext.current.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    CookieCard(alpha = 1f) {
+    CookieCard(alpha = 1f,) {
         LazyColumn {
             item {
                 Text(
@@ -45,15 +45,15 @@ internal fun DebugList(category: CategoryData, apps: List<ResolveInfo>, context:
             items(apps, key = { it.activityInfo.packageName }) { resolveInfo ->
                 Row(
                     modifier =
-                    Modifier.fillMaxWidth().padding(2.dp).clickable {
-                        // Copy package name to clipboard on row click
-                        val clipData =
-                            ClipData.newPlainText(
-                                "Package Name",
-                                resolveInfo.activityInfo.packageName,
-                            )
-                        clipboardManager.setPrimaryClip(clipData)
-                    },
+                        Modifier.fillMaxWidth().padding(2.dp).clickable {
+                            // Copy package name to clipboard on row click
+                            val clipData =
+                                ClipData.newPlainText(
+                                    "Package Name",
+                                    resolveInfo.activityInfo.packageName,
+                                )
+                            clipboardManager.setPrimaryClip(clipData)
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AppIcon(resolveInfo = resolveInfo, onClick = {})

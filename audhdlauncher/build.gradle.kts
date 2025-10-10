@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "pro.themed.audhdlauncher"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = SimpleDateFormat("yyMMdd").format(Date()).toInt()
         versionName = SimpleDateFormat("yy.MM.dd").format(Date()).toString()

@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 250627,
-      "versionName": "25.06.27",
+      "versionCode": 250909,
+      "versionName": "25.09.09",
       "outputFile": "audhdlauncher-release.apk"
     }
   ],
@@ -33,5 +33,5 @@
       ]
     }
   ],
-  "minSdkVersionForDexing": 21
+  "minSdkVersionForDexing": 23
 }
