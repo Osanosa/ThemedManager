@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -49,14 +50,15 @@ fun CommandModeSelectionDialog(
 
                 Text(
                     text =
-                        "Select how game interventions are applied. Changing modes will require reconfiguring all apps.",
+                        stringResource(R.string.operationmodeinfo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
                 Column(
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
                                 selectedMode = CommandMode.DEFAULT
@@ -93,7 +95,7 @@ fun CommandModeSelectionDialog(
 
                     Text(
                         text =
-                            "- Uses cmd game commands\n- Recommended for most users\n- Works reliably on Android 14 onwards\n- More stable and well-tested\n- Resets upon reboot",
+                            stringResource(R.string.defaultmode),
                         style = MaterialTheme.typography.bodySmall,
                         color =
                             if (selectedMode == CommandMode.DEFAULT)
@@ -105,7 +107,8 @@ fun CommandModeSelectionDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 Column(
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
                                 selectedMode = CommandMode.ALTERNATIVE
@@ -117,7 +120,7 @@ fun CommandModeSelectionDialog(
                                         MaterialTheme.colorScheme.primaryContainer
                                     else MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
 
-                            )
+                                )
                             .padding(8.dp)
                 ) {
                     // Alternative Mode Option
@@ -145,7 +148,7 @@ fun CommandModeSelectionDialog(
                     ) {
                         Text(
                             text =
-                                "- Uses device_config game_overlay commands\n- Known to potentially cause conflicts\n- Allows testing alternative rendering backends\n- May not work properly on all ROMs\n- Experimental support for Android 13\n- Persistant across reboots",
+                                stringResource(R.string.alternativemode),
                             style = MaterialTheme.typography.bodySmall,
                             color =
                                 if (selectedMode == CommandMode.ALTERNATIVE)

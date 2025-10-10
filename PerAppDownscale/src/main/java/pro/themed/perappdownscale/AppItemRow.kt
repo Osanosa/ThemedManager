@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
@@ -175,7 +176,8 @@ fun Item(
     }
     Column(
         modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .background(
                     color =
                         if (index % 2 == 0) Color.LightGray.copy(alpha = 0.05f)
@@ -188,16 +190,18 @@ fun Item(
                 )
     ) {
         Row(
-            Modifier.fillMaxWidth().clickable {
-                expanded = !expanded
-                if (privilegedHelper != null) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val result =
-                            privilegedHelper.executeCommand("cmd game list-configs ${app.first}")
-                        interventions = result.output
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                    if (privilegedHelper != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val result =
+                                privilegedHelper.executeCommand("cmd game list-configs ${app.first}")
+                            interventions = result.output
+                        }
                     }
-                }
-            },
+                },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BadgedBox(
@@ -215,7 +219,9 @@ fun Item(
                             imageVector = Icons.Filled.AddCircle,
                             contentDescription = null,
                             tint = Color.Red,
-                            modifier = Modifier.size(12.dp).rotate(45f),
+                            modifier = Modifier
+                                .size(12.dp)
+                                .rotate(45f),
                         )
                 }
             ) {
@@ -295,9 +301,10 @@ fun ColumnScope.ExpandedControls(
             Text(
                 text =
                     interventions +
-                        "\n\n(This requirement was added in some A15 roms, there's no direct workaround other then change display resolution)",
+                        "\n\n"+ stringResource(R.string.a15_notofgametype),
                 modifier =
-                    Modifier.background(MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
+                    Modifier
+                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
                         .padding(16.dp),
             )
         else {
@@ -397,7 +404,8 @@ fun ColumnScope.ExpandedControls(
             }
 
             Column(
-                Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                Modifier
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                     .padding(8.dp)
             ) {
 
@@ -440,14 +448,16 @@ fun ColumnScope.ExpandedControls(
                 // Alternative mode unsupported app warning
                 if (commandMode == CommandMode.ALTERNATIVE && !isAppSupported) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                         color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.7f),
                         shape = RoundedCornerShape(8.dp),
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
                                 text =
-                                    "ⓘ This app is not in the game system list and is not expected to work, but feel free to try anyway.",
+                                    stringResource(R.string.alternativemode_incompatible),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                             )
@@ -457,7 +467,9 @@ fun ColumnScope.ExpandedControls(
 
                 if (systemOverride != null) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
                         shape = RoundedCornerShape(8.dp),
                     ) {
@@ -465,9 +477,9 @@ fun ColumnScope.ExpandedControls(
                             Text(
                                 text =
                                     if (overrideCheckFailed) {
-                                        "Unable to remove game_overlay intervention. Remove it manually through Game Space settings or similar ROM features."
+                                        stringResource(R.string.game_overlay_entryremoval_fail)
                                     } else {
-                                        "Conflicting game_overlay intervention: $systemOverride.\n\nThis app has conflicting game settings that may cause issues like incorrect fullscreen behavior or configs not applied. Remove from Game Space library or disable similar ROM settings."
+                                        stringResource(R.string.game_overlay_entryconflict, systemOverride.toString())
                                     },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
@@ -496,48 +508,20 @@ fun ColumnScope.ExpandedControls(
                                     },
                                     modifier = Modifier.align(Alignment.End),
                                 ) {
-                                    Text("Force Remove")
+                                    Text(stringResource(R.string.force_remove))
                                 }
                             }
                         }
                     }
-                }
-                if (
-                    modes.substringAfter("current mode:").substringBefore(",").trim() !=
-                        "standard" &&
-                        modes.substringAfter("current mode:").substringBefore(",").trim() !=
-                            "custom"
-                ) {
-                    Text(
-                        text =
-                            if (
-                                modes
-                                    .substringAfter("current mode:")
-                                    .substringBefore(",")
-                                    .trim()
-                                    .contains("Unknown command", ignoreCase = true)
-                            )
-                                "UNABLE TO FETCH CURRENT MODE. COMMAND EXECUTION FAILED. CHECK SELFTEST AND REPORT THIS TO SUPPORT GROUP"
-                            else
-                                "Current mode is <${
-                                modes.substringAfter("current mode:").substringBefore(",").trim()
-                            }>. Some devices have presets with default downscale value and this package currently has one selected. To proceed try clicking reset all or open debug dialog and click force set custom mode. It is also recommended to disable any rom game modes or similar features that may cause issues. ",
-                        modifier =
-                            Modifier.padding(8.dp)
-                                .fillMaxWidth()
-                                .background(
-                                    MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
-                                    androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                                )
-                                .padding(8.dp),
-                    )
                 }
 
                 // Graphics Driver Control
                 if (commandMode == CommandMode.DEFAULT) {
                     // DEFAULT mode: Simple ANGLE switch
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -623,7 +607,9 @@ fun ColumnScope.ExpandedControls(
                     }
                 } else {
                     // ALTERNATIVE mode: Graphics backend selector
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)) {
                         Text(
                             text = "Graphics Backend",
                             style = MaterialTheme.typography.headlineSmallEmphasized,
@@ -660,7 +646,9 @@ fun ColumnScope.ExpandedControls(
 
                         Row(
                             modifier =
-                                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             val backends =
@@ -714,9 +702,10 @@ fun ColumnScope.ExpandedControls(
                         }
                         Text(
                             text =
-                                "Please note that setting backends is experimental and you're supposed to report whether you see any difference",
+                                stringResource(R.string.backend_warning),
                             modifier =
-                                Modifier.padding(8.dp)
+                                Modifier
+                                    .padding(8.dp)
                                     .fillMaxWidth()
                                     .background(
                                         MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
@@ -740,7 +729,8 @@ fun ColumnScope.ExpandedControls(
                     ) {
                         Column(
                             modifier =
-                                Modifier.padding(16.dp)
+                                Modifier
+                                    .padding(16.dp)
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer,
                                         shape = MaterialTheme.shapes.large,
@@ -749,7 +739,7 @@ fun ColumnScope.ExpandedControls(
                         ) {
                             Text(
                                 text =
-                                    "Enter downscale factor manually. It can be either less or greater than 1. Greater values result in higher than native resolution (oversampling). Please note that some apps may opt-out of these interventions.",
+                                    stringResource(R.string.enter_downscale_factor_manually_it_can_be_either_less_or_greater_than_1_greater_values_result_in_higher_than_native_resolution_oversampling_please_note_that_some_apps_may_opt_out_of_these_interventions),
                                 modifier = Modifier.padding(bottom = 8.dp),
                             )
                             var temp by remember { mutableStateOf(appliedDownscale) }
@@ -815,7 +805,8 @@ fun ColumnScope.ExpandedControls(
                                 Text(
                                     "You sure about that?",
                                     modifier =
-                                        Modifier.fillMaxWidth()
+                                        Modifier
+                                            .fillMaxWidth()
                                             .padding(top = 16.dp)
                                             .background(
                                                 MaterialTheme.colorScheme.errorContainer.copy(
@@ -841,7 +832,9 @@ fun ColumnScope.ExpandedControls(
                         contentDescription = "Info",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier =
-                            Modifier.size(24.dp).clickable(onClick = { showDownscaleInfo = true }),
+                            Modifier
+                                .size(24.dp)
+                                .clickable(onClick = { showDownscaleInfo = true }),
                     )
                 }
 
@@ -858,7 +851,8 @@ fun ColumnScope.ExpandedControls(
                     ) {
                         Column(
                             modifier =
-                                Modifier.padding(16.dp)
+                                Modifier
+                                    .padding(16.dp)
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer,
                                         shape = MaterialTheme.shapes.large,
@@ -867,7 +861,7 @@ fun ColumnScope.ExpandedControls(
                         ) {
                             Text(
                                 text =
-                                    "Enter FPS limit value manually. This will limit the app's frame rate to the specified value. Please note that not all apps/roms support this feature and it does not unlock engine fps.",
+                                    stringResource(R.string.enter_fps_limit_value_manually_this_will_limit_the_app_s_frame_rate_to_the_specified_value_please_note_that_not_all_apps_roms_support_this_feature_and_it_does_not_unlock_engine_fps),
                                 modifier = Modifier.padding(bottom = 8.dp),
                             )
                             var temp by remember {
@@ -1007,7 +1001,9 @@ fun ColumnScope.ExpandedControls(
                         imageVector = Icons.Default.Create,
                         contentDescription = "Edit FPS",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp).clickable(onClick = { showFpsInfo = true }),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable(onClick = { showFpsInfo = true }),
                     )
                 }
                 Row(
@@ -1072,7 +1068,7 @@ fun ColumnScope.ExpandedControls(
                             }
                         },
                     ) {
-                        Text(text = "Reset")
+                        Text(text = stringResource(R.string.reset))
                     }
                 }
 
@@ -1111,7 +1107,8 @@ fun ColumnScope.ExpandedControls(
 
                         Column(
                             modifier =
-                                Modifier.padding(16.dp)
+                                Modifier
+                                    .padding(16.dp)
                                     .background(
                                         MaterialTheme.colorScheme.surface,
                                         shape = MaterialTheme.shapes.large,
@@ -1120,7 +1117,7 @@ fun ColumnScope.ExpandedControls(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
-                                text = "Debug Info for $packageName",
+                                text = stringResource(R.string.debug_info_for, packageName.toString()),
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.padding(bottom = 16.dp),
                             )
@@ -1128,7 +1125,8 @@ fun ColumnScope.ExpandedControls(
                                 text = configs,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier =
-                                    Modifier.background(
+                                    Modifier
+                                        .background(
                                             MaterialTheme.colorScheme.surfaceVariant,
                                             shape =
                                                 androidx.compose.foundation.shape
@@ -1141,7 +1139,8 @@ fun ColumnScope.ExpandedControls(
                                 text = modes,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier =
-                                    Modifier.background(
+                                    Modifier
+                                        .background(
                                             MaterialTheme.colorScheme.surfaceVariant,
                                             shape =
                                                 androidx.compose.foundation.shape
@@ -1154,7 +1153,8 @@ fun ColumnScope.ExpandedControls(
                                 text = dumpsys,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier =
-                                    Modifier.background(
+                                    Modifier
+                                        .background(
                                             MaterialTheme.colorScheme.surfaceVariant,
                                             shape =
                                                 androidx.compose.foundation.shape
@@ -1164,25 +1164,49 @@ fun ColumnScope.ExpandedControls(
                                         .fillMaxWidth(),
                             )
 
-                            Button({
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    privilegedHelper?.executeCommand(
-                                        "cmd game mode custom $packageName"
-                                    )
-                                    privilegedHelper?.executeCommand("cmd game reset $packageName")
+                            Row(modifier = Modifier.horizontalScroll(rememberScrollState())
 
-                                    configs =
-                                        privilegedHelper
-                                            ?.executeCommand("cmd game list-configs $packageName")
-                                            ?.output ?: "ERROR retrieving configs"
-                                    modes =
-                                        privilegedHelper
-                                            ?.executeCommand("cmd game list-modes $packageName")
-                                            ?.output ?: "ERROR retrieving modes"
-                                    callback()
+                            ) {
+                                Button({
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        privilegedHelper?.executeCommand(
+                                            "cmd game mode custom $packageName"
+                                        )
+                                        privilegedHelper?.executeCommand("cmd game reset $packageName")
+
+                                        configs =
+                                            privilegedHelper
+                                                ?.executeCommand("cmd game list-configs $packageName")
+                                                ?.output ?: "ERROR retrieving configs"
+                                        modes =
+                                            privilegedHelper
+                                                ?.executeCommand("cmd game list-modes $packageName")
+                                                ?.output ?: "ERROR retrieving modes"
+                                        callback()
+                                    }
+                                }) {
+                                    Text("Force set mode to custom")
                                 }
-                            }) {
-                                Text("Force set mode to custom")
+                                Button({
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        privilegedHelper?.executeCommand(
+                                            "cmd game mode 2 $packageName"
+                                        )
+                                        privilegedHelper?.executeCommand("cmd game reset $packageName")
+
+                                        configs =
+                                            privilegedHelper
+                                                ?.executeCommand("cmd game list-configs $packageName")
+                                                ?.output ?: "ERROR retrieving configs"
+                                        modes =
+                                            privilegedHelper
+                                                ?.executeCommand("cmd game list-modes $packageName")
+                                                ?.output ?: "ERROR retrieving modes"
+                                        callback()
+                                    }
+                                }) {
+                                    Text("Force set mode to performance")
+                                }
                             }
                         }
                     }
@@ -1208,10 +1232,10 @@ fun ColumnScope.ExpandedControls(
                             }
                         }
                     ) {
-                        Text(text = "Reset all")
+                        Text(text = stringResource(R.string.reset_all))
                     }
 
-                    Button(onClick = { showDebugDialog = true }) { Text(text = "Show debug") }
+                    Button(onClick = { showDebugDialog = true }) { Text(text = stringResource(R.string.show_debug)) }
                 }
             }
         }

@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -139,7 +140,9 @@ fun SelfTestDialog(
                 )
 
                 // Command results
-                Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())) {
                     testResults.forEach { result ->
                         CommandResultItem(result = result)
                         Spacer(Modifier.padding(vertical = 8.dp))
@@ -156,7 +159,7 @@ fun SelfTestDialog(
                     AnimatedVisibility(!isRunning) {
                         Column {
                             Text(
-                                text = "All commands are expected to run without errors.\nIf that is not the case, please report it to the support group.",
+                                text = stringResource(R.string.selftest_info),
                                 style = MaterialTheme.typography.bodyLargeEmphasized,
 
                                 )
@@ -218,7 +221,9 @@ fun CommandResultItem(result: TestResult) {
         if (isError) {
             Text(
                 text =
-                    "^^^EXECUTION OF THIS COMMAND FAILED\n^^^APP MIGHT NOT WORK PROPERLY\n^^^PLEASE REPORT THIS TO SUPPORT GROUP",
+                    stringResource(R.string.selftest_failed) + if( result.error.contains("list") && android.os.Build.VERSION.SDK_INT == 33) stringResource(
+                        R.string.it_is_a_known_issue_on_a13
+                    ) else "" ,
                 style = MaterialTheme.typography.bodySmall,
                 fontFamily = FontFamily.Monospace,
                 color = Color.Red,
@@ -383,7 +388,7 @@ fun ModeSelectionDialog(
         Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Choose Operation Mode",
+                    text = stringResource(R.string.choose_permissions_mode),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp),
@@ -391,21 +396,23 @@ fun ModeSelectionDialog(
 
                 when {
                     isLoading -> {
-                        Text("Checking availability...")
+                        Text(stringResource(R.string.checking_privileged_availability))
                     }
                     availabilityStatus == null -> {
                         // Status is null - show error state with retry
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text = "Failed to check device capabilities",
+                                text = stringResource(R.string.failed_to_check_device_capabilities),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(bottom = 8.dp),
                             )
-                            Button(onClick = { updateStatus() }) { Text("Retry") }
+                            Button(onClick = { updateStatus() }) { Text(stringResource(R.string.retry)) }
                         }
                     }
                     else -> {
@@ -414,16 +421,17 @@ fun ModeSelectionDialog(
                         // Root option - always shown
                         Row(
                             modifier =
-                                Modifier.fillMaxWidth()
+                                Modifier
+                                    .fillMaxWidth()
                                     .clickable {
                                         if (status.rootAvailable) {
                                             selectedMode = 0
                                         } else {
                                             Toast.makeText(
-                                                    context,
-                                                    "Root access not available on this device",
-                                                    Toast.LENGTH_SHORT,
-                                                )
+                                                context,
+                                                context.getString(R.string.root_access_not_available_on_this_device),
+                                                Toast.LENGTH_SHORT,
+                                            )
                                                 .show()
                                         }
                                     }
@@ -438,7 +446,7 @@ fun ModeSelectionDialog(
                                     } else {
                                         Toast.makeText(
                                                 context,
-                                                "Root access not available on this device",
+                                            context.getString(R.string.root_access_not_available_on_this_device),
                                                 Toast.LENGTH_SHORT,
                                             )
                                             .show()
@@ -462,11 +470,11 @@ fun ModeSelectionDialog(
                                     text =
                                         when {
                                             status.rootAvailable && !status.rootPermissionDenied ->
-                                                status.rootVersion ?: "Available"
+                                                status.rootVersion ?: stringResource(R.string.available)
                                             status.rootAvailable && status.rootPermissionDenied ->
-                                                "Permission denied"
-                                            status.rootAvailable -> "Ready to test"
-                                            else -> "Not available"
+                                                stringResource(R.string.permission_denied)
+                                            status.rootAvailable -> stringResource(R.string.ready_to_test)
+                                            else -> stringResource(R.string.not_available)
                                         },
                                     style = MaterialTheme.typography.bodySmall,
                                     color =
@@ -486,20 +494,22 @@ fun ModeSelectionDialog(
                         // Shizuku option - always shown
                         Row(
                             modifier =
-                                Modifier.fillMaxWidth()
+                                Modifier
+                                    .fillMaxWidth()
                                     .clickable {
                                         when {
                                             status.shizukuAvailable &&
-                                                status.shizukuPermissionGranted -> {
+                                                    status.shizukuPermissionGranted -> {
                                                 selectedMode = 1
                                             }
+
                                             status.shizukuAvailable -> {
                                                 helper.requestShizukuPermission(1001)
                                                 Toast.makeText(
-                                                        context,
-                                                        "Please grant Shizuku permission",
-                                                        Toast.LENGTH_SHORT,
-                                                    )
+                                                    context,
+                                                    context.getString(R.string.please_grant_shizuku_permission),
+                                                    Toast.LENGTH_SHORT,
+                                                )
                                                     .show()
                                                 // Update status after permission request
                                                 scope.launch {
@@ -507,20 +517,22 @@ fun ModeSelectionDialog(
                                                     updateStatus()
                                                 }
                                             }
+
                                             status.shizukuInstalled -> {
                                                 Toast.makeText(
-                                                        context,
-                                                        "Please start Shizuku service first",
-                                                        Toast.LENGTH_LONG,
-                                                    )
+                                                    context,
+                                                    context.getString(R.string.please_start_shizuku_service_first),
+                                                    Toast.LENGTH_LONG,
+                                                )
                                                     .show()
                                             }
+
                                             else -> {
                                                 Toast.makeText(
-                                                        context,
-                                                        "Please install Shizuku first",
-                                                        Toast.LENGTH_LONG,
-                                                    )
+                                                    context,
+                                                    context.getString(R.string.please_install_shizuku_first),
+                                                    Toast.LENGTH_LONG,
+                                                )
                                                     .show()
                                             }
                                         }
@@ -540,7 +552,7 @@ fun ModeSelectionDialog(
                                             helper.requestShizukuPermission(1001)
                                             Toast.makeText(
                                                     context,
-                                                    "Please grant Shizuku permission",
+                                                context.getString(R.string.please_grant_shizuku_permission),
                                                     Toast.LENGTH_SHORT,
                                                 )
                                                 .show()
@@ -553,7 +565,7 @@ fun ModeSelectionDialog(
                                         status.shizukuInstalled -> {
                                             Toast.makeText(
                                                     context,
-                                                    "Please start Shizuku service first",
+                                                context.getString(R.string.please_start_shizuku_service_first),
                                                     Toast.LENGTH_LONG,
                                                 )
                                                 .show()
@@ -561,7 +573,7 @@ fun ModeSelectionDialog(
                                         else -> {
                                             Toast.makeText(
                                                     context,
-                                                    "Please install Shizuku first",
+                                                context.getString(R.string.please_install_shizuku_first),
                                                     Toast.LENGTH_LONG,
                                                 )
                                                 .show()
@@ -589,9 +601,9 @@ fun ModeSelectionDialog(
                                         when {
                                             status.shizukuAvailable &&
                                                 status.shizukuPermissionGranted -> "Ready"
-                                            status.shizukuAvailable -> "Permission required"
+                                            status.shizukuAvailable -> stringResource(R.string.permission_required)
                                             status.shizukuInstalled ->
-                                                "Please configure Shizuku first"
+                                                stringResource(R.string.please_configure_shizuku_first)
                                             else -> "Not installed"
                                         },
                                     style = MaterialTheme.typography.bodySmall,
@@ -656,7 +668,8 @@ fun ModeSelectionDialog(
                         // Proceed button - always shown
                         Row(
                             modifier =
-                                Modifier.fillMaxWidth()
+                                Modifier
+                                    .fillMaxWidth()
                                     .clickable {
                                         scope.launch {
                                             val mode =
@@ -665,6 +678,7 @@ fun ModeSelectionDialog(
                                                     1 ->
                                                         PrivilegedCommandHelper.ExecutionMode
                                                             .SHIZUKU
+
                                                     else ->
                                                         PrivilegedCommandHelper.ExecutionMode.NONE
                                                 }
@@ -699,28 +713,29 @@ fun ModeSelectionDialog(
                                                             showSelfTest = true
                                                         } else {
                                                             Toast.makeText(
-                                                                    context,
-                                                                    "Root permission denied",
-                                                                    Toast.LENGTH_SHORT,
-                                                                )
+                                                                context,
+                                                                "Root permission denied",
+                                                                Toast.LENGTH_SHORT,
+                                                            )
                                                                 .show()
                                                             // Update status to reflect the denial
                                                             updateStatus(skipRootIfDenied = false)
                                                         }
                                                     } else {
                                                         Toast.makeText(
-                                                                context,
-                                                                "Root access not available on this device",
-                                                                Toast.LENGTH_SHORT,
-                                                            )
+                                                            context,
+                                                            "Root access not available on this device",
+                                                            Toast.LENGTH_SHORT,
+                                                        )
                                                             .show()
                                                     }
                                                 }
+
                                                 1 -> {
                                                     // Check if Shizuku is ready
                                                     if (
                                                         status.shizukuAvailable &&
-                                                            status.shizukuPermissionGranted
+                                                        status.shizukuPermissionGranted
                                                     ) {
                                                         // Save preference and show self-test
                                                         val sharedPref =
@@ -737,33 +752,34 @@ fun ModeSelectionDialog(
                                                         showSelfTest = true
                                                     } else if (!status.shizukuInstalled) {
                                                         Toast.makeText(
-                                                                context,
-                                                                "Please install Shizuku first",
-                                                                Toast.LENGTH_SHORT,
-                                                            )
+                                                            context,
+                                                            "Please install Shizuku first",
+                                                            Toast.LENGTH_SHORT,
+                                                        )
                                                             .show()
                                                     } else if (!status.shizukuAvailable) {
                                                         Toast.makeText(
-                                                                context,
-                                                                "Please start Shizuku service",
-                                                                Toast.LENGTH_SHORT,
-                                                            )
+                                                            context,
+                                                            "Please start Shizuku service",
+                                                            Toast.LENGTH_SHORT,
+                                                        )
                                                             .show()
                                                     } else if (!status.shizukuPermissionGranted) {
                                                         Toast.makeText(
-                                                                context,
-                                                                "Please grant Shizuku permission",
-                                                                Toast.LENGTH_SHORT,
-                                                            )
+                                                            context,
+                                                            "Please grant Shizuku permission",
+                                                            Toast.LENGTH_SHORT,
+                                                        )
                                                             .show()
                                                     }
                                                 }
+
                                                 else -> {
                                                     Toast.makeText(
-                                                            context,
-                                                            "Please select a mode",
-                                                            Toast.LENGTH_SHORT,
-                                                        )
+                                                        context,
+                                                        "Please select a mode",
+                                                        Toast.LENGTH_SHORT,
+                                                    )
                                                         .show()
                                                 }
                                             }

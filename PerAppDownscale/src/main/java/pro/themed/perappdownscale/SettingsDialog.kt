@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -87,7 +88,7 @@ fun SettingsDialog(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Switch between Root and Shizuku execution modes",
+                            text = stringResource(R.string.switch_between_root_and_shizuku_execution_modes),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
@@ -122,7 +123,7 @@ fun SettingsDialog(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Select default or alternative command mode",
+                            text = stringResource(R.string.select_default_or_alternative_command_mode),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )

@@ -75,6 +75,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -175,9 +176,9 @@ class PerAppDownscaleActivity : ComponentActivity() {
                 )
 
             // Get active tips (not dismissed) - reactive to changes
-            var dismissedTips by rememberSaveable { mutableStateOf(setOf<String>()) }
+            var dismissedTips by remember{ mutableStateOf(setOf<String>()) }
             val activeTips =
-                rememberSaveable (dismissedTips) {
+                remember (dismissedTips) {
                     tips.filter { tip ->
                         !prefs.getBoolean("${tip.id}_dismissed", false) &&
                             !dismissedTips.contains(tip.id)
@@ -187,7 +188,9 @@ class PerAppDownscaleActivity : ComponentActivity() {
             @Composable
             fun TipBanner(tip: Tip) {
                 Surface(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
                     shape = RoundedCornerShape(12.dp),
                 ) {
@@ -498,31 +501,33 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             // Status indicator
                             Column(
                                 modifier =
-                                    Modifier.size(48.dp).clickable {
-                                        val statusMessage = buildString {
-                                            if (rootAvailable) {
-                                                append("✓ Root Available\n")
-                                            } else if (rootPermissionDenied) {
-                                                append("✗ Root Permission Denied\n")
-                                            } else {
-                                                append("✗ Root Not Available\n")
+                                    Modifier
+                                        .size(48.dp)
+                                        .clickable {
+                                            val statusMessage = buildString {
+                                                if (rootAvailable) {
+                                                    append("✓ Root Available\n")
+                                                } else if (rootPermissionDenied) {
+                                                    append("✗ Root Permission Denied\n")
+                                                } else {
+                                                    append("✗ Root Not Available\n")
+                                                }
+                                                if (shizukuAvailable) {
+                                                    append("✓ Shizuku Ready\n")
+                                                } else if (shizukuInstalled) {
+                                                    append(
+                                                        "⚙ Shizuku Installed (needs configuration)\n"
+                                                    )
+                                                } else {
+                                                    append("✗ Shizuku Not Installed\n")
+                                                }
+                                                if (!rootAvailable && !shizukuAvailable) {
+                                                    append("⚠ No privileged access ready")
+                                                }
                                             }
-                                            if (shizukuAvailable) {
-                                                append("✓ Shizuku Ready\n")
-                                            } else if (shizukuInstalled) {
-                                                append(
-                                                    "⚙ Shizuku Installed (needs configuration)\n"
-                                                )
-                                            } else {
-                                                append("✗ Shizuku Not Installed\n")
-                                            }
-                                            if (!rootAvailable && !shizukuAvailable) {
-                                                append("⚠ No privileged access ready")
-                                            }
-                                        }
-                                        Toast.makeText(context, statusMessage, Toast.LENGTH_LONG)
-                                            .show()
-                                    },
+                                            Toast.makeText(context, statusMessage, Toast.LENGTH_LONG)
+                                                .show()
+                                        },
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
                             ) {
@@ -552,9 +557,10 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             // Title
                             Text(
                                 text = "TMPAD",
-                                style = MaterialTheme.typography.headlineLarge,
+                                style = MaterialTheme.typography.headlineLargeEmphasized,
                                 modifier =
-                                    Modifier.clip(RoundedCornerShape(8.dp))
+                                    Modifier
+                                        .clip(RoundedCornerShape(8.dp))
                                         .clickable {
                                             if (privilegedHelper != null) {
                                                 CoroutineScope(Dispatchers.IO).launch {
@@ -691,7 +697,8 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                 cacheWindow = LazyLayoutCacheWindow(1f)
                             ),
                             modifier =
-                                Modifier.weight(1f)
+                                Modifier
+                                    .weight(1f)
                                     .pullToRefresh(
                                         isRefreshing,
                                         pullRefreshState,
@@ -705,7 +712,8 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier =
-                                            Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+                                            Modifier
+                                                .padding(start = 8.dp, end = 8.dp, top = 8.dp)
                                                 .background(
                                                     color =
                                                         MaterialTheme.colorScheme.primaryContainer,
@@ -716,7 +724,7 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                     ) {
                                         LoadingIndicator()
                                         Spacer(modifier = Modifier.width(16.dp))
-                                        Text(text = "Loading list...")
+                                        Text(text = stringResource(R.string.loading_list))
                                     }
                                 }
                             }
@@ -725,22 +733,24 @@ class PerAppDownscaleActivity : ComponentActivity() {
 
                             AnimatedVisibility(visible = visibleList.isEmpty() && finishedLoading) {
                                     Surface(
-                                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
                                         color = MaterialTheme.colorScheme.primary,
                                         shape = RoundedCornerShape(16.dp),
                                     ) {
                                         Column(Modifier.padding(8.dp)) {
                                             Text(
                                                 text =
-                                                    if (selectedIndex == 0) "No known games found"
-                                                    else "No known apps found",
+                                                    if (selectedIndex == 0) stringResource(R.string.no_known_games_found)
+                                                    else stringResource(R.string.no_known_apps_found),
                                                 fontSize = 24.sp,
                                             )
                                             Text(
                                                 text =
                                                     if (selectedIndex == 0)
-                                                        "Check out apps tab tho →"
-                                                    else "Check out games tab tho ↩",
+                                                        stringResource(R.string.check_out_apps_tab_tho)
+                                                    else stringResource(R.string.check_out_games_tab_tho),
                                                 fontSize = 16.sp,
                                             )
                                         }
@@ -754,7 +764,9 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                         onValueChange = { filter = it },
                                         label = { Text("Filter") },
                                         modifier =
-                                            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp),
                                     )
                                 }
                             }
@@ -765,20 +777,22 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             item("gamespace_warning") {
                                 AnimatedVisibility(visible = gamespaceGameList != null && finishedLoading) {
                                     Surface(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp, vertical = 4.dp),
                                         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
                                         shape = RoundedCornerShape(12.dp),
                                     ) {
                                         Column(modifier = Modifier.padding(12.dp)) {
                                             Text(
-                                                text = "GameSpace conflict detected",
+                                                text = stringResource(R.string.gamespace_conflict_detected),
                                                 style = MaterialTheme.typography.titleMedium,
                                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(bottom = 4.dp)
                                             )
                                             Text(
-                                                text = "Your ROM has a GameSpace game list that may interfere with game interventions. Clear it to avoid conflicts.",
+                                                text = stringResource(R.string.gamespacewarning),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                             )
@@ -797,7 +811,9 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 },
-                                                modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
+                                                modifier = Modifier
+                                                    .align(Alignment.End)
+                                                    .padding(top = 8.dp),
                                             ) {
                                                 Text("Clear GameSpace List")
                                             }
@@ -811,20 +827,22 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             AnimatedVisibility(visible = android.os.Build.VERSION.SDK_INT == 33 && finishedLoading) {
 
                                     Surface(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp, vertical = 4.dp),
                                         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
                                         shape = RoundedCornerShape(12.dp),
                                     ) {
                                         Column(modifier = Modifier.padding(12.dp)) {
                                             Text(
-                                                text = "⚠️ Android 13 has broken game APIs and the app might not behave as expected.",
+                                                text = stringResource(R.string.a13warning),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                             )
                                             if (currentCommandMode == CommandMode.DEFAULT) {
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
-                                                    text = "Android 13 usually doesn't work with default mode. Switch to alternative mode in settings.",
+                                                    text = stringResource(R.string.android_13_usually_doesn_t_work_with_default_mode_switch_to_alternative_mode_in_settings),
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.9f),
                                                 )
@@ -838,13 +856,15 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             // Alternative Mode Warning Banner
                             AnimatedVisibility(visible = currentCommandMode == CommandMode.ALTERNATIVE && finishedLoading) {
                                     Surface(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp, vertical = 4.dp),
                                         color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f),
                                         shape = RoundedCornerShape(12.dp),
                                     ) {
                                         Column(modifier = Modifier.padding(12.dp)) {
                                             Text(
-                                                text = "Alternative mode is active. Only apps with game category (0) in manifest are supported by system",
+                                                text = stringResource(R.string.alternative_mode_is_active_only_apps_with_game_category_0_in_manifest_are_supported_by_system),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                                             )
@@ -871,15 +891,17 @@ class PerAppDownscaleActivity : ComponentActivity() {
                             if (selectedIndex == 0) {
                                 item {
                                     Surface(
-                                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
                                         color = MaterialTheme.colorScheme.primary,
                                         shape = RoundedCornerShape(16.dp),
                                     ) {
                                         Column(Modifier.padding(8.dp)) {
-                                            Text(text = "Something missing?", fontSize = 24.sp)
+                                            Text(text = stringResource(R.string.something_missing), fontSize = 24.sp)
                                             Text(
                                                 text =
-                                                    "If a game isn't filtered to this tab report it to support group at t.me/themedsupport",
+                                                    stringResource(R.string.if_a_game_isn_t_filtered_to_this_tab_report_it_to_support_group_at_t_me_themedsupport),
                                                 fontSize = 16.sp,
                                             )
                                         }
@@ -888,7 +910,8 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                 item {
                                     LinkButtons(
                                         modifier =
-                                            Modifier.fillMaxWidth()
+                                            Modifier
+                                                .fillMaxWidth()
                                                 .padding(horizontal = 72.dp, vertical = 8.dp)
                                                 .background(
                                                     MaterialTheme.colorScheme.primaryContainer,
@@ -979,7 +1002,8 @@ fun RefreshIndicator(state: PullToRefreshState) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .animateContentSize()
                 .padding(
                     vertical = (state.distanceFraction * 10).roundToInt().dp,
@@ -992,7 +1016,7 @@ fun RefreshIndicator(state: PullToRefreshState) {
         Row(Modifier.padding(horizontal = 16.dp)) {
             val text =
                 when {
-                    state.distanceFraction < 1f -> "Pull to refresh"
+                    state.distanceFraction < 1f -> "Pull to refresh ⤵️"
                     state.distanceFraction < 1.5f -> "Release to refresh ✅"
                     state.distanceFraction < 1.8f -> "Release to refresh 🦎"
                     else ->
