@@ -20,7 +20,7 @@
     <string name="selftest_failed">^^^EXECUTION OF THIS COMMAND FAILED\n^^^APP MIGHT NOT WORK PROPERLY\n^^^PLEASE REPORT THIS TO SUPPORT GROUP</string>
     <string name="it_is_a_known_issue_on_a13">\n(it is a known issue on A13)</string>
     <string name="choose_permissions_mode">Choose permissions mode</string>
-    <string name="checking_privileged_availability">Checking privileged availability...</string>
+    <string name="checking_privileged_availability">Checking privileged availability…</string>
     <string name="failed_to_check_device_capabilities">Failed to check device capabilities</string>
     <string name="retry">Retry</string>
     <string name="root_access_not_available_on_this_device">Root access not available on this device</string>
@@ -33,7 +33,7 @@
     <string name="please_install_shizuku_first">Please install Shizuku first</string>
     <string name="permission_required">Permission required</string>
     <string name="please_configure_shizuku_first">Please configure Shizuku first</string>
-    <string name="loading_list">Loading list...</string>
+    <string name="loading_list">Loading list…</string>
     <string name="no_known_games_found">No known games found</string>
     <string name="no_known_apps_found">No known apps found</string>
     <string name="check_out_apps_tab_tho">Check out apps tab tho 👉</string>

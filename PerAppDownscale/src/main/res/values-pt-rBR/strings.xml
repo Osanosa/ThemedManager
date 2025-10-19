@@ -20,7 +20,7 @@
     <string name="selftest_failed">^^^EXECUÇÃO DESTE COMANDO FALHOU\n^^^O APP PODE NÃO FUNCIONAR CORRETAMENTE\n^^^POR FAVOR REPORTE AO GRUPO DE SUPORTE</string>
     <string name="it_is_a_known_issue_on_a13">\n(este é um problema conhecido no A13)</string>
     <string name="choose_permissions_mode">Escolha o modo de permissões</string>
-    <string name="checking_privileged_availability">Verificando disponibilidade de acesso privilegiado...</string>
+    <string name="checking_privileged_availability">Verificando disponibilidade de acesso privilegiado…</string>
     <string name="failed_to_check_device_capabilities">Falha ao verificar capacidades do dispositivo</string>
     <string name="retry">Tentar novamente</string>
     <string name="root_access_not_available_on_this_device">Acesso root não disponível neste dispositivo</string>
@@ -33,7 +33,7 @@
     <string name="please_install_shizuku_first">Por favor instale o Shizuku primeiro</string>
     <string name="permission_required">Permissão necessária</string>
     <string name="please_configure_shizuku_first">Por favor configure o Shizuku primeiro</string>
-    <string name="loading_list">Carregando lista...</string>
+    <string name="loading_list">Carregando lista…</string>
     <string name="no_known_games_found">Nenhum jogo conhecido encontrado</string>
     <string name="no_known_apps_found">Nenhum app conhecido encontrado</string>
     <string name="check_out_apps_tab_tho">Confira a aba de apps 👉</string>

@@ -20,7 +20,7 @@
     <string name="selftest_failed">^^^اس کمانڈ کی تکمیل ناکام\n^^^ایپ صحیح طریقے سے کام نہیں کر سکتی\n^^^براہ کرم سپورٹ گروپ کو رپورٹ کریں</string>
     <string name="it_is_a_known_issue_on_a13">\n(یہ A13 پر معلوم مسئلہ ہے)</string>
     <string name="choose_permissions_mode">اجازت کا موڈ منتخب کریں</string>
-    <string name="checking_privileged_availability">مراعات یافتہ رسائی کی دستیابی چیک کی جا رہی ہے...</string>
+    <string name="checking_privileged_availability">مراعات یافتہ رسائی کی دستیابی چیک کی جا رہی ہے…</string>
     <string name="failed_to_check_device_capabilities">ڈیوائس کی صلاحیتوں کی جانچ ناکام</string>
     <string name="retry">دوبارہ کوشش کریں</string>
     <string name="root_access_not_available_on_this_device">اس ڈیوائس پر root رسائی دستیاب نہیں</string>
@@ -33,7 +33,7 @@
     <string name="please_install_shizuku_first">براہ کرم پہلے Shizuku انسٹال کریں</string>
     <string name="permission_required">اجازت ضروری</string>
     <string name="please_configure_shizuku_first">براہ کرم پہلے Shizuku کو ترتیب دیں</string>
-    <string name="loading_list">فہرست لوڈ ہو رہی ہے...</string>
+    <string name="loading_list">فہرست لوڈ ہو رہی ہے…</string>
     <string name="no_known_games_found">کوئی معلوم گیمز نہیں ملیں</string>
     <string name="no_known_apps_found">کوئی معلوم ایپس نہیں ملیں</string>
     <string name="check_out_apps_tab_tho">ایپس ٹیب دیکھیں 👉</string>

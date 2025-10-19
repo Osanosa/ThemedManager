@@ -20,7 +20,7 @@
     <string name="selftest_failed">^^^PELAKSANAAN ARAHAN INI GAGAL\n^^^APLIKASI MUNGKIN TIDAK BERFUNGSI DENGAN BAIK\n^^^SILA LAPORKAN KEPADA KUMPULAN SOKONGAN</string>
     <string name="it_is_a_known_issue_on_a13">\n(ini adalah isu yang diketahui pada A13)</string>
     <string name="choose_permissions_mode">Pilih mod kebenaran</string>
-    <string name="checking_privileged_availability">Memeriksa ketersediaan akses istimewa...</string>
+    <string name="checking_privileged_availability">Memeriksa ketersediaan akses istimewa…</string>
     <string name="failed_to_check_device_capabilities">Gagal memeriksa keupayaan peranti</string>
     <string name="retry">Cuba semula</string>
     <string name="root_access_not_available_on_this_device">Akses root tidak tersedia pada peranti ini</string>
@@ -33,7 +33,7 @@
     <string name="please_install_shizuku_first">Sila pasang Shizuku dahulu</string>
     <string name="permission_required">Kebenaran diperlukan</string>
     <string name="please_configure_shizuku_first">Sila konfigurasikan Shizuku dahulu</string>
-    <string name="loading_list">Memuatkan senarai...</string>
+    <string name="loading_list">Memuatkan senarai…</string>
     <string name="no_known_games_found">Tiada game yang dikenali dijumpai</string>
     <string name="no_known_apps_found">Tiada aplikasi yang dikenali dijumpai</string>
     <string name="check_out_apps_tab_tho">Semak tab aplikasi 👉</string>
