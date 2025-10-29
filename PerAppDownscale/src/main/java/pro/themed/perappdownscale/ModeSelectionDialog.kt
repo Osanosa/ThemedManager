@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -58,6 +59,69 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+@Composable
+fun ShizukuInstallDialog(
+    onDismiss: () -> Unit,
+    onPlayStoreSelected: () -> Unit,
+    onGitHubSelected: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier) {
+                Text(
+                    text = "Install Shizuku",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(16.dp),
+                )
+
+                Text(
+                    text = "Choose where to install Shizuku from:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding( 16.dp),
+                )
+
+                // Play Store option
+                Row(
+                    modifier = Modifier
+                        .clickable { onPlayStoreSelected() }
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Google Play Store",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                // GitHub option
+                Row(
+                    modifier = Modifier
+                        .clickable { onGitHubSelected() }
+                        .fillMaxWidth()
+                        .padding( 24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "GitHub Releases",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                // Cancel button
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                ) {
+                    Text("Cancel")
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -253,6 +317,7 @@ fun ModeSelectionDialog(
         mutableStateOf<PrivilegedCommandHelper.AvailabilityStatus?>(null)
     }
     var showSelfTest by remember { mutableStateOf(false) }
+    var showShizukuInstallDialog by remember { mutableStateOf(false) }
     var selectedExecutionMode by remember {
         mutableStateOf<PrivilegedCommandHelper.ExecutionMode?>(null)
     }
@@ -305,39 +370,6 @@ fun ModeSelectionDialog(
         }
     }
 
-    // Function to install Shizuku with fallback
-    fun installShizuku() {
-        try {
-            // Try Play Store first
-            val playStoreIntent =
-                Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("market://details?id=moe.shizuku.privileged.api")
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-            context.startActivity(playStoreIntent)
-        } catch (e: Exception) {
-            try {
-                // Fallback to browser Play Store
-                val browserIntent =
-                    Intent(Intent.ACTION_VIEW).apply {
-                        data =
-                            Uri.parse(
-                                "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
-                            )
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                context.startActivity(browserIntent)
-            } catch (e2: Exception) {
-                // Final fallback to GitHub releases
-                val githubIntent =
-                    Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse("https://github.com/RikkaApps/Shizuku/releases")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                context.startActivity(githubIntent)
-            }
-        }
-    }
 
     // Function to open Shizuku app for configuration
     fun openShizukuApp() {
@@ -626,13 +658,7 @@ fun ModeSelectionDialog(
                                 !status.shizukuInstalled -> {
                                     IconButton(
                                         onClick = {
-                                            installShizuku()
-                                            // Update status after a short delay to check if install
-                                            // started
-                                            scope.launch {
-                                                delay(1000)
-                                                updateStatus()
-                                            }
+                                            showShizukuInstallDialog = true
                                         }
                                     ) {
                                         Icon(
@@ -827,6 +853,51 @@ fun ModeSelectionDialog(
             },
             helper = helper,
             mode = selectedExecutionMode!!,
+        )
+    }
+
+    // Show Shizuku install dialog when needed
+    if (showShizukuInstallDialog) {
+        ShizukuInstallDialog(
+            onDismiss = { showShizukuInstallDialog = false },
+            onPlayStoreSelected = {
+                showShizukuInstallDialog = false
+                try {
+                    val playStoreIntent =
+                        Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse("market://details?id=moe.shizuku.privileged.api")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                    context.startActivity(playStoreIntent)
+                } catch (e: Exception) {
+                    try {
+                        val browserIntent =
+                            Intent(Intent.ACTION_VIEW).apply {
+                                data =
+                                    Uri.parse(
+                                        "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
+                                    )
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                        context.startActivity(browserIntent)
+                    } catch (e2: Exception) {
+                        Toast.makeText(context, "Unable to open Play Store", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            onGitHubSelected = {
+                showShizukuInstallDialog = false
+                try {
+                    val githubIntent =
+                        Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse("https://github.com/RikkaApps/Shizuku/releases")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                    context.startActivity(githubIntent)
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Unable to open GitHub", Toast.LENGTH_SHORT).show()
+                }
+            }
         )
     }
 }

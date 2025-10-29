@@ -101,4 +101,7 @@ dependencies {
     // Shizuku support
     implementation("dev.rikka.shizuku:api:12.1.0")
     implementation("dev.rikka.shizuku:provider:12.1.0")
+
+    // Google Play Billing
+    implementation("com.android.billingclient:billing:7.1.1")
 }

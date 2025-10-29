@@ -96,10 +96,12 @@ import kotlinx.coroutines.withContext
 import pro.themed.perappdownscale.ui.theme.ThemedManagerTheme
 import rikka.shizuku.Shizuku
 import java.security.MessageDigest
+import androidx.compose.runtime.collectAsState
 import kotlin.math.roundToInt
 
 class PerAppDownscaleActivity : ComponentActivity() {
     private lateinit var analytics: FirebaseAnalytics
+    private lateinit var billingManager: BillingManager
 
     // Shizuku permission request result listener
     private val permissionResultListener =
@@ -133,6 +135,7 @@ class PerAppDownscaleActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         analytics = Firebase.analytics
+        billingManager = BillingManager(this)
 
         val scope = CoroutineScope(Dispatchers.Main)
 
@@ -160,6 +163,10 @@ class PerAppDownscaleActivity : ComponentActivity() {
         Shizuku.addBinderDeadListener(binderDeadListener)
 
         enableEdgeToEdge()
+
+        // Check for AdFree purchases within 10 second timeout
+        billingManager.checkPurchasesWithinTimeout(10000)
+
         setContent {
             val context = LocalContext.current
             val prefs: SharedPreferences = context.getSharedPreferences("app_tips", MODE_PRIVATE)
@@ -231,10 +238,12 @@ class PerAppDownscaleActivity : ComponentActivity() {
                 var showModeDialog by rememberSaveable { mutableStateOf(false) }
                 var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
                 var showCommandModeDialog by rememberSaveable { mutableStateOf(false) }
+                var showAdFreeTipDialog by rememberSaveable { mutableStateOf(false) }
                 var shizukuAvailable by rememberSaveable { mutableStateOf(false) }
                 var shizukuInstalled by rememberSaveable { mutableStateOf(false) }
                 var rootAvailable by rememberSaveable { mutableStateOf(false) }
                 var rootPermissionDenied by rememberSaveable { mutableStateOf(false) }
+                var isFirebaseContributor by rememberSaveable { mutableStateOf(false) }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 val coroutineScope = rememberCoroutineScope()
                 
@@ -242,7 +251,7 @@ class PerAppDownscaleActivity : ComponentActivity() {
                 val commandModePrefs = context.getSharedPreferences("command_mode_prefs", MODE_PRIVATE)
                 var currentCommandMode by rememberSaveable {
                     mutableStateOf(
-                        when (commandModePrefs.getInt("command_mode", 0)) {
+                        when (commandModePrefs.getInt("command_mode", if (android.os.Build.VERSION.SDK_INT != 33) 0 else 1)) {
                             0 -> CommandMode.DEFAULT
                             1 -> CommandMode.ALTERNATIVE
                             else -> CommandMode.DEFAULT
@@ -921,8 +930,18 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        LaunchedEffect(Unit) { FirebaseIsContributor(context, privilegedHelper) }
-                        Row { AdmobBanner(context) }
+                        LaunchedEffect(Unit) {
+                            FirebaseIsContributor(context, privilegedHelper) { isContributor, date ->
+                                isFirebaseContributor = isContributor
+                                Log.d("PerAppDownscaleActivity", "Firebase contributor status updated: $isContributor")
+                            }
+                        }
+
+                        // Show ads only if user is not a contributor (neither Firebase nor AdFree purchase)
+                        val purchaseState by billingManager.purchaseState.collectAsState()
+                        if (!purchaseState.isAdFreePurchased && !isFirebaseContributor) {
+                            Row { AdmobBanner(context) }
+                        }
                     }
                 }
 
@@ -949,6 +968,10 @@ class PerAppDownscaleActivity : ComponentActivity() {
                         onCommandModeClicked = {
                             showSettingsDialog = false
                             showCommandModeDialog = true
+                        },
+                        onAdFreeTipClicked = {
+                            showSettingsDialog = false
+                            showAdFreeTipDialog = true
                         }
                     )
                 }
@@ -968,6 +991,15 @@ class PerAppDownscaleActivity : ComponentActivity() {
                                 }
                             ).apply()
                         }
+                    )
+                }
+
+                // AdFree/Tip Dialog
+                if (showAdFreeTipDialog) {
+                    AdFreeTipDialog(
+                        onDismiss = { showAdFreeTipDialog = false },
+                        billingManager = billingManager,
+                        activity = this@PerAppDownscaleActivity
                     )
                 }
             }

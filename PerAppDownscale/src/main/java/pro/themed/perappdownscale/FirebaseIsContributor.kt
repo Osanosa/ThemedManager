@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 fun FirebaseIsContributor(
     context: Context,
-    privilegedHelper: PrivilegedCommandHelper
+    privilegedHelper: PrivilegedCommandHelper,
+    onContributorStatusChanged: (Boolean, String?) -> Unit
 ) {
     val sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
     CoroutineScope(Dispatchers.IO).launch {
@@ -38,30 +39,23 @@ Thread.sleep(5000)
 
                 // If the subkey doesn't exist, set isSubkeyPresent to false
                 if (isSubkeyPresent) {
-                    sharedPreferences.edit().putBoolean("isContributor", true).apply()
-                    sharedPreferences
-                        .edit {
-                            putString(
-                                "isContributorDate",
-                                "${dataSnapshot.getValue(String::class.java)}"
-                            )
-                        }
+                    val contributorDate = dataSnapshot.getValue(String::class.java)
+                    onContributorStatusChanged(true, contributorDate)
                     Toast.makeText(context, "THANK YOU FOR YOUR CONTRIBUTION", Toast.LENGTH_SHORT)
                         .show()
 
-                    Log.d("DATABASE", "ENTRY FOUND")
+                    Log.d("DATABASE", "ENTRY FOUND - Firebase Contributor: true")
                 } else {
-                    sharedPreferences.edit().putBoolean("isContributor", false).apply()
-                    sharedPreferences.edit().putString("isContributorDate", "null").apply()
+                    onContributorStatusChanged(false, null)
 
-                    Log.d("DATABASE", "ENTRY NOT FOUND")
+                    Log.d("DATABASE", "ENTRY NOT FOUND - Firebase Contributor: false")
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Handle any errors here
-                sharedPreferences.edit().putBoolean("isContributor", false).apply()
-                Log.d("DATABASE", "ENTRY SEARCH FAILED")
+                onContributorStatusChanged(false, null)
+                Log.d("DATABASE", "ENTRY SEARCH FAILED - Firebase Contributor: false")
             }
         }
     )
