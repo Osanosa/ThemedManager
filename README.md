@@ -1,5 +1,13 @@
+Source for all the apps made under Themed Project umbrella
 
-# ThemedManager
-
-
-This repository contains source code of overlay manager app found at https://github.com/Magisk-Modules-Alt-Repo/ThemedProject
+- Themed Manager
+- PXLSRTR
+- TMPAD
+- TMARR
+- AuL
+- MTK-BPF-PATCHER
+- FileSizes
+- CSM3
+- FM3
+- VBMetaPatcher
+  
